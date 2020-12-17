@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "moduleResolution": "node",
+    // "jsx": "preserve",
+    "esModuleInterop": true,
+    "outDir": "build/dist",
+    "declaration": true,
+
+    "allowSyntheticDefaultImports": true,
+
+    "downlevelIteration": true,
+    "importHelpers": false,
+    "sourceMap": true,
+    "module": "esnext",
+
+    "jsx": "react",
+    "allowJs": true,
+    // "noEmit": true,
+    "checkJs": false,
+    "lib": ["dom", "es2015", "es2016", "es2017", "esnext"],
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    // "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "suppressImplicitAnyIndexErrors": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@@/*": ["src/.umi/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "lib",
+    "es",
+    "dist",
+    "typings",
+    "**/__test__",
+    "test"
+  ]
+}

@@ -1,0 +1,8 @@
+test/fixtures
+dist
+es
+lib
+config/
+.doc
+.umi
+.umi-production
