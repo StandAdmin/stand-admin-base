@@ -3,7 +3,13 @@ import { notification, Modal } from 'antd';
 import { merge, get } from 'lodash';
 // import Localforage from 'localforage';
 
-import { IResponse, TAsyncFnAny, ICommonObj } from './interface';
+import {
+  IResponse,
+  TAsyncFnAny,
+  ICommonObj,
+  IStandModelOptions,
+  IStandConfigModelOptions,
+} from './interface';
 
 function delayP(ms: number, val = true) {
   return new Promise(resolve => {
@@ -14,6 +20,8 @@ function delayP(ms: number, val = true) {
 // const localforage = Localforage.createInstance({
 //   name: 'StandModel',
 // });
+
+const isFunction = (f: any) => typeof f === 'function';
 
 function convertParamsName(
   params: ICommonObj,
@@ -112,23 +120,7 @@ export function getDynamicModelPkg(modelPkg: any, nsPre: string) {
   };
 }
 
-export function getStandModel(opts: {
-  idFieldName?: string;
-  nameFieldName?: string;
-  fldsPathInResp?: {
-    [key: string]: string[] | string;
-  };
-  searchParamsMap?: {
-    [key: string]: string;
-  };
-  StoreNs: string;
-  StoreNsTitle: string;
-  searchRecords?: TAsyncFnAny;
-  addRecord?: TAsyncFnAny;
-  updateRecord?: TAsyncFnAny;
-  deleteRecord?: TAsyncFnAny;
-  extensions: any;
-}) {
+export function getStandModel(opts: IStandModelOptions) {
   const {
     idFieldName = 'id',
     nameFieldName = 'name',
@@ -152,6 +144,10 @@ export function getStandModel(opts: {
     deleteRecord,
     extensions,
   } = opts;
+
+  if (!StoreNs) {
+    throw new Error(`StoreNs should no be empty!`);
+  }
 
   // const LSKey_SearchParams = `${StoreNs}_searchParams`;
 
@@ -516,8 +512,53 @@ export function getStandModel(opts: {
       //   },
       // },
     },
-    typeof extensions === 'function'
+    isFunction(extensions)
       ? extensions({ ...opts, handleRespError })
       : extensions,
   );
+}
+
+export function getStandConfigModel(opts: IStandConfigModelOptions) {
+  const { getConfig, StoreNs } = opts;
+
+  if (!StoreNs) {
+    throw new Error(`StoreNs should no be empty!`);
+  }
+
+  return {
+    namespace: StoreNs,
+    state: {},
+    effects: {
+      *loadConfig(_: any, { all, call, put }: any) {
+        const results: ICommonObj[] = yield all(
+          (Array.isArray(getConfig) ? getConfig : [getConfig]).map(item =>
+            isFunction(item) ? call(item) : Promise.resolve(item),
+          ),
+        );
+
+        yield put({
+          type: 'saveState',
+          payload: results.reduce((map, item) => {
+            Object.assign(map, item);
+            return map;
+          }, {}),
+        });
+      },
+    },
+    reducers: {
+      saveState(state: any, action: { payload: any }) {
+        return {
+          ...state,
+          ...action.payload,
+        };
+      },
+    },
+    subscriptions: {
+      setup({ dispatch }: any) {
+        dispatch({
+          type: 'loadConfig',
+        });
+      },
+    },
+  };
 }

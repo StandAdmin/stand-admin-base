@@ -17,6 +17,33 @@ export type TCommonObjOrEmpty = ICommonObj | undefined | null;
 
 export type TFnParamsFilter = (...args: any[]) => TCommonObjOrEmpty;
 
+export interface IStandModelOptions {
+  idFieldName?: string;
+  nameFieldName?: string;
+  fldsPathInResp?: {
+    [key: string]: string[] | string;
+  };
+  searchParamsMap?: {
+    [key: string]: string;
+  };
+  StoreNs: string;
+  StoreNsTitle: string;
+  searchRecords?: TAsyncFnAny;
+  addRecord?: TAsyncFnAny;
+  updateRecord?: TAsyncFnAny;
+  deleteRecord?: TAsyncFnAny;
+  extensions: any;
+}
+
+export type TGetConfigFn = () => Promise<ICommonObj>;
+
+export type TGetConfigItem = TGetConfigFn | ICommonObj;
+
+export interface IStandConfigModelOptions {
+  StoreNs: string;
+  getConfig: TGetConfigItem | TGetConfigItem[];
+}
+
 export interface IResponse {
   success: boolean;
   message?: string;
