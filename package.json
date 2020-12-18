@@ -1,6 +1,6 @@
 {
   "name": "stand-admin-base",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A CRUD framework work perfectly with Antd Pro",
   "scripts": {
     "start": "dumi dev",

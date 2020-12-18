@@ -1,7 +1,9 @@
 import { identity } from 'lodash';
 
+import { ICommonObj } from '../interface';
+
 export default {
-  mapToOptions(obj, opts) {
+  mapToOptions(obj: ICommonObj, opts: { valueFilter: (val: any) => any }) {
     const { valueFilter = identity } = opts || {};
 
     return Object.keys(obj).map(key => ({
@@ -9,7 +11,7 @@ export default {
       label: obj[key],
     }));
   },
-  arrayToOptions(arr) {
+  arrayToOptions(arr: any[]) {
     return arr.map(value => ({ value, label: value }));
   },
 };
