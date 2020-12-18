@@ -33,7 +33,7 @@ const getNewMountId = () => {
 };
 
 export default function(hocParams: IRecordsHocParams) {
-  const { recordModel, configModel, connect, ...restHocParams } = hocParams;
+  const { recordModel, configModel, getConnect, ...restHocParams } = hocParams;
 
   const { idFieldName = 'id', nameFieldName = 'name', StoreNsTitle, StoreNs } =
     recordModel || {};
@@ -292,7 +292,7 @@ export default function(hocParams: IRecordsHocParams) {
           syncParamsToUrl,
           passSearchWhenParamsEqual,
           urlParamsNs,
-          history,
+          getHistory,
         } = this.props;
 
         const urlQueryParams = { ns: urlParamsNs };
@@ -330,6 +330,8 @@ export default function(hocParams: IRecordsHocParams) {
             this.searchRecords(params);
             return;
           }
+
+          const history = getHistory();
 
           history.push({
             pathname: history.location.pathname,
@@ -744,7 +746,7 @@ export default function(hocParams: IRecordsHocParams) {
       }
     }
 
-    return connect(
+    return getConnect()(
       ({
         [StoreNs]: storeRef,
         [ConfigStoreNs]: configStoreRef,

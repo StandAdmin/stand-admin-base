@@ -118,7 +118,7 @@ export interface History {
 
 export interface IConfigLoadingHocParams {
   configModel: IModelPkg;
-  connect: TFnAny;
+  getConnect: () => TFnAny;
 }
 export interface IRecordsHocBaseParams {
   updateSearchParamsEvenError?: boolean;
@@ -141,8 +141,8 @@ export interface IRecordsHocBaseParams {
   onRefresh?: () => void;
   callStoreActionPayloadFilter?: (action: string, payload: any) => void;
   getDvaApp: () => DvaApp;
-  history: History;
-  connect: TFnAny;
+  getHistory: () => History;
+  getConnect: () => TFnAny;
 }
 
 export interface IRecordsHocParams

@@ -19,12 +19,12 @@ export * from './hooks/useStandUpsertForm';
 export * from './hooks/useStandTableList';
 
 export const StandConfigLoadingHoc = (hocParams: IConfigLoadingHocParams) => {
-  const { configModel, connect } = hocParams;
+  const { configModel, getConnect } = hocParams;
 
   const { StoreNs: ConfigStoreNs } = configModel || {};
 
   return (WrappedComponent: React.ComponentType<any>) =>
-    connect(({ loading }: any) => ({
+    getConnect()(({ loading }: any) => ({
       configLoading: loading.effects[`${ConfigStoreNs}/loadConfig`],
     }))(WrappedComponent);
 };
