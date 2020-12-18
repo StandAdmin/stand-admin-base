@@ -116,6 +116,10 @@ export interface History {
   location: any;
 }
 
+export interface IConfigLoadingHocParams {
+  configModel: IModelPkg;
+  connect: TFnAny;
+}
 export interface IRecordsHocBaseParams {
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
