@@ -17,6 +17,24 @@ export type TCommonObjOrEmpty = ICommonObj | undefined | null;
 
 export type TFnParamsFilter = (...args: any[]) => TCommonObjOrEmpty;
 
+export interface IResponse {
+  success: boolean;
+  message?: string;
+  permissionApplyUrl?: string;
+  data?: any;
+  [key: string]: any;
+}
+
+export interface IResponseOfSearchRecords extends IResponse {
+  data: {
+    list?: any[];
+    total?: number;
+    pageNum?: number;
+    pageSize?: number;
+    [key: string]: any;
+  };
+}
+
 export interface IStandModelOptions {
   idFieldName?: string;
   nameFieldName?: string;
@@ -28,10 +46,10 @@ export interface IStandModelOptions {
   };
   StoreNs: string;
   StoreNsTitle: string;
-  searchRecords?: TAsyncFnAny;
-  addRecord?: TAsyncFnAny;
-  updateRecord?: TAsyncFnAny;
-  deleteRecord?: TAsyncFnAny;
+  searchRecords?: (params?: ICommonObj) => Promise<IResponseOfSearchRecords>;
+  addRecord?: (record: ICommonObj) => Promise<IResponse>;
+  updateRecord?: (record: ICommonObj) => Promise<IResponse>;
+  deleteRecord?: (params: ICommonObj) => Promise<IResponse>;
   extensions: any;
 }
 
@@ -42,14 +60,6 @@ export type TGetConfigItem = TGetConfigFn | ICommonObj;
 export interface IStandConfigModelOptions {
   StoreNs: string;
   getConfig: TGetConfigItem | TGetConfigItem[];
-}
-
-export interface IResponse {
-  success: boolean;
-  message?: string;
-  permissionApplyUrl?: string;
-  data?: any;
-  [key: string]: any;
 }
 
 export interface IStoreActionParams {
