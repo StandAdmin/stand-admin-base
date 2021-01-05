@@ -12,13 +12,16 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
   const globalRecordCache: ICommonObj = {};
 
   return (WrappedComponent: React.ComponentType<any>) => {
-    const Comp: React.FC<TListCtrlProps<R>> = props => {
+    const Comp: React.FC<TListCtrlProps<R> & {
+      onChangeWithData?: (list: R[]) => void;
+    }> = props => {
       const { getRecordId, idFieldName, nameFieldName } = props;
 
       const {
         checkedIdList: origCheckedIdList,
         getRecordMapByIdList,
         onChange: origOnChange,
+        onChangeWithData,
         ...rest
       } = props;
 
@@ -62,7 +65,14 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
           }, {}),
         );
 
-        return origOnChange(itemList.map((item: R) => getRecordId(item)));
+        if (onChangeWithData) {
+          onChangeWithData(itemList);
+        }
+
+        return (
+          origOnChange &&
+          origOnChange(itemList.map((item: R) => getRecordId(item)))
+        );
       });
 
       useEffect(() => {
