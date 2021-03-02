@@ -47,6 +47,7 @@ export interface IStandModelOptions {
   StoreNs: string;
   StoreNsTitle: string;
   searchRecords?: (params?: ICommonObj) => Promise<IResponseOfSearchRecords>;
+  getRecord?: (params?: ICommonObj) => Promise<IResponse>;
   addRecord?: (record: ICommonObj) => Promise<IResponse>;
   updateRecord?: (record: ICommonObj) => Promise<IResponse>;
   deleteRecord?: (params: ICommonObj) => Promise<IResponse>;
@@ -257,6 +258,7 @@ export interface IStandContextProps<R = any>
   updateRecord: (record: R, callback?: (resp: any) => void) => Promise<any>;
   addRecord: (record: R, callback?: (resp: any) => void) => Promise<any>;
   showRecordForm: (activeRecord: any, recordFormVisibleTag?: any) => void;
+  loadAndShowRecordForm: (params: any, recordFormVisibleTag?: any) => void;
   deleteRecord: (
     params: ICommonObj,
     callback?: (resp: any) => void,

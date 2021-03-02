@@ -139,6 +139,7 @@ export function getStandModel(opts: IStandModelOptions) {
     StoreNs,
     StoreNsTitle,
     searchRecords,
+    getRecord,
     addRecord,
     updateRecord,
     deleteRecord,
@@ -211,13 +212,26 @@ export function getStandModel(opts: IStandModelOptions) {
           );
 
           if (!response || !response.success) {
-            handleRespError({ response, errorTitle: '获取单一结果失败' });
+            handleRespError({ response, errorTitle: '查询单一结果失败' });
             return false;
           }
 
           const { list, total } = getCommonFlds(response);
 
           return total > 0 ? list[0] : null;
+        },
+        *getOne({ params }: { params?: any }, { call }: any) {
+          const response: any = yield call(
+            getRecord,
+            filterParams({ ...params }),
+          );
+
+          if (!response || !response.success) {
+            handleRespError({ response, errorTitle: '获取单一结果失败' });
+            return false;
+          }
+
+          return response.data;
         },
         *search(
           {

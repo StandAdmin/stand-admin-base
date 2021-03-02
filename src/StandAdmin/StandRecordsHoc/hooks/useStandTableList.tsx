@@ -53,6 +53,7 @@ export function useStandTableList(props: any) {
   const {
     renderPagination,
     showRecordForm,
+    loadAndShowRecordForm,
     storeRef,
     getRecordId,
     idFieldName,
@@ -109,6 +110,7 @@ export function useStandTableList(props: any) {
     config: context.configStoreRef,
     records,
     showRecordForm,
+    loadAndShowRecordForm,
     tableListStyles: styles,
     tableListProps,
     searchLoading,

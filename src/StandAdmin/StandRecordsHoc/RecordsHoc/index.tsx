@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { LoadingOutlined } from '@ant-design/icons';
-import { Empty, Pagination, message } from 'antd';
+import { Empty, Pagination, message, Modal, Spin } from 'antd';
 import classNames from 'classnames';
 import { isEqual, debounce, pick } from 'lodash';
 import { toUrlQuery, fromUrlQuery } from '../../utils/urlQueryHelper';
@@ -359,6 +359,29 @@ export default function(hocParams: IRecordsHocParams) {
         });
       };
 
+      loadAndShowRecordForm = (params: any, recordFormVisibleTag = true) => {
+        const { dispatch } = this.props;
+
+        const modal = Modal.info({
+          content: <Spin />,
+          maskClosable: false,
+          okButtonProps: { style: { display: 'none' } },
+        });
+
+        (dispatch({
+          type: `${StoreNs}/getOne`,
+          params,
+        }) as Promise<any>)
+          .then(activeRecord => {
+            if (activeRecord) {
+              this.showRecordForm(activeRecord, recordFormVisibleTag);
+            }
+          })
+          .finally(() => {
+            modal.destroy();
+          });
+      };
+
       showRecordForm = (activeRecord: any, recordFormVisibleTag = true) => {
         const { dispatch, onRecordFormVisibleTagChange } = this.props;
         (dispatch({
@@ -647,6 +670,7 @@ export default function(hocParams: IRecordsHocParams) {
           getSearchParams,
           reloadSearch,
           searchRecords,
+          loadAndShowRecordForm,
           getUrlParams,
           showEmptyRecordForm,
           callAction,
@@ -692,6 +716,7 @@ export default function(hocParams: IRecordsHocParams) {
           updateRecord,
           addRecord,
           showRecordForm,
+          loadAndShowRecordForm,
           deleteRecord,
           goSearch,
           getSearchParams,
