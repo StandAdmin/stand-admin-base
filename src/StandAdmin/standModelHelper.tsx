@@ -341,23 +341,27 @@ export function getStandModel(opts: IStandModelOptions) {
           return true;
         },
         *findRecordById({ id }: { id: any }, { select }: any) {
-          const records = yield select((state: any) => state[StoreNs].records);
+          const records: any[] = yield select(
+            (state: any) => state[StoreNs].records,
+          );
           return records.find((item: any) => item[idFieldName] === id);
         },
         *blinkRecordById(
           { id, timeout = 2000 }: { id: any; timeout: number },
           { put }: any,
         ) {
-          const recordItem = yield put.resolve({
+          const recordItem: any = yield put.resolve({
             type: 'findRecordById',
             id,
           });
 
-          return yield put({
+          yield put({
             type: 'blinkRecord',
             record: recordItem || null,
             timeout,
           });
+
+          return true;
         },
         *blinkRecord(
           { record, timeout = 2000 }: { record: any; timeout?: number },
@@ -385,7 +389,7 @@ export function getStandModel(opts: IStandModelOptions) {
           }: { record: any; callback?: (resp: IResponse) => void },
           { call }: any,
         ) {
-          const response = yield call(addRecord, record);
+          const response: IResponse = yield call(addRecord, record);
 
           if (!response || !response.success) {
             handleRespError({ response, errorTitle: '新建失败' });
@@ -402,7 +406,7 @@ export function getStandModel(opts: IStandModelOptions) {
           }: { record: any; callback?: (resp: IResponse) => void },
           { call }: any,
         ) {
-          const response = yield call(updateRecord, record);
+          const response: IResponse = yield call(updateRecord, record);
 
           if (!response || !response.success) {
             handleRespError({ response, errorTitle: '更新失败' });
@@ -420,7 +424,7 @@ export function getStandModel(opts: IStandModelOptions) {
         ) {
           const { [idFieldName]: id } = params;
 
-          const recordItem = id
+          const recordItem: any = id
             ? yield put.resolve({
                 type: 'findRecordById',
                 id,
@@ -432,7 +436,7 @@ export function getStandModel(opts: IStandModelOptions) {
             record: recordItem || null,
           });
 
-          const response = yield call(deleteRecord, params);
+          const response: IResponse = yield call(deleteRecord, params);
 
           yield put({
             type: 'setRemovingRecord',
@@ -460,7 +464,10 @@ export function getStandModel(opts: IStandModelOptions) {
           },
           { call }: any,
         ) {
-          const response = yield call(serviceFunction, ...serviceParams);
+          const response: IResponse = yield call(
+            serviceFunction,
+            ...serviceParams,
+          );
 
           if (!response || !response.success) {
             handleRespError({
