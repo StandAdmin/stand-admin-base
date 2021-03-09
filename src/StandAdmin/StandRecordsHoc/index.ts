@@ -1,6 +1,6 @@
 import styles from './styles';
 
-import { StandContext } from '../const';
+import { StandContext, ConfigLoadingFld, ConfigLoadingMethod } from '../const';
 
 import StandListCtrlHoc from './ListCtrlHoc';
 import StandRecordsHoc from './RecordsHoc';
@@ -24,7 +24,14 @@ export const StandConfigLoadingHoc = (hocParams: IConfigLoadingHocParams) => {
   const { StoreNs: ConfigStoreNs } = configModel || {};
 
   return (WrappedComponent: React.ComponentType<any>) =>
-    getConnect()(({ loading }: any) => ({
-      configLoading: loading.effects[`${ConfigStoreNs}/loadConfig`],
-    }))(WrappedComponent);
+    getConnect()(({ loading, [ConfigStoreNs]: configStoreRef }: any) => {
+      const configStoreRefState =
+        configStoreRef || configModel.default.state || {};
+
+      return {
+        configLoading:
+          loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`] ||
+          configStoreRefState[ConfigLoadingFld],
+      };
+    })(WrappedComponent);
 };

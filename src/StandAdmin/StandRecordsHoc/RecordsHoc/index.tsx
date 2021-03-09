@@ -6,7 +6,11 @@ import classNames from 'classnames';
 import { isEqual, debounce, pick } from 'lodash';
 import { toUrlQuery, fromUrlQuery } from '../../utils/urlQueryHelper';
 import ActionCounterHoc from '../../ActionCounterHoc';
-import { StandContext } from '../../const';
+import {
+  StandContext,
+  ConfigLoadingFld,
+  ConfigLoadingMethod,
+} from '../../const';
 import {
   IRecordsProps,
   IRecordsHocParams,
@@ -129,7 +133,7 @@ export default function(hocParams: IRecordsHocParams) {
         const app = getDvaApp();
 
         if (!app) {
-          throw new Error('App still empty now!!');
+          throw new Error('DvaApp still empty now!!');
         }
 
         return app;
@@ -142,7 +146,7 @@ export default function(hocParams: IRecordsHocParams) {
         const existModels = app._models;
 
         if (!existModels) {
-          throw new Error('_models not exists on app');
+          throw new Error('_models not exists on DvaApp');
         }
 
         return existModels.some((model: any) => model.namespace === namespace);
@@ -156,14 +160,14 @@ export default function(hocParams: IRecordsHocParams) {
         const app = this.getDvaApp();
 
         this.getRelModelPkgs().forEach(modelPkg => {
+          if (this.isModelNsExists(modelPkg.StoreNs)) {
+            // console.warn(`Model alreay exists: ${modelPkg.StoreNs}`);
+            return;
+          }
+
+          app.model(modelPkg.default);
+
           if (modelPkg.isDynamic) {
-            if (this.isModelNsExists(modelPkg.StoreNs)) {
-              console.warn(`Model alreay exists: ${modelPkg.StoreNs}`);
-              return;
-            }
-
-            app.model(modelPkg.default);
-
             this.autoRegisteredStoreNsMap[modelPkg.StoreNs] = true;
           }
         });
@@ -175,7 +179,6 @@ export default function(hocParams: IRecordsHocParams) {
         this.getRelModelPkgs().forEach(modelPkg => {
           if (this.autoRegisteredStoreNsMap[modelPkg.StoreNs]) {
             app.unmodel(modelPkg.StoreNs);
-
             delete this.autoRegisteredStoreNsMap[modelPkg.StoreNs];
           }
         });
@@ -776,12 +779,21 @@ export default function(hocParams: IRecordsHocParams) {
         [StoreNs]: storeRef,
         [ConfigStoreNs]: configStoreRef,
         loading,
-      }: any) => ({
-        storeRef: storeRef || recordModel.default.state,
-        configStoreRef: configStoreRef || configModel.default.state,
-        searchLoading: loading.effects[`${StoreNs}/search`],
-        configLoading: loading.effects[`${ConfigStoreNs}/loadConfig`],
-      }),
+      }: any) => {
+        const storeRefState = storeRef || recordModel.default.state || {};
+
+        const configStoreRefState =
+          configStoreRef || configModel.default.state || {};
+
+        return {
+          storeRef: storeRefState,
+          configStoreRef: configStoreRefState,
+          searchLoading: loading.effects[`${StoreNs}/search`],
+          configLoading:
+            loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`] ||
+            configStoreRefState[ConfigLoadingFld],
+        };
+      },
     )(ActionCounterHoc()(Comp as any));
   };
 }
