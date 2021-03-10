@@ -17,6 +17,7 @@ export {
 export * from './hooks/useStandSearchForm';
 export * from './hooks/useStandUpsertForm';
 export * from './hooks/useStandTableList';
+export * from './hooks/useStandContext';
 
 export const StandConfigLoadingHoc = (hocParams: IConfigLoadingHocParams) => {
   const { configModel, getConnect } = hocParams;
