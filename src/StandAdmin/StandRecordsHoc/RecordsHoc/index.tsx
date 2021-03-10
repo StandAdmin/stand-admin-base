@@ -63,6 +63,7 @@ export default function(hocParams: IRecordsHocParams) {
     sorterSearchParams: undefined,
     reservedUrlParamNames: [],
     useLastSavedSearchParamsOnMount: false,
+    placeholderIfConfigLoading: true,
     ...restHocParams,
   };
 
@@ -673,6 +674,18 @@ export default function(hocParams: IRecordsHocParams) {
       getRecordName = (record: any) => record && record[nameFieldName];
 
       render() {
+        const { configLoading, placeholderIfConfigLoading } = this.props;
+
+        if (configLoading && placeholderIfConfigLoading) {
+          return placeholderIfConfigLoading === true ? (
+            <Spin />
+          ) : (
+            placeholderIfConfigLoading
+          );
+        }
+
+        const { wrapperClassName, ...restProps } = this.props;
+
         const {
           getRecordName,
           clearActiveRecord,
@@ -703,13 +716,10 @@ export default function(hocParams: IRecordsHocParams) {
           getConfigModelPkg,
         } = this;
 
-        const { wrapperClassName, ...restProps } = this.props;
-
         const {
           storeRef,
           configStoreRef,
           searchLoading,
-          configLoading,
           increaseActionCount,
           decreaseActionCount,
           getActionCount,

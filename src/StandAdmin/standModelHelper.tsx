@@ -550,7 +550,7 @@ export function getStandConfigModel(opts: IStandConfigModelOptions) {
 
   return {
     namespace: StoreNs,
-    state: { [ConfigLoadingFld]: false },
+    state: { [ConfigLoadingFld]: true },
     effects: {
       *[ConfigLoadingMethod](_: any, { all, call, put }: any) {
         put({

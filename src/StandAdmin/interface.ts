@@ -148,6 +148,7 @@ export interface IRecordsHocBaseParams {
   filterSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
   reservedUrlParamNames?: string[];
   useLastSavedSearchParamsOnMount?: boolean;
+  placeholderIfConfigLoading?: boolean | React.ReactNode;
   wrapperClassName?: string;
   formNamePrefix?: string;
   onRecordFormVisibleTagChange?: (recordFormVisibleTag: any) => void;
