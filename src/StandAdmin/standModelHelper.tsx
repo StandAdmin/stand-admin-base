@@ -2,6 +2,7 @@ import React from 'react';
 import { notification, Modal } from 'antd';
 import { merge, get } from 'lodash';
 // import Localforage from 'localforage';
+import { ConfigLoadingFld, ConfigLoadingMethod } from './const';
 
 import {
   IResponse,
@@ -9,6 +10,7 @@ import {
   ICommonObj,
   IStandModelOptions,
   IStandConfigModelOptions,
+  IModelPkg,
 } from './interface';
 
 function delayP(ms: number, val = true) {
@@ -103,7 +105,7 @@ export function handleCommonRespError(
   });
 }
 
-export function getDynamicModelPkg(modelPkg: any, nsPre: string) {
+export function getDynamicModelPkg(modelPkg: IModelPkg, nsPre: string) {
   const { modelOpts, StoreNs } = modelPkg;
 
   if (!modelOpts) {
@@ -548,9 +550,14 @@ export function getStandConfigModel(opts: IStandConfigModelOptions) {
 
   return {
     namespace: StoreNs,
-    state: {},
+    state: { [ConfigLoadingFld]: false },
     effects: {
-      *loadConfig(_: any, { all, call, put }: any) {
+      *[ConfigLoadingMethod](_: any, { all, call, put }: any) {
+        put({
+          type: 'saveState',
+          payload: { [ConfigLoadingFld]: true },
+        });
+
         const results: ICommonObj[] = yield all(
           (Array.isArray(getConfig) ? getConfig : [getConfig]).map(item =>
             isFunction(item) ? call(item) : Promise.resolve(item),
@@ -559,10 +566,13 @@ export function getStandConfigModel(opts: IStandConfigModelOptions) {
 
         yield put({
           type: 'saveState',
-          payload: results.reduce((map, item) => {
-            Object.assign(map, item);
-            return map;
-          }, {}),
+          payload: results.reduce(
+            (map, item) => {
+              Object.assign(map, item);
+              return map;
+            },
+            { [ConfigLoadingFld]: false },
+          ),
         });
       },
     },
@@ -577,9 +587,36 @@ export function getStandConfigModel(opts: IStandConfigModelOptions) {
     subscriptions: {
       setup({ dispatch }: any) {
         dispatch({
-          type: 'loadConfig',
+          type: ConfigLoadingMethod,
         });
       },
     },
+  };
+}
+
+export function buildStandRecordModelPkg(opts: IStandModelOptions): IModelPkg {
+  const { idFieldName, nameFieldName, StoreNs, StoreNsTitle } = opts;
+
+  return {
+    StoreNs,
+    StoreNsTitle,
+
+    idFieldName,
+    nameFieldName,
+
+    modelOpts: opts,
+    default: getStandModel({ ...opts, StoreNs }),
+  };
+}
+
+export function buildStandConfigModelPkg(
+  opts: IStandConfigModelOptions,
+): IModelPkg {
+  const { StoreNs, StoreNsTitle } = opts;
+
+  return {
+    StoreNs,
+    StoreNsTitle,
+    default: getStandConfigModel({ ...opts, StoreNs }),
   };
 }

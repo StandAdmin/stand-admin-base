@@ -5,6 +5,8 @@ import standUtils from './utils/standUtils';
 export * from './StandRecordsHoc';
 export * from './standModelHelper';
 
-export { BatchCheckHoc, ActionCounterHoc, standUtils };
-
 export * from './interface';
+
+import { openLog, closeLog } from './utils/logUtils';
+
+export { BatchCheckHoc, ActionCounterHoc, standUtils, openLog, closeLog };

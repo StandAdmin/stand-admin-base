@@ -51,7 +51,17 @@ export interface IStandModelOptions {
   addRecord?: (record: ICommonObj) => Promise<IResponse>;
   updateRecord?: (record: ICommonObj) => Promise<IResponse>;
   deleteRecord?: (params: ICommonObj) => Promise<IResponse>;
-  extensions: any;
+  extensions?: any;
+}
+
+export interface IModelPkg {
+  idFieldName?: string;
+  nameFieldName?: string;
+  StoreNsTitle?: string;
+  StoreNs?: string;
+  isDynamic?: boolean;
+  modelOpts?: IStandModelOptions;
+  default: any;
 }
 
 export type TGetConfigFn = () => Promise<ICommonObj>;
@@ -59,7 +69,8 @@ export type TGetConfigFn = () => Promise<ICommonObj>;
 export type TGetConfigItem = TGetConfigFn | ICommonObj;
 
 export interface IStandConfigModelOptions {
-  StoreNs: string;
+  StoreNsTitle?: string;
+  StoreNs?: string;
   getConfig: TGetConfigItem | TGetConfigItem[];
 }
 
@@ -100,15 +111,6 @@ export interface IStoreRef {
   blinkRecord?: TCommonObjOrEmpty;
   activeRecord?: TCommonObjOrEmpty;
   removingRecord?: TCommonObjOrEmpty;
-}
-
-export interface IModelPkg {
-  idFieldName: string;
-  nameFieldName: string;
-  StoreNsTitle: string;
-  StoreNs: string;
-  isDynamic?: boolean;
-  default: any;
 }
 
 export interface IRecordsHocModelParams {
@@ -285,6 +287,9 @@ export interface IStandContextProps<R = any>
   getRecordName: (record: R) => TKey;
   reloadSearch: () => void;
   dispatch: Dispatch<any>;
+
+  getRecordModelPkg: () => IModelPkg;
+  getConfigModelPkg: () => IModelPkg;
 
   getDefaultSearchParams: (specProps?: ICommonObj) => ICommonObj;
   getSpecSearchParams: (specProps?: ICommonObj) => ICommonObj;

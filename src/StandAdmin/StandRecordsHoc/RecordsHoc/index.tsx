@@ -5,6 +5,7 @@ import { Empty, Pagination, message, Modal, Spin } from 'antd';
 import classNames from 'classnames';
 import { isEqual, debounce, pick } from 'lodash';
 import { toUrlQuery, fromUrlQuery } from '../../utils/urlQueryHelper';
+import { logInfo } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
 import {
   StandContext,
@@ -21,6 +22,7 @@ import {
   TCommonObjOrEmpty,
   IRecordsHocBaseParams,
   ICommonObj,
+  IStandContextProps,
 } from '../../interface';
 
 import styles from '../styles';
@@ -39,8 +41,12 @@ const getNewMountId = () => {
 export default function(hocParams: IRecordsHocParams) {
   const { recordModel, configModel, getConnect, ...restHocParams } = hocParams;
 
-  const { idFieldName = 'id', nameFieldName = 'name', StoreNsTitle, StoreNs } =
-    recordModel || {};
+  const {
+    idFieldName = 'id',
+    nameFieldName = 'name',
+    StoreNsTitle = '',
+    StoreNs,
+  } = recordModel || {};
 
   const { StoreNs: ConfigStoreNs } = configModel || {};
 
@@ -152,8 +158,12 @@ export default function(hocParams: IRecordsHocParams) {
         return existModels.some((model: any) => model.namespace === namespace);
       };
 
+      getRecordModelPkg = () => recordModel;
+
+      getConfigModelPkg = () => configModel;
+
       getRelModelPkgs = () => {
-        return [recordModel, configModel];
+        return [this.getRecordModelPkg(), this.getConfigModelPkg()];
       };
 
       tryRegisterModels = () => {
@@ -161,9 +171,11 @@ export default function(hocParams: IRecordsHocParams) {
 
         this.getRelModelPkgs().forEach(modelPkg => {
           if (this.isModelNsExists(modelPkg.StoreNs)) {
-            // console.warn(`Model alreay exists: ${modelPkg.StoreNs}`);
+            // logInfo(`Model alreay exists: ${modelPkg.StoreNs}`);
             return;
           }
+
+          logInfo(`Load model: ${modelPkg.StoreNs}`);
 
           app.model(modelPkg.default);
 
@@ -687,6 +699,8 @@ export default function(hocParams: IRecordsHocParams) {
           callService,
           getLatestSearchParams,
           debouncedSearchRecords,
+          getRecordModelPkg,
+          getConfigModelPkg,
         } = this;
 
         const { wrapperClassName, ...restProps } = this.props;
@@ -702,7 +716,7 @@ export default function(hocParams: IRecordsHocParams) {
           formNamePrefix = 'Form',
         } = this.props;
 
-        const contextVal = {
+        const contextVal: IStandContextProps = {
           StoreNs,
           storeRef,
           configStoreRef,
@@ -737,6 +751,9 @@ export default function(hocParams: IRecordsHocParams) {
           increaseActionCount,
           decreaseActionCount,
           getActionCount,
+
+          getRecordModelPkg,
+          getConfigModelPkg,
 
           getDefaultSearchParams,
           getSpecSearchParams,
