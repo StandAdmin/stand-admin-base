@@ -130,7 +130,8 @@ export interface History {
 }
 
 export interface IConfigLoadingHocParams {
-  configModel: IModelPkg;
+  recordModel?: IModelPkg;
+  configModel?: IModelPkg;
   getConnect: () => TFnAny;
 }
 export interface IRecordsHocBaseParams {

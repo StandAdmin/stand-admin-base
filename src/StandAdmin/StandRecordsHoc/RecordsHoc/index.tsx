@@ -7,11 +7,7 @@ import { isEqual, debounce, pick } from 'lodash';
 import { toUrlQuery, fromUrlQuery } from '../../utils/urlQueryHelper';
 import { logInfo } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
-import {
-  StandContext,
-  ConfigLoadingFld,
-  ConfigLoadingMethod,
-} from '../../const';
+import { StandContext } from '../../const';
 import {
   IRecordsProps,
   IRecordsHocParams,
@@ -24,6 +20,8 @@ import {
   ICommonObj,
   IStandContextProps,
 } from '../../interface';
+
+import { StandConnectHoc } from '../utils';
 
 import styles from '../styles';
 
@@ -39,7 +37,7 @@ const getNewMountId = () => {
 };
 
 export default function(hocParams: IRecordsHocParams) {
-  const { recordModel, configModel, getConnect, ...restHocParams } = hocParams;
+  const { recordModel, configModel, ...restHocParams } = hocParams;
 
   const {
     idFieldName = 'id',
@@ -47,8 +45,6 @@ export default function(hocParams: IRecordsHocParams) {
     StoreNsTitle = '',
     StoreNs,
   } = recordModel || {};
-
-  const { StoreNs: ConfigStoreNs } = configModel || {};
 
   const defaultRestHocParams = {
     updateSearchParamsEvenError: false,
@@ -801,26 +797,6 @@ export default function(hocParams: IRecordsHocParams) {
       }
     }
 
-    return getConnect()(
-      ({
-        [StoreNs]: storeRef,
-        [ConfigStoreNs]: configStoreRef,
-        loading,
-      }: any) => {
-        const storeRefState = storeRef || recordModel.default.state || {};
-
-        const configStoreRefState =
-          configStoreRef || configModel.default.state || {};
-
-        return {
-          storeRef: storeRefState,
-          configStoreRef: configStoreRefState,
-          searchLoading: loading.effects[`${StoreNs}/search`],
-          configLoading:
-            loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`] ||
-            configStoreRefState[ConfigLoadingFld],
-        };
-      },
-    )(ActionCounterHoc()(Comp as any));
+    return StandConnectHoc(hocParams)(ActionCounterHoc()(Comp as any));
   };
 }
