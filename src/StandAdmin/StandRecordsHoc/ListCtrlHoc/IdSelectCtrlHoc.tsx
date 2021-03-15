@@ -7,8 +7,6 @@ import { IListCtrlHocParams, ICommonObj, TKey } from '../../interface';
 const TagProp = '_cus_tag_';
 
 export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
-  const { getRecordMapByIdList: defaultGetRecordMapByIdList } = hocParams;
-
   const globalRecordCache: ICommonObj = {};
 
   return (WrappedComponent: React.ComponentType<any>) => {
@@ -18,6 +16,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
       const { getRecordId, idFieldName, nameFieldName } = props;
 
       const {
+        defaultCheckedIdList,
         checkedIdList: origCheckedIdList,
         getRecordMapByIdList,
         onChange: origOnChange,
@@ -25,7 +24,9 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
         ...rest
       } = props;
 
-      const checkedIdList = origCheckedIdList || [];
+      const isControlledMode = !!origCheckedIdList;
+
+      const checkedIdList = origCheckedIdList || defaultCheckedIdList || [];
 
       const [recordCache, setRecordCache] = useState(globalRecordCache);
 
@@ -107,10 +108,18 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
         return checkedIdList.map((id: any) => getFullRecord(id));
       }, [checkedIdList, recordCache]);
 
-      return <WrappedComponent {...{ checkedList, onChange }} {...rest} />;
+      return (
+        <WrappedComponent
+          {...{
+            [isControlledMode
+              ? 'checkedList'
+              : 'defaultCheckedList']: checkedList,
+            onChange,
+          }}
+          {...rest}
+        />
+      );
     };
-
-    Comp.defaultProps = { getRecordMapByIdList: defaultGetRecordMapByIdList };
 
     return Comp;
   };

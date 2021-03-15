@@ -371,19 +371,43 @@ export default function(hocParams: IRecordsHocParams) {
         });
       };
 
-      loadAndShowRecordForm = (params: any, recordFormVisibleTag = true) => {
+      getRecord = (params?: TCommonObjOrEmpty) => {
         const { dispatch } = this.props;
 
+        return dispatch({
+          type: `${StoreNs}/getRecord`,
+          params,
+        }) as Promise<any>;
+      };
+
+      getRecordMapByIdList = async (idList: any[]) => {
+        const { getRecordMapByIdList } = this.props;
+
+        if (getRecordMapByIdList) {
+          return getRecordMapByIdList(idList);
+        }
+
+        const recordList = await Promise.all(
+          idList.map(id => this.getRecord({ [idFieldName]: id })),
+        );
+
+        const dataMap: ICommonObj = {};
+
+        recordList.forEach(record => {
+          dataMap[this.getRecordId(record)] = record;
+        });
+
+        return dataMap;
+      };
+
+      loadAndShowRecordForm = (params: any, recordFormVisibleTag = true) => {
         const modal = Modal.info({
           content: <Spin />,
           maskClosable: false,
           okButtonProps: { style: { display: 'none' } },
         });
 
-        (dispatch({
-          type: `${StoreNs}/getOne`,
-          params,
-        }) as Promise<any>)
+        this.getRecord(params)
           .then(activeRecord => {
             if (activeRecord) {
               this.showRecordForm(activeRecord, recordFormVisibleTag);
@@ -694,6 +718,8 @@ export default function(hocParams: IRecordsHocParams) {
           getSearchParams,
           reloadSearch,
           searchRecords,
+          getRecordMapByIdList,
+          getRecord,
           loadAndShowRecordForm,
           getUrlParams,
           showEmptyRecordForm,
@@ -740,6 +766,8 @@ export default function(hocParams: IRecordsHocParams) {
           addRecord,
           showRecordForm,
           loadAndShowRecordForm,
+          getRecordMapByIdList,
+          getRecord,
           deleteRecord,
           goSearch,
           getSearchParams,

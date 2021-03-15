@@ -155,6 +155,7 @@ export interface IRecordsHocBaseParams {
   onRecordFormVisibleTagChange?: (recordFormVisibleTag: any) => void;
   onRefresh?: () => void;
   callStoreActionPayloadFilter?: (action: string, payload: any) => void;
+  getRecordMapByIdList?: (idList: any[]) => Promise<ICommonObj>;
   getDvaApp: () => DvaApp;
   getHistory: () => History;
   getConnect: () => TFnAny;
@@ -175,13 +176,7 @@ export interface IRecordsProps extends IRecordsHocBaseParams {
 
 export interface IIdSelCtrlHocParams<R> {
   checkedIdList?: TKey[];
-  getRecordMapByIdList?: (
-    idList: TKey[],
-  ) => Promise<
-    {
-      [key in TKey]: R;
-    }
-  >;
+  defaultCheckedIdList?: TKey[];
 }
 
 export interface IListCtrlHocParams<R>
@@ -259,6 +254,8 @@ export interface IStandContextProps<R = any>
   clearActiveRecord: () => void;
   hideRecordFormOnly: () => void;
   hideRecordForm: () => void;
+  getRecordMapByIdList: (idList: any[]) => Promise<ICommonObj>;
+  getRecord: (specParams?: ICommonObj) => Promise<any>;
   updateRecord: (record: R, callback?: (resp: any) => void) => Promise<any>;
   addRecord: (record: R, callback?: (resp: any) => void) => Promise<any>;
   showRecordForm: (activeRecord: any, recordFormVisibleTag?: any) => void;

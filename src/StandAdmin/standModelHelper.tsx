@@ -222,7 +222,7 @@ export function getStandModel(opts: IStandModelOptions) {
 
           return total > 0 ? list[0] : null;
         },
-        *getOne({ params }: { params?: any }, { call }: any) {
+        *getRecord({ params }: { params?: any }, { call }: any) {
           const response: any = yield call(
             getRecord,
             filterParams({ ...params }),
