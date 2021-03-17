@@ -5,7 +5,7 @@ import { Empty, Pagination, message, Modal, Spin } from 'antd';
 import classNames from 'classnames';
 import { isEqual, debounce, pick } from 'lodash';
 import { toUrlQuery, fromUrlQuery } from '../../utils/urlQueryHelper';
-import { logInfo } from '../../utils/logUtils';
+import { logInfo, logWarn } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
 import { StandContext } from '../../const';
 import {
@@ -270,7 +270,8 @@ export default function(hocParams: IRecordsHocParams) {
         const props = specProps || this.props;
 
         if (!props.location) {
-          throw new Error('location not exists on props!');
+          logWarn('location not exists on props!');
+          return {};
         }
 
         return fromUrlQuery(props.location.search, { ns: props.urlParamsNs });
@@ -310,47 +311,47 @@ export default function(hocParams: IRecordsHocParams) {
         const urlQueryParams = { ns: urlParamsNs };
 
         if (syncParamsToUrl) {
-          if (!this.props.location) {
-            throw new Error('location not in props');
-          }
+          if (this.props.location) {
+            let reservedParams = {};
 
-          let reservedParams = {};
+            if (reservedUrlParamNames && reservedUrlParamNames.length > 0) {
+              reservedParams = pick(
+                fromUrlQuery(this.props.location.search, urlQueryParams),
+                reservedUrlParamNames,
+              );
+            }
 
-          if (reservedUrlParamNames && reservedUrlParamNames.length > 0) {
-            reservedParams = pick(
-              fromUrlQuery(this.props.location.search, urlQueryParams),
-              reservedUrlParamNames,
+            const newQueryStr = toUrlQuery(
+              { ...reservedParams, ...params },
+              urlQueryParams,
             );
-          }
+            const oldQueryParams = fromUrlQuery(
+              this.props.location.search,
+              urlQueryParams,
+            );
 
-          const newQueryStr = toUrlQuery(
-            { ...reservedParams, ...params },
-            urlQueryParams,
-          );
-          const oldQueryParams = fromUrlQuery(
-            this.props.location.search,
-            urlQueryParams,
-          );
+            if (
+              isEqual(oldQueryParams, fromUrlQuery(newQueryStr, urlQueryParams))
+            ) {
+              if (passSearchWhenParamsEqual) {
+                return;
+              }
 
-          if (
-            isEqual(oldQueryParams, fromUrlQuery(newQueryStr, urlQueryParams))
-          ) {
-            if (passSearchWhenParamsEqual) {
+              this.searchRecords(params);
               return;
             }
 
-            this.searchRecords(params);
+            const history = getHistory();
+
+            history.push({
+              pathname: history.location.pathname,
+              search: newQueryStr,
+            });
+
             return;
+          } else {
+            logWarn('location not in props');
           }
-
-          const history = getHistory();
-
-          history.push({
-            pathname: history.location.pathname,
-            search: newQueryStr,
-          });
-
-          return;
         }
 
         this.searchRecords(params);
