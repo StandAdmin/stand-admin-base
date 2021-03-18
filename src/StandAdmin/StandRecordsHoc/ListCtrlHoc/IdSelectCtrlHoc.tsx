@@ -24,9 +24,10 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
         ...rest
       } = props;
 
-      const isControlledMode = !!origCheckedIdList;
+      const isControlledMode = 'checkedIdList' in props;
 
-      const checkedIdList = origCheckedIdList || defaultCheckedIdList || [];
+      const checkedIdList =
+        (isControlledMode ? origCheckedIdList : defaultCheckedIdList) || [];
 
       const [recordCache, setRecordCache] = useState(globalRecordCache);
 
