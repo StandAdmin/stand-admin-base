@@ -80,11 +80,12 @@ export type TListCtrlHocComp<R> = React.ComponentType<
 };
 
 export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
-  const { isModalMode = true, ...restOptions } = hocParams;
+  const { ...restOptions } = hocParams;
 
   return (WrappedComponent: React.ComponentType<any>): TListCtrlHocComp<R> => {
     class Comp extends React.Component<TListCtrlProps<R>, IListCtrlState> {
       static defaultProps = {
+        isModalMode: true,
         isStandListCtrl: true,
         defaultModalVisible: false,
         disableSpecSearchParams: true,
@@ -114,7 +115,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
       }
 
       componentDidMount() {
-        const { searchRecordsOnMount } = this.props;
+        const { searchRecordsOnMount, isModalMode } = this.props;
 
         if (!searchRecordsOnMount) {
           if (!isModalMode || this.isModalVisible()) {
@@ -327,6 +328,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
           modalTriggerTitle,
           modalWrapperClassName,
           modalTriggerClassName,
+          isModalMode,
           ...restProps
         } = this.props;
 
@@ -335,6 +337,8 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
             {...restProps}
             {...{
               isModalMode,
+              syncParamsToUrl: !isModalMode,
+              searchRecordsOnMount: false,
             }}
           />
         );
@@ -351,8 +355,6 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
     }
 
     const standHoc = StandRecordsHoc({
-      syncParamsToUrl: !isModalMode,
-      searchRecordsOnMount: false,
       ...restOptions,
     });
 
