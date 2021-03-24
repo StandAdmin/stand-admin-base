@@ -80,15 +80,25 @@ export type TListCtrlHocComp<R> = React.ComponentType<
 };
 
 export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
-  const { ...restOptions } = hocParams;
+  const { ...restHocParams } = hocParams;
+
+  const defaultRestHocParams = {
+    isModalMode: true,
+    isStandListCtrl: true,
+    defaultModalVisible: false,
+    disableSpecSearchParams: true,
+    searchRecordsOnMount: false,
+    ...restHocParams,
+  };
+
+  if (!('syncParamsToUrl' in defaultRestHocParams)) {
+    defaultRestHocParams.syncParamsToUrl = !defaultRestHocParams.isModalMode;
+  }
 
   return (WrappedComponent: React.ComponentType<any>): TListCtrlHocComp<R> => {
     class Comp extends React.Component<TListCtrlProps<R>, IListCtrlState> {
       static defaultProps = {
-        isModalMode: true,
-        isStandListCtrl: true,
-        defaultModalVisible: false,
-        disableSpecSearchParams: true,
+        ...defaultRestHocParams,
       };
 
       static getDerivedStateFromProps(
@@ -117,10 +127,8 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
       componentDidMount() {
         const { searchRecordsOnMount, isModalMode } = this.props;
 
-        if (!searchRecordsOnMount) {
-          if (!isModalMode || this.isModalVisible()) {
-            this.props.debouncedSearchRecords();
-          }
+        if (!isModalMode || this.isModalVisible() || searchRecordsOnMount) {
+          this.props.debouncedSearchRecords();
         }
       }
 
@@ -355,7 +363,8 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
     }
 
     const standHoc = StandRecordsHoc({
-      ...restOptions,
+      ...defaultRestHocParams,
+      takeOverMount: true,
     });
 
     const CompWithBatchCheck = BatchCheckHoc()(Comp as any);

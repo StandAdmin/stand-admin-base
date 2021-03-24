@@ -94,10 +94,12 @@ export default function(hocParams: IRecordsHocParams) {
 
         this.resetRecordsState();
 
-        const { searchRecordsOnMount } = this.props;
+        const { takeOverMount, searchRecordsOnMount } = this.props;
 
-        if (searchRecordsOnMount) {
-          this.searchRecords();
+        if (!takeOverMount) {
+          if (searchRecordsOnMount) {
+            this.searchRecords();
+          }
         }
       }
 
@@ -274,7 +276,7 @@ export default function(hocParams: IRecordsHocParams) {
         const props = specProps || this.props;
 
         if (!props.location) {
-          logWarn('location not exists on props!');
+          logWarn('location not exists on props!', props);
           return {};
         }
 

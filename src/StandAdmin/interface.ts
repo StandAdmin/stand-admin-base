@@ -140,6 +140,7 @@ export interface IRecordsHocBaseParams {
   syncParamsToUrl?: boolean;
   urlParamsNs?: false | string;
   searchRecordsOnMount?: boolean;
+  takeOverMount?: boolean;
   searchRecordsOnParamsChange?: boolean;
   searchRecordsOnRefresh?: boolean;
   defaultSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
