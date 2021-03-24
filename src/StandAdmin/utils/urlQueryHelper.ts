@@ -13,7 +13,7 @@ export function toUrlQuery(
   const result: ICommonObj = {};
 
   if (ns) {
-    result[ns] = params;
+    result[ns] = JSON.stringify(params);
   } else {
     Object.keys(params).forEach(k => {
       const val = params[k];

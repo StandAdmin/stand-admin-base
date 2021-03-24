@@ -3,7 +3,7 @@ import React from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Empty, Pagination, message, Modal, Spin } from 'antd';
 import classNames from 'classnames';
-import { isEqual, debounce, pick } from 'lodash';
+import { isEqual, debounce, pick, pickBy } from 'lodash';
 import { toUrlQuery, fromUrlQuery } from '../../utils/urlQueryHelper';
 import { logInfo, logWarn } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
@@ -308,31 +308,27 @@ export default function(hocParams: IRecordsHocParams) {
           getHistory,
         } = this.props;
 
-        const urlQueryParams = { ns: urlParamsNs };
+        const urlQueryOpts = { ns: urlParamsNs };
 
         if (syncParamsToUrl) {
           if (this.props.location) {
-            let reservedParams = {};
+            const reservedParams = {};
+
+            const oldQueryParams = fromUrlQuery(
+              this.props.location.search,
+              urlQueryOpts,
+            );
 
             if (reservedUrlParamNames && reservedUrlParamNames.length > 0) {
-              reservedParams = pick(
-                fromUrlQuery(this.props.location.search, urlQueryParams),
-                reservedUrlParamNames,
+              Object.assign(
+                reservedParams,
+                pick(oldQueryParams, reservedUrlParamNames),
               );
             }
 
-            const newQueryStr = toUrlQuery(
-              { ...reservedParams, ...params },
-              urlQueryParams,
-            );
-            const oldQueryParams = fromUrlQuery(
-              this.props.location.search,
-              urlQueryParams,
-            );
+            const newQueryParams = { ...reservedParams, ...params };
 
-            if (
-              isEqual(oldQueryParams, fromUrlQuery(newQueryStr, urlQueryParams))
-            ) {
+            if (isEqual(oldQueryParams, newQueryParams)) {
               if (passSearchWhenParamsEqual) {
                 return;
               }
@@ -343,9 +339,25 @@ export default function(hocParams: IRecordsHocParams) {
 
             const history = getHistory();
 
+            const searchQuery = [toUrlQuery(newQueryParams, urlQueryOpts)];
+
+            if (urlParamsNs) {
+              // Keep "unrelated" params
+              const extraSearchQuery = toUrlQuery(
+                pickBy(
+                  fromUrlQuery(this.props.location.search),
+                  (value, key) => key !== urlParamsNs,
+                ),
+              );
+
+              if (extraSearchQuery) {
+                searchQuery.push(extraSearchQuery);
+              }
+            }
+
             history.push({
               pathname: history.location.pathname,
-              search: newQueryStr,
+              search: searchQuery.join('&'),
             });
 
             return;
