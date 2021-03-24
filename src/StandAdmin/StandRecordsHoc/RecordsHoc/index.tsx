@@ -276,7 +276,7 @@ export default function(hocParams: IRecordsHocParams) {
         const props = specProps || this.props;
 
         if (!props.location) {
-          logWarn('location not exists on props!', props);
+          logInfo('location not exists on props!');
           return {};
         }
 

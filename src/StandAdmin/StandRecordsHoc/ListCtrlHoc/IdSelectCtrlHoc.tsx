@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useUnmount, usePersistFn } from '@/StandAdmin/utils/hooks';
-import { TListCtrlProps } from '.';
-
-import { IListCtrlHocParams, ICommonObj, TKey } from '../../interface';
+import {
+  IListCtrlHocParams,
+  ICommonObj,
+  TKey,
+  TListCtrlProps,
+} from '../../interface';
 
 const TagProp = '_cus_tag_';
 

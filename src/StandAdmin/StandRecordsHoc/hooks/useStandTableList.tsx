@@ -3,6 +3,7 @@ import { Table } from 'antd';
 import classNames from 'classnames';
 import { TableProps, ColumnsType } from 'antd/es/table';
 import { StandContext } from '../../const';
+import { TListCtrlProps } from '../../interface';
 
 import styles from '../styles';
 
@@ -12,14 +13,17 @@ export interface StandRenderParams extends TableProps<any> {
   autoScrollX?: boolean | { defaultWidth?: number; extraWidth?: number };
 }
 
-export function getOptsForStandTableList(props: any) {
+export interface IStandTableListOpts {
+  disabledSearchParams?: string[];
+}
+
+export function getOptsForStandTableList(props: any): IStandTableListOpts {
   return {
-    disabledSearchParams:
-      props.disableSpecSearchParams && props.specSearchParams
-        ? Object.keys(props.specSearchParams).filter(
-            k => props.specSearchParams[k] !== undefined,
-          )
-        : null,
+    disabledSearchParams: props.specSearchParams
+      ? Object.keys(props.specSearchParams).filter(
+          k => props.specSearchParams[k] !== undefined,
+        )
+      : null,
   };
 }
 
@@ -45,10 +49,12 @@ export function calColWidth(
   return total;
 }
 
-export function useStandTableList(props: any) {
-  const context = useContext(StandContext);
-
+export function useStandTableList(props: TListCtrlProps<any>) {
   const stateOpts = useMemo(() => getOptsForStandTableList(props), [props]);
+
+  const { isStandListCtrl, checkedList, maxCheckedLength, isModalMode } = props;
+
+  const context = useContext(StandContext);
 
   const {
     renderPagination,
@@ -60,8 +66,6 @@ export function useStandTableList(props: any) {
     searchLoading,
     handleTableChange,
   } = context;
-
-  const { isStandListCtrl, checkedList, maxCheckedLength, isModalMode } = props;
 
   const { records, activeRecord, blinkRecord, removingRecord } = storeRef;
 

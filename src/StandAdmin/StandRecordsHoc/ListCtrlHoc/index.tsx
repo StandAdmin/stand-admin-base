@@ -7,9 +7,8 @@ import BatchCheckHoc from '../../BatchCheckHoc';
 import {
   IListCtrlHocParams,
   IListCtrlProps,
-  IStandContextProps,
-  IBatchCheckHocProps,
   IBatchCheckProps,
+  TListCtrlProps,
 } from '../../interface';
 import IdSelectCtrlHoc from './IdSelectCtrlHoc';
 
@@ -18,11 +17,6 @@ import styles from '../styles';
 interface IListCtrlState {
   modalVisible: boolean | undefined;
 }
-
-export type TListCtrlProps<R> = IListCtrlProps<R> &
-  IStandContextProps &
-  IBatchCheckHocProps<R> &
-  IBatchCheckProps<R>;
 
 function defaultModalTriggerRender({
   props,
@@ -86,7 +80,6 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
     isModalMode: true,
     isStandListCtrl: true,
     defaultModalVisible: false,
-    disableSpecSearchParams: true,
     searchRecordsOnMount: false,
     ...restHocParams,
   };

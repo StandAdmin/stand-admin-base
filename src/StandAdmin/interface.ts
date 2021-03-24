@@ -203,7 +203,6 @@ export interface IListCtrlProps<R> extends IListCtrlHocParams<R> {
   resetCheckedOnModalShow?: boolean;
   onModalOk?: (params: { checkedList: any[] }) => void;
   clearCheckedAfterClose?: boolean;
-  disableSpecSearchParams?: boolean;
 }
 
 export interface IBatchCheckProps<R> {
@@ -301,3 +300,8 @@ export interface IStandContextProps<R = any>
   isStoreDataStale: boolean;
   mountId: TKey;
 }
+
+export type TListCtrlProps<R> = IListCtrlProps<R> &
+  IStandContextProps &
+  IBatchCheckHocProps<R> &
+  IBatchCheckProps<R>;

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useMemo } from 'react';
 
 import { Form } from 'antd';
 import { FormInstance } from 'antd/es/form';
@@ -9,9 +9,13 @@ import { usePersistFn } from '@/StandAdmin/utils/hooks';
 
 import { StandContext } from '../../const';
 
-import { ICommonObj, TCommonObjOrEmpty } from '../../interface';
+import {
+  ICommonObj,
+  TCommonObjOrEmpty,
+  IStandContextProps,
+} from '../../interface';
 
-export interface IStandSearchFormProps {
+export interface IStandSearchFormOpts {
   defaultSearchParams?: ICommonObj;
   searchParamsToValues?: (params: ICommonObj) => TCommonObjOrEmpty;
   searchParamsFromValues?: (
@@ -38,23 +42,32 @@ export interface IStandSearchFormProps {
 //   }
 // }
 
-export function getOptsForStandSearchForm(props: any) {
+export function getOptsForStandSearchForm(props: any): IStandSearchFormOpts {
   return {
-    disabledSearchParams:
-      props.disableSpecSearchParams && props.specSearchParams
-        ? Object.keys(props.specSearchParams).filter(
-            k => props.specSearchParams[k] !== undefined,
-          )
-        : null,
+    disabledSearchParams: props.specSearchParams
+      ? Object.keys(props.specSearchParams).filter(
+          k => props.specSearchParams[k] !== undefined,
+        )
+      : null,
   };
 }
 
-export function useStandSearchForm({
-  defaultSearchParams,
-  searchParamsToValues = identity,
-  searchParamsFromValues = identity,
-  disabledSearchParams,
-}: IStandSearchFormProps = {}) {
+export function useStandSearchForm(
+  props: IStandSearchFormOpts | IStandContextProps,
+) {
+  const stateOpts = useMemo(() => {
+    return 'debouncedSearchRecords' in props
+      ? getOptsForStandSearchForm(props)
+      : props;
+  }, [props]);
+
+  const {
+    defaultSearchParams = {},
+    searchParamsToValues = identity,
+    searchParamsFromValues = identity,
+    disabledSearchParams,
+  } = stateOpts;
+
   const context = useContext(StandContext);
 
   const {

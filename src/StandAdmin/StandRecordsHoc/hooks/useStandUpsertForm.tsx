@@ -6,7 +6,7 @@ import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { StandContext } from '../../const';
 import { ICommonObj, TCommonObjOrEmpty } from '../../interface';
 
-export interface IStandUpsertFormProps {
+export interface IStandUpsertFormOpts {
   // form?: any;
   /**
    * 默认的表单数据
@@ -51,7 +51,7 @@ export function getOptsForStandUpsertForm(
   props: any,
   {
     defaultValues,
-  }: { defaultValues?: IStandUpsertFormProps['defaultValues'] } = {},
+  }: { defaultValues?: IStandUpsertFormOpts['defaultValues'] } = {},
 ) {
   const config = props.configStoreRef;
 
@@ -81,7 +81,7 @@ export function useStandUpsertForm({
   submitValues,
   onSuccess,
   isModalVisible: origIsModalVisible = isTrue,
-}: IStandUpsertFormProps = {}) {
+}: IStandUpsertFormOpts = {}) {
   const context = useContext(StandContext);
 
   const {
