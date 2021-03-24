@@ -1,10 +1,17 @@
 import { stringify, parse as qsParse } from 'query-string';
-
+import { isEqual } from 'lodash';
 import { StateParamPrefix } from '../const';
 
 import { paramToUrl, paramFromUrl } from './urlParams';
 
 import { ICommonObj } from '../interface';
+
+export function isQueryParamsEqual(paramsA: ICommonObj, paramsB: ICommonObj) {
+  return isEqual(
+    fromUrlQuery(toUrlQuery(paramsA)),
+    fromUrlQuery(toUrlQuery(paramsB)),
+  );
+}
 
 export function toUrlQuery(
   params: ICommonObj,

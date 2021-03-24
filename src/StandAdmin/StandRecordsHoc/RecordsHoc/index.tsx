@@ -4,7 +4,11 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Empty, Pagination, message, Modal, Spin } from 'antd';
 import classNames from 'classnames';
 import { isEqual, debounce, pick, pickBy } from 'lodash';
-import { toUrlQuery, fromUrlQuery } from '../../utils/urlQueryHelper';
+import {
+  toUrlQuery,
+  fromUrlQuery,
+  isQueryParamsEqual,
+} from '../../utils/urlQueryHelper';
 import { logInfo, logWarn } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
 import { StandContext } from '../../const';
@@ -328,7 +332,7 @@ export default function(hocParams: IRecordsHocParams) {
 
             const newQueryParams = { ...reservedParams, ...params };
 
-            if (isEqual(oldQueryParams, newQueryParams)) {
+            if (isQueryParamsEqual(oldQueryParams, newQueryParams)) {
               if (passSearchWhenParamsEqual) {
                 return;
               }
