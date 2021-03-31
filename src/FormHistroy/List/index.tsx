@@ -5,7 +5,12 @@ import { IHistoryRecord, ITargetFormInfo } from '../interface';
 import { decodeFormVals } from '../../StandAdmin/utils/formEncoder';
 
 export default (props: any) => {
-  const { targetFormInfo, formValuesEncoder, toggleModalVisible } = props;
+  const {
+    targetFormInfo,
+    formValuesEncoder,
+    toggleModalVisible,
+    actionHooks,
+  } = props;
 
   const { form: targetForm } = targetFormInfo as ITargetFormInfo;
 
@@ -48,7 +53,15 @@ export default (props: any) => {
                 onClick={() => {
                   const { decode = decodeFormVals } = formValuesEncoder || {};
 
-                  targetForm.setFieldsValue(decode(record.formVals));
+                  const formValues = decode(record.formVals);
+
+                  targetForm.setFieldsValue(formValues);
+
+                  const { afterRestore } = actionHooks || {};
+
+                  if (afterRestore) {
+                    afterRestore({ formValues });
+                  }
 
                   toggleModalVisible(false);
                 }}

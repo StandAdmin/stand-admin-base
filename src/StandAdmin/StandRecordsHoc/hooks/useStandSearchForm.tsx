@@ -6,7 +6,7 @@ import { FormInstance } from 'antd/es/form';
 // import classNames from 'classnames';
 import { identity } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
-
+import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 import { StandContext } from '../../const';
 
 import {
@@ -76,6 +76,7 @@ export function useStandSearchForm(
     goSearch,
     StoreNs,
     mountId,
+    nameFieldName,
     getDefaultSearchParams,
     getSpecSearchParams,
   } = context;
@@ -155,6 +156,12 @@ export function useStandSearchForm(
 
   return {
     formId,
+    formHistroyTriggerProps: {
+      targetFormInfo: { formId, form },
+      formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
+      historyRecordInfo: { nameFieldName },
+      actionHooks: { afterRestore: submitForm },
+    },
     formProps: {
       name: `${formId}_${mountId}`,
       form,
