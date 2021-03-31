@@ -2,12 +2,19 @@ import React from 'react';
 import { TableProps } from 'antd/es/table';
 import { ModalProps } from 'antd/es/modal';
 import { Dispatch } from 'dva';
+import { Connect } from 'react-redux';
 
 export type TKey = string | number;
 
 export type TFnAny = (...args: any[]) => any;
 
 export type TAsyncFnAny = (...args: any[]) => Promise<any>;
+
+export interface IGlobalConfig {
+  getDvaApp?: () => DvaApp;
+  getHistory?: () => History;
+  getConnect?: () => Connect;
+}
 
 export interface ICommonObj {
   [key: string]: any;
@@ -26,7 +33,7 @@ export interface IResponse {
 }
 
 export interface IResponseOfSearchRecords extends IResponse {
-  data: {
+  data?: {
     list?: any[];
     total?: number;
     pageNum?: number;
@@ -114,8 +121,8 @@ export interface IStoreRef {
 }
 
 export interface IRecordsHocModelParams {
-  recordModel: IModelPkg;
-  configModel: IModelPkg;
+  recordModel?: IModelPkg;
+  configModel?: IModelPkg;
 }
 
 export interface DvaApp {
@@ -157,9 +164,6 @@ export interface IRecordsHocBaseParams {
   onRefresh?: () => void;
   callStoreActionPayloadFilter?: (action: string, payload: any) => void;
   getRecordMapByIdList?: (idList: any[]) => Promise<ICommonObj>;
-  getDvaApp: () => DvaApp;
-  getHistory: () => History;
-  getConnect: () => TFnAny;
 }
 
 export interface IRecordsHocParams

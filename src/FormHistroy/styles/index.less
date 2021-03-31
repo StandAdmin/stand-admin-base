@@ -1,0 +1,34 @@
+@import '~antd/lib/style/themes/default.less';
+
+@cls-prefix: stand-admin-formhistroy;
+
+.@{cls-prefix}-toolbar {
+  margin-bottom: 12px;
+}
+
+.@{cls-prefix}-vtoolbox {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid @border-color-base;
+  border-radius: @border-radius-base;
+
+  > * {
+    &:not(:last-child) {
+      border-bottom: 1px solid @border-color-base;
+    }
+  }
+
+  .@{cls-prefix}-vtoolbox-icon {
+    cursor: pointer;
+    width: 20px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // background-color: @background-color-light;
+    &:hover {
+      background-color: @tabs-highlight-color;
+      color: @white;
+    }
+  }
+}

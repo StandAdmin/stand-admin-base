@@ -1,3 +1,5 @@
+export * from './config';
+
 import BatchCheckHoc from './BatchCheckHoc';
 import ActionCounterHoc from './ActionCounterHoc';
 import standUtils from './utils/standUtils';

@@ -1,4 +1,5 @@
 import { ConfigLoadingFld, ConfigLoadingMethod } from '../const';
+import { getConfig } from '../config';
 
 import { IConfigLoadingHocParams, IRecordsHocParams } from '../interface';
 
@@ -7,7 +8,9 @@ export const StandConfigLoadingHoc = (hocParams: IConfigLoadingHocParams) => {
 };
 
 export const StandConnectHoc = (hocParams: Partial<IRecordsHocParams>) => {
-  const { configModel, recordModel, getConnect } = hocParams;
+  const { getConnect } = getConfig();
+
+  const { configModel, recordModel } = hocParams;
 
   const { StoreNs } = recordModel || {};
 

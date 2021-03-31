@@ -151,9 +151,12 @@ export function useStandSearchForm(
     return <Form.Item {...restProps}>{finalChildren}</Form.Item>;
   });
 
+  const formId = `${formNamePrefix}_${StoreNs}_Search`;
+
   return {
+    formId,
     formProps: {
-      name: `${formNamePrefix}_${StoreNs}_${mountId}_Search`,
+      name: `${formId}_${mountId}`,
       form,
       initialValues: getInitValues(),
       onFinish,

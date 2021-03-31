@@ -9,6 +9,7 @@ import {
   fromUrlQuery,
   isQueryParamsEqual,
 } from '../../utils/urlQueryHelper';
+import { getConfig } from '../../config';
 import { logInfo, logWarn } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
 import { StandContext } from '../../const';
@@ -137,7 +138,7 @@ export default function(hocParams: IRecordsHocParams) {
       };
 
       getDvaApp = () => {
-        const { getDvaApp } = this.props;
+        const { getDvaApp } = getConfig();
 
         const app = getDvaApp();
 
@@ -311,8 +312,9 @@ export default function(hocParams: IRecordsHocParams) {
           syncParamsToUrl,
           passSearchWhenParamsEqual,
           urlParamsNs,
-          getHistory,
         } = this.props;
+
+        const { getHistory } = getConfig();
 
         const urlQueryOpts = { ns: urlParamsNs };
 

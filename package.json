@@ -1,6 +1,6 @@
 {
   "name": "stand-admin-base",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "A CRUD framework work perfectly with Antd Pro",
   "scripts": {
     "start": "dumi dev",
@@ -28,7 +28,9 @@
       "prettier --parser=typescript --write"
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "localforage": "^1.9.0"
+  },
   "peerDependencies": {
     "@ant-design/icons": "^4.1.0",
     "antd": "^4.9.2",

@@ -89,6 +89,7 @@ export function useStandUpsertForm({
     idFieldName,
     // getRecordId,
     getRecordName,
+    nameFieldName,
     formNamePrefix,
     storeRef,
     StoreNs,
@@ -207,9 +208,16 @@ export function useStandUpsertForm({
 
   const activeRecordName = getRecordName(activeRecord);
 
+  const formId = `${formNamePrefix}_${StoreNs}_Upsert`;
+
   return {
+    formId,
+    formHistroyTriggerProps: {
+      targetFormInfo: { formId, form },
+      historyRecordInfo: { nameFieldName },
+    },
     formProps: {
-      name: `${formNamePrefix}_${StoreNs}_${mountId}_Upsert`,
+      name: `${formId}_${mountId}`,
       form,
       initialValues: getInitValues(activeRecord),
       onFinish,
