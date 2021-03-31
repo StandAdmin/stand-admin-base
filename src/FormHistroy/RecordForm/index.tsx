@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, Modal, Button, Input } from 'antd';
 import { ITargetFormInfo } from '../interface';
+import { encodeFormVals } from '../../StandAdmin/utils/formEncoder';
 import {
   useStandUpsertForm,
   getOptsForStandUpsertForm,
@@ -20,14 +21,19 @@ const formItemLayout = {
 };
 
 export default (props: any) => {
-  const { targetFormInfo, historyRecordInfo } = props;
+  const { targetFormInfo, historyRecordInfo, formValuesEncoder } = props;
 
   const { formId, form: targetForm } = targetFormInfo as ITargetFormInfo;
 
   const { nameFieldName } = historyRecordInfo;
 
+  const getFormVals = () => {
+    const { encode = encodeFormVals } = formValuesEncoder || {};
+    return encode(targetForm.getFieldsValue());
+  };
+
   const getDefaultName = () => {
-    const targetFormVals = targetForm.getFieldsValue();
+    const targetFormVals = getFormVals();
 
     return nameFieldName in targetFormVals ? targetFormVals[nameFieldName] : '';
   };
@@ -50,7 +56,7 @@ export default (props: any) => {
       return {
         name,
         formId,
-        formVals: targetForm.getFieldsValue(),
+        formVals: getFormVals(),
       };
     },
   });

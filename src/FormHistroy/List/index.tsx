@@ -2,9 +2,10 @@ import React from 'react';
 import { Popconfirm } from 'antd';
 import { useStandTableList } from '../../StandAdmin';
 import { IHistoryRecord, ITargetFormInfo } from '../interface';
+import { decodeFormVals } from '../../StandAdmin/utils/formEncoder';
 
 export default (props: any) => {
-  const { targetFormInfo, toggleModalVisible } = props;
+  const { targetFormInfo, formValuesEncoder, toggleModalVisible } = props;
 
   const { form: targetForm } = targetFormInfo as ITargetFormInfo;
 
@@ -45,7 +46,10 @@ export default (props: any) => {
             <li>
               <a
                 onClick={() => {
-                  targetForm.setFieldsValue(record.formVals);
+                  const { decode = decodeFormVals } = formValuesEncoder || {};
+
+                  targetForm.setFieldsValue(decode(record.formVals));
+
                   toggleModalVisible(false);
                 }}
               >

@@ -5,7 +5,7 @@ import { identity, isEqual } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { StandContext } from '../../const';
 import { ICommonObj, TCommonObjOrEmpty } from '../../interface';
-
+import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 export interface IStandUpsertFormOpts {
   // form?: any;
   /**
@@ -214,6 +214,7 @@ export function useStandUpsertForm({
     formId,
     formHistroyTriggerProps: {
       targetFormInfo: { formId, form },
+      formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
       historyRecordInfo: { nameFieldName },
     },
     formProps: {
