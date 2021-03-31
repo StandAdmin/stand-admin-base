@@ -9,6 +9,8 @@ import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 import { StandContext } from '../../const';
 
+import FormHistroyTrigger from '../../../FormHistroy/trigger';
+
 import {
   ICommonObj,
   TCommonObjOrEmpty,
@@ -154,14 +156,19 @@ export function useStandSearchForm(
 
   const formId = `${formNamePrefix}_${StoreNs}_Search`;
 
+  const formHistroyTriggerProps = {
+    targetFormInfo: { formId, form },
+    formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
+    historyRecordInfo: { nameFieldName },
+    actionHooks: { afterRestore: submitForm },
+  };
+
   return {
     formId,
-    formHistroyTriggerProps: {
-      targetFormInfo: { formId, form },
-      formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
-      historyRecordInfo: { nameFieldName },
-      actionHooks: { afterRestore: submitForm },
-    },
+    formHistroyTriggerProps,
+    renderFormHistroyTrigger: () => (
+      <FormHistroyTrigger {...formHistroyTriggerProps} />
+    ),
     formProps: {
       name: `${formId}_${mountId}`,
       form,

@@ -1,13 +1,18 @@
 /* eslint-disable react/jsx-curly-newline */
 import React from 'react';
+
 import {
   StandListCtrlHoc,
   StandRecordsHoc,
+} from '../StandAdmin/StandRecordsHoc';
+
+import { useStandContext } from '../StandAdmin/StandRecordsHoc/hooks/useStandContext';
+
+import {
   buildStandRecordModelPkg,
   buildStandConfigModelPkg,
-  useStandContext,
   getDynamicModelPkg,
-} from '../StandAdmin';
+} from '../StandAdmin/standModelHelper';
 
 // import ToolBar from './ToolBar';
 import List from './List';

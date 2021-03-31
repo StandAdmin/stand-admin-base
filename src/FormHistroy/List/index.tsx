@@ -1,6 +1,6 @@
 import React from 'react';
 import { Popconfirm } from 'antd';
-import { useStandTableList } from '../../StandAdmin';
+import { useStandTableList } from '../../StandAdmin/StandRecordsHoc/hooks/useStandTableList';
 import { IHistoryRecord, ITargetFormInfo } from '../interface';
 import { decodeFormVals } from '../../StandAdmin/utils/formEncoder';
 

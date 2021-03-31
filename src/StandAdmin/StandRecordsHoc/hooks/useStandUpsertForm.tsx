@@ -1,4 +1,4 @@
-import { useEffect, useContext, useRef } from 'react';
+import React, { useEffect, useContext, useRef } from 'react';
 import { Form } from 'antd';
 import { FormInstance } from 'antd/es/form';
 import { identity, isEqual } from 'lodash';
@@ -6,6 +6,9 @@ import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { StandContext } from '../../const';
 import { ICommonObj, TCommonObjOrEmpty } from '../../interface';
 import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
+
+import FormHistroyTrigger from '../../../FormHistroy/trigger';
+
 export interface IStandUpsertFormOpts {
   // form?: any;
   /**
@@ -210,13 +213,18 @@ export function useStandUpsertForm({
 
   const formId = `${formNamePrefix}_${StoreNs}_Upsert`;
 
+  const formHistroyTriggerProps = {
+    targetFormInfo: { formId, form },
+    formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
+    historyRecordInfo: { nameFieldName },
+  };
+
   return {
     formId,
-    formHistroyTriggerProps: {
-      targetFormInfo: { formId, form },
-      formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
-      historyRecordInfo: { nameFieldName },
-    },
+    formHistroyTriggerProps,
+    renderFormHistroyTrigger: () => (
+      <FormHistroyTrigger {...formHistroyTriggerProps} />
+    ),
     formProps: {
       name: `${formId}_${mountId}`,
       form,
