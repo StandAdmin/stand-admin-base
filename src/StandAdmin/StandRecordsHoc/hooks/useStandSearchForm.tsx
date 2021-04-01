@@ -81,6 +81,7 @@ export function useStandSearchForm(
     StoreNs,
     mountId,
     nameFieldName,
+    StoreNsTitle,
     getDefaultSearchParams,
     getSpecSearchParams,
   } = context;
@@ -159,7 +160,7 @@ export function useStandSearchForm(
   const formId = `${formNamePrefix}_${StoreNs}_Search`;
 
   const formHistroyTriggerProps = {
-    targetFormInfo: { formId, form },
+    targetFormInfo: { formId, form, title: `${StoreNsTitle}查询` },
     formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
     historyRecordInfo: { nameFieldName },
     actionHooks: { afterRestore: submitForm },

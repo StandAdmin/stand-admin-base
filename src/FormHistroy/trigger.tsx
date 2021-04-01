@@ -48,7 +48,7 @@ const modalTrigger = ({ showModal }: any) => (
 export default (props: any) => {
   const { targetFormInfo } = props;
 
-  const { formId } = targetFormInfo as ITargetFormInfo;
+  const { formId, title } = targetFormInfo as ITargetFormInfo;
 
   const SelectCtrl = getDynamicComp(`${formId}-select-ctrl`);
 
@@ -65,7 +65,7 @@ export default (props: any) => {
         modalTrigger={modalTrigger}
         modalProps={{
           width: 700,
-          title: '表单历史记录',
+          title: `表单历史记录 - ${title}`,
           footer: null,
         }}
         isStandListCtrl={false}

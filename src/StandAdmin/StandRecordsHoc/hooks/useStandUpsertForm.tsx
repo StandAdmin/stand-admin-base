@@ -88,7 +88,7 @@ export function useStandUpsertForm({
   const context = useContext(StandContext);
 
   const {
-    recordNsTitle,
+    StoreNsTitle,
     idFieldName,
     // getRecordId,
     getRecordName,
@@ -214,7 +214,7 @@ export function useStandUpsertForm({
   const formId = `${formNamePrefix}_${StoreNs}_Upsert`;
 
   const formHistroyTriggerProps = {
-    targetFormInfo: { formId, form },
+    targetFormInfo: { formId, form, title: `${StoreNsTitle}` },
     formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
     historyRecordInfo: { nameFieldName },
   };
@@ -233,8 +233,8 @@ export function useStandUpsertForm({
     },
     modalProps: {
       title: !isUpdate
-        ? `创建 ${recordNsTitle}`
-        : `修改 ${recordNsTitle}${
+        ? `创建 ${StoreNsTitle}`
+        : `修改 ${StoreNsTitle}${
             activeRecordName ? ` - ${activeRecordName}` : ''
           }`,
       visible: isModalVisible(recordFormVisibleTag),

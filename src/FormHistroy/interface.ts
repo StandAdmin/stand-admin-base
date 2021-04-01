@@ -21,4 +21,5 @@ export interface IHistoryRecordSearchParams {
 export interface ITargetFormInfo {
   formId: string;
   form: FormInstance;
+  title: string;
 }
