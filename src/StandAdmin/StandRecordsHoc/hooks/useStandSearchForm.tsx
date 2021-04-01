@@ -57,10 +57,12 @@ export function getOptsForStandSearchForm(props: any): IStandSearchFormOpts {
 export function useStandSearchForm(
   props: IStandSearchFormOpts | IStandContextProps,
 ) {
-  const stateOpts = useMemo(() => {
-    return 'debouncedSearchRecords' in props
-      ? getOptsForStandSearchForm(props)
-      : props;
+  const stOpts = useMemo(() => {
+    return (
+      (props && 'debouncedSearchRecords' in props
+        ? getOptsForStandSearchForm(props)
+        : (props as IStandSearchFormOpts)) || {}
+    );
   }, [props]);
 
   const {
@@ -68,7 +70,7 @@ export function useStandSearchForm(
     searchParamsToValues = identity,
     searchParamsFromValues = identity,
     disabledSearchParams,
-  } = stateOpts;
+  } = stOpts;
 
   const context = useContext(StandContext);
 

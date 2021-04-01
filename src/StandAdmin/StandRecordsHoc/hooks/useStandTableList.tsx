@@ -50,7 +50,7 @@ export function calColWidth(
 }
 
 export function useStandTableList(props: TListCtrlProps<any>) {
-  const stateOpts = useMemo(() => getOptsForStandTableList(props), [props]);
+  const stOpts = useMemo(() => getOptsForStandTableList(props), [props]);
 
   const { isStandListCtrl, checkedList, maxCheckedLength, isModalMode } = props;
 
@@ -129,8 +129,8 @@ export function useStandTableList(props: TListCtrlProps<any>) {
       } = extraProps;
 
       // 禁用的搜索项禁用过滤
-      if (noFiltersForDisabledSearchParams && stateOpts.disabledSearchParams) {
-        stateOpts.disabledSearchParams.forEach(paramKey => {
+      if (noFiltersForDisabledSearchParams && stOpts.disabledSearchParams) {
+        stOpts.disabledSearchParams.forEach(paramKey => {
           if (columns) {
             const colItem = columns.find(
               (item: any) => item.dataIndex === paramKey,
