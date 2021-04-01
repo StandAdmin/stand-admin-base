@@ -28,7 +28,7 @@ export default (props: any) => {
       title: 'ID',
       dataIndex: 'id',
       fixed: 'left',
-      width: 100,
+      width: 80,
     },
     {
       title: '名称',
@@ -38,7 +38,7 @@ export default (props: any) => {
     {
       title: '修改时间',
       dataIndex: 'updateAt',
-      width: 180,
+      width: 190,
     },
     {
       title: '操作',
@@ -102,5 +102,9 @@ export default (props: any) => {
     },
   ];
 
-  return standRender({ autoScrollX: { defaultWidth: 150 }, columns });
+  return standRender({
+    autoScrollX: { defaultWidth: 150 },
+    columns,
+    size: 'small',
+  });
 };
