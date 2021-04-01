@@ -33,16 +33,16 @@ const modalTrigger = ({ showModal }: any) => (
 );
 
 export default (props: any) => {
-  const SelectCtrl = getDynamicComp('select-ctrl');
-
-  const SaveTrigger = getDynamicComp('save-trigger', {
-    isListCtrl: false,
-    Comp: SaveTriggerWrapper,
-  });
-
   const { targetFormInfo } = props;
 
   const { formId } = targetFormInfo as ITargetFormInfo;
+
+  const SelectCtrl = getDynamicComp(`${formId}-select-ctrl`);
+
+  const SaveTrigger = getDynamicComp(`${formId}-save-trigger`, {
+    isListCtrl: false,
+    Comp: SaveTriggerWrapper,
+  });
 
   return (
     <div className={styles.vtoolbox}>
