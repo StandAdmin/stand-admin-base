@@ -1,21 +1,34 @@
 import React from 'react';
 import { HistoryOutlined, SaveOutlined } from '@ant-design/icons';
-import { Tooltip } from 'antd';
+import { message, Tooltip } from 'antd';
 import { ITargetFormInfo } from './interface';
 import { getDynamicComp, RecordFormWrapper } from './main';
+import { useStandContext } from '../StandAdmin/StandRecordsHoc/hooks/useStandContext';
+import { isEmpty } from 'lodash';
 
 import styles from './styles';
 
 const SaveTriggerWrapper = (props: any) => {
+  const { targetFormInfo } = props;
+
+  const { showEmptyRecordForm } = useStandContext();
+
+  const { form: targetForm } = targetFormInfo as ITargetFormInfo;
+
+  const handleSaveClick = () => {
+    if (isEmpty(targetForm.getFieldsValue())) {
+      message.warn(`表单内容为空！`);
+    }
+
+    showEmptyRecordForm();
+  };
+
   return (
     <RecordFormWrapper
       {...props}
-      trigger={({ showEmptyRecordForm }: any) => (
+      trigger={() => (
         <Tooltip placement="left" title="保存当前表单内容">
-          <div
-            className={styles['vtoolbox-icon']}
-            onClick={showEmptyRecordForm}
-          >
+          <div className={styles['vtoolbox-icon']} onClick={handleSaveClick}>
             <SaveOutlined />
           </div>
         </Tooltip>

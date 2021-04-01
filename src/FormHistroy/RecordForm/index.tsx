@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Modal, Button, Input } from 'antd';
+import { cloneDeepWith } from 'lodash';
 import { ITargetFormInfo } from '../interface';
 import { encodeFormVals } from '../../StandAdmin/utils/formEncoder';
 import {
@@ -20,6 +21,48 @@ const formItemLayout = {
   },
 };
 
+function strLen(str: string) {
+  var count = 0;
+  for (var i = 0, len = str.length; i < len; i++) {
+    count += str.charCodeAt(i) < 256 ? 1 : 2;
+  }
+  return count;
+}
+
+const getStrValPrioriy = (a: any) => {
+  switch (typeof a) {
+    case 'string':
+      return strLen(a);
+
+    case 'number':
+      return 1;
+
+    default:
+      return 0;
+  }
+};
+
+const findValidName = (targetVals: any) => {
+  const strVals: (string | number)[] = [];
+
+  // 深度遍历
+  cloneDeepWith(targetVals, function(val) {
+    if (typeof val === 'string' || typeof val === 'number') {
+      strVals.push(val);
+    }
+  });
+
+  if (strVals.length) {
+    strVals.sort((a, b) => {
+      return getStrValPrioriy(b) - getStrValPrioriy(a);
+    });
+
+    return strVals[0];
+  }
+
+  return null;
+};
+
 export default (props: any) => {
   const { targetFormInfo, historyRecordInfo, formValuesEncoder } = props;
 
@@ -35,7 +78,13 @@ export default (props: any) => {
   const getDefaultName = () => {
     const targetFormVals = getFormVals();
 
-    return nameFieldName in targetFormVals ? targetFormVals[nameFieldName] : '';
+    let name = targetFormVals[nameFieldName];
+
+    if (!name) {
+      name = findValidName(targetFormVals);
+    }
+
+    return name || '';
   };
 
   const { context, formProps, modalProps } = useStandUpsertForm({
