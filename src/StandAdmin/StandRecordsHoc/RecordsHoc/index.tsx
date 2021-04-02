@@ -2,6 +2,7 @@ import React from 'react';
 
 import { LoadingOutlined } from '@ant-design/icons';
 import { Empty, Pagination, message, Modal, Spin } from 'antd';
+import { PaginationProps } from 'antd/es/pagination';
 import classNames from 'classnames';
 import { isEqual, debounce, pick, pickBy } from 'lodash';
 import {
@@ -681,7 +682,10 @@ export default function(hocParams: IRecordsHocParams) {
         );
       };
 
-      renderPagination = ({ className, ...restProps }: any = {}) => {
+      renderPagination = ({
+        className,
+        ...restProps
+      }: PaginationProps = {}) => {
         const { storeRef } = this.props;
 
         const { pagination } = storeRef;

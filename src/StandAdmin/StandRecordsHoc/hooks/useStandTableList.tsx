@@ -1,6 +1,7 @@
 import React, { Fragment, useContext, useMemo } from 'react';
 import { Table } from 'antd';
 import classNames from 'classnames';
+import { PaginationProps } from 'antd/es/pagination';
 import { TableProps, ColumnsType } from 'antd/es/table';
 import { StandContext } from '../../const';
 import { TListCtrlProps } from '../../interface';
@@ -155,10 +156,16 @@ export function useStandTableList(props: TListCtrlProps<any>) {
         }
       }
 
+      const { size } = restProps;
+
+      const paginationProps: PaginationProps = {
+        size: size === 'small' ? 'small' : undefined,
+      };
+
       return (
         <Fragment>
           <Table {...tableListProps} {...restProps} {...{ columns, scroll }} />
-          {hasPagination && renderPagination()}
+          {hasPagination && renderPagination(paginationProps)}
         </Fragment>
       );
     },

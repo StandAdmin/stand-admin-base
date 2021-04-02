@@ -1,6 +1,7 @@
 import React from 'react';
 import { TableProps } from 'antd/es/table';
 import { ModalProps } from 'antd/es/modal';
+import { PaginationProps } from 'antd/es/pagination';
 import { Dispatch } from 'dva';
 import { Connect } from 'react-redux';
 
@@ -283,7 +284,7 @@ export interface IStandContextProps<R = any>
     shouldRefresh: boolean,
   ) => Promise<any>;
 
-  renderPagination: (params?: any) => void;
+  renderPagination: (params?: PaginationProps) => void;
 
   handleTableChange: TableProps<any>['onChange'];
   getRecordId: (record: R) => TKey;
