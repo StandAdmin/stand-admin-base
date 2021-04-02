@@ -3,6 +3,9 @@ import { identity } from 'lodash';
 import { ICommonObj } from '../interface';
 
 export default {
+  /**
+   * map({key:value}) 转 option({value:key,label:value})
+   */
   mapToOptions(obj: ICommonObj, opts: { valueFilter: (val: any) => any }) {
     const { valueFilter = identity } = opts || {};
 
@@ -11,6 +14,9 @@ export default {
       label: obj[key],
     }));
   },
+  /**
+   * array([item])转option({value:item,label:item})
+   */
   arrayToOptions(arr: any[]) {
     return arr.map(value => ({ value, label: value }));
   },
