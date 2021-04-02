@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { IActionCounterHocProps } from '../interface';
 interface IActionCounterState {
   counterMap: { [key: string]: number };
 }
@@ -29,17 +30,27 @@ export default function() {
         }));
       };
 
-      getActionCount = (action?: string) => {
+      getActionCount = (action?: string | string[]) => {
         const { counterMap } = this.state;
 
+        const targetKeys: string[] = [];
+
         if (action) {
-          return counterMap[action] || 0;
+          if (Array.isArray(action)) {
+            targetKeys.push(...action);
+          } else {
+            targetKeys.push(action);
+          }
         }
 
-        return Object.keys(counterMap).reduce(
-          (accumulator, key) => accumulator + counterMap[key],
-          0,
-        );
+        return Object.keys(counterMap).reduce((accumulator, key) => {
+          return (
+            accumulator +
+            (!targetKeys.length || targetKeys.indexOf(key) >= 0
+              ? counterMap[key]
+              : 0)
+          );
+        }, 0);
       };
 
       render() {
@@ -49,7 +60,7 @@ export default function() {
           getActionCount,
         } = this;
 
-        const ctx = {
+        const ctx: IActionCounterHocProps = {
           increaseActionCount,
           decreaseActionCount,
           getActionCount,

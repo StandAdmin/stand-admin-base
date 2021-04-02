@@ -240,7 +240,7 @@ export interface IBatchCheckHocProps<R> {
 export interface IActionCounterHocProps {
   increaseActionCount: (action?: string, num?: number) => void;
   decreaseActionCount: (action?: string, num?: number) => void;
-  getActionCount: (action?: string) => number;
+  getActionCount: (action?: string | string[]) => number;
 }
 
 export interface IStandContextProps<R = any>
@@ -273,6 +273,7 @@ export interface IStandContextProps<R = any>
   getSearchParams: (specProps?: ICommonObj) => object;
   searchRecords: (specParams?: ICommonObj) => void;
   debouncedSearchRecords: (specParams?: ICommonObj) => void;
+  blinkRecordById: (id: any) => void;
   idFieldName: string;
   nameFieldName: string;
 

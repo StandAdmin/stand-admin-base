@@ -349,7 +349,7 @@ export function getStandModel(opts: IStandModelOptions) {
           return records.find((item: any) => item[idFieldName] === id);
         },
         *blinkRecordById(
-          { id, timeout = 2000 }: { id: any; timeout: number },
+          { id, timeout = 1000 }: { id: any; timeout: number },
           { put }: any,
         ) {
           const recordItem: any = yield put.resolve({

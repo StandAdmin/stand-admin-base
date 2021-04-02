@@ -474,7 +474,7 @@ export default function(hocParams: IRecordsHocParams) {
         }: IStoreActionParams,
       ) => {
         if (resp && resp.success) {
-          const { dispatch, searchRecordsOnRefresh, onRefresh } = this.props;
+          const { searchRecordsOnRefresh, onRefresh } = this.props;
 
           if (successMsg !== false) {
             message.success(successMsg || `${actionTitle}成功！`);
@@ -489,10 +489,7 @@ export default function(hocParams: IRecordsHocParams) {
                   const matchRecord = resp.data || payload.record;
 
                   if (matchRecord) {
-                    dispatch({
-                      type: `${StoreNs}/blinkRecordById`,
-                      id: matchRecord[idFieldName],
-                    });
+                    this.blinkRecordById(this.getRecordId(matchRecord));
                   }
                 }
               });
@@ -507,6 +504,14 @@ export default function(hocParams: IRecordsHocParams) {
             this.hideRecordFormOnly();
           }
         }
+      };
+
+      blinkRecordById = (id: any) => {
+        const { dispatch } = this.props;
+        dispatch({
+          type: `${StoreNs}/blinkRecordById`,
+          id,
+        });
       };
 
       callStoreAction = (args: IStoreActionParams) => {
@@ -761,6 +766,7 @@ export default function(hocParams: IRecordsHocParams) {
           debouncedSearchRecords,
           getRecordModelPkg,
           getConfigModelPkg,
+          blinkRecordById,
         } = this;
 
         const {
@@ -783,6 +789,7 @@ export default function(hocParams: IRecordsHocParams) {
           showEmptyRecordForm,
           recordNsTitle: StoreNsTitle,
           StoreNsTitle,
+          blinkRecordById,
           getUrlParams,
           clearActiveRecord,
           hideRecordFormOnly,
