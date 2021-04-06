@@ -1,11 +1,10 @@
-import styles from './styles';
-
 import { StandContext } from '../const';
-
 import StandListCtrlHoc from './ListCtrlHoc';
 import StandRecordsHoc from './RecordsHoc';
-
+import { IRecordCommonHocParams } from '../interface';
 import { StandConfigLoadingHoc, StandConnectHoc } from './utils';
+
+import styles from './styles';
 
 export {
   StandRecordsHoc,
@@ -15,3 +14,7 @@ export {
   StandConfigLoadingHoc,
   StandConnectHoc,
 };
+
+export function defineCommonHocParams(params: IRecordCommonHocParams) {
+  return params;
+}

@@ -1,11 +1,7 @@
 import { ConfigLoadingFld, ConfigLoadingMethod } from '../const';
 import { getConfig } from '../config';
-
-import { IConfigLoadingHocParams, IRecordsHocParams } from '../interface';
-
-export const StandConfigLoadingHoc = (hocParams: IConfigLoadingHocParams) => {
-  return StandConnectHoc(hocParams);
-};
+import { omit } from 'lodash';
+import { IRecordsHocParams } from '../interface';
 
 export const StandConnectHoc = (hocParams: Partial<IRecordsHocParams>) => {
   const { getConnect } = getConfig();
@@ -32,7 +28,7 @@ export const StandConnectHoc = (hocParams: Partial<IRecordsHocParams>) => {
 
       return {
         storeRef: storeRefState,
-        configStoreRef: configStoreRefState,
+        configStoreRef: omit(configStoreRefState, [ConfigLoadingFld]),
         searchLoading: loading.effects[`${StoreNs}/search`],
         configLoading:
           loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`] ||
@@ -40,3 +36,6 @@ export const StandConnectHoc = (hocParams: Partial<IRecordsHocParams>) => {
       };
     })(WrappedComponent);
 };
+
+/** @deprecated use StandConnectHoc instead */
+export const StandConfigLoadingHoc = StandConnectHoc;

@@ -121,11 +121,6 @@ export interface IStoreRef {
   removingRecord?: TCommonObjOrEmpty;
 }
 
-export interface IRecordsHocModelParams {
-  recordModel?: IModelPkg;
-  configModel?: IModelPkg;
-}
-
 export interface DvaApp {
   model: (model: any) => void;
   unmodel: (namespace: string) => void;
@@ -137,27 +132,48 @@ export interface History {
   location: any;
 }
 
-export interface IConfigLoadingHocParams {
-  recordModel?: IModelPkg;
-  configModel?: IModelPkg;
-  getConnect: () => TFnAny;
+export interface IRecordsHocModelParams {
+  /**
+   * Normally returned by buildStandConfigModelPkg
+   */
+  configModel: IModelPkg;
+
+  /**
+   * Normally returned by buildStandRecordModelPkg
+   */
+  recordModel: IModelPkg;
 }
-export interface IRecordsHocBaseParams {
+
+export interface IRecordCommonHocParams extends IRecordsHocModelParams {
+  /**
+   * Whether sync search params to url
+   */
+  syncParamsToUrl?: boolean;
+  /**
+   * Param namespace to avoid conflict
+   */
+  urlParamsNs?: false | string;
+  /**
+   * Default search params
+   */
+  defaultSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
+  /**
+   * Special search params, which can not be overide
+   */
+  specSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
+
+  sorterSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
+  filterSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
+}
+export interface IRecordsHocBaseParams extends IRecordCommonHocParams {
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
-  syncParamsToUrl?: boolean;
-  urlParamsNs?: false | string;
   searchRecordsOnMount?: boolean;
   takeOverMount?: boolean;
   searchRecordsOnParamsChange?: boolean;
   searchRecordsOnRefresh?: boolean;
-  defaultSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
-  specSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
   finalSearchParamsFilter?: (params?: TCommonObjOrEmpty) => TCommonObjOrEmpty;
-  sorterSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
-  filterSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
   reservedUrlParamNames?: string[];
-  useLastSavedSearchParamsOnMount?: boolean;
   placeholderIfConfigLoading?: boolean | React.ReactNode;
   wrapperClassName?: string;
   formNamePrefix?: string;
@@ -167,10 +183,7 @@ export interface IRecordsHocBaseParams {
   getRecordMapByIdList?: (idList: any[]) => Promise<ICommonObj>;
 }
 
-export interface IRecordsHocParams
-  extends IRecordsHocBaseParams,
-    IRecordsHocModelParams {}
-
+export interface IRecordsHocParams extends IRecordsHocBaseParams {}
 export interface IRecordsProps extends IRecordsHocBaseParams {
   location?: { search: string };
   dispatch: Dispatch<any>;

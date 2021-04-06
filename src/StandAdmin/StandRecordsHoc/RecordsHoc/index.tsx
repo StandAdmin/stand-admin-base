@@ -64,7 +64,6 @@ export default function(hocParams: IRecordsHocParams) {
     specSearchParams: undefined,
     sorterSearchParams: undefined,
     reservedUrlParamNames: [],
-    useLastSavedSearchParamsOnMount: false,
     placeholderIfConfigLoading: true,
     ...restHocParams,
   };
@@ -168,7 +167,9 @@ export default function(hocParams: IRecordsHocParams) {
       getConfigModelPkg = () => configModel;
 
       getRelModelPkgs = () => {
-        return [this.getRecordModelPkg(), this.getConfigModelPkg()];
+        return [this.getRecordModelPkg(), this.getConfigModelPkg()].filter(
+          pkg => !!pkg,
+        );
       };
 
       tryRegisterModels = () => {
