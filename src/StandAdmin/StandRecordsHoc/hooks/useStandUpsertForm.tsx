@@ -211,7 +211,9 @@ export function useStandUpsertForm({
 
   const activeRecordName = getRecordName(activeRecord);
 
-  const formId = `${formNamePrefix}_${StoreNs}_Upsert`;
+  const formId = `${formNamePrefix}_${StoreNs}_Upsert${
+    typeof recordFormVisibleTag !== 'boolean' ? '_' + recordFormVisibleTag : ''
+  }`;
 
   const formHistroyTriggerProps = {
     targetFormInfo: { formId, form, title: `${StoreNsTitle}` },

@@ -65,6 +65,7 @@ export default function(hocParams: IRecordsHocParams) {
     sorterSearchParams: undefined,
     reservedUrlParamNames: [],
     placeholderIfConfigLoading: true,
+    formNamePrefix: 'Form',
     ...restHocParams,
   };
 
@@ -777,7 +778,7 @@ export default function(hocParams: IRecordsHocParams) {
           increaseActionCount,
           decreaseActionCount,
           getActionCount,
-          formNamePrefix = 'Form',
+          formNamePrefix,
         } = this.props;
 
         const contextVal: IStandContextProps = {
