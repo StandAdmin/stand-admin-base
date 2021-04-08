@@ -27,7 +27,7 @@ const SaveTriggerWrapper = (props: any) => {
     <RecordFormWrapper
       {...props}
       trigger={() => (
-        <Tooltip placement="left" title="保存当前表单内容">
+        <Tooltip placement="left" title="暂存表单为草稿">
           <div className={styles['vtoolbox-icon']} onClick={handleSaveClick}>
             <SaveOutlined />
           </div>
@@ -38,7 +38,7 @@ const SaveTriggerWrapper = (props: any) => {
 };
 
 const modalTrigger = ({ showModal }: any) => (
-  <Tooltip placement="left" title="查看历史记录">
+  <Tooltip placement="left" title="查看草稿记录">
     <div className={styles['vtoolbox-icon']}>
       <HistoryOutlined onClick={showModal} />
     </div>
@@ -65,7 +65,7 @@ export default (props: any) => {
         modalTrigger={modalTrigger}
         modalProps={{
           width: 700,
-          title: `表单历史记录 - ${title}`,
+          title: `表单草稿记录 - ${title}`,
           footer: null,
         }}
         isStandListCtrl={false}

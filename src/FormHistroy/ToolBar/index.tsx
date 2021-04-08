@@ -15,7 +15,7 @@ export default (props: any) => {
         onClick={showEmptyRecordForm}
         icon={<SaveOutlined />}
       >
-        保存当前表单内容
+        暂存表单为草稿
       </Button>
     </div>
   );

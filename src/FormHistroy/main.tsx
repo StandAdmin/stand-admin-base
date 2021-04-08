@@ -46,7 +46,7 @@ export const configModel = buildStandConfigModelPkg({
 // 创建RecordModel
 export const recordModel = buildStandRecordModelPkg({
   StoreNs: 'StandAdminFormHistroyRecords',
-  StoreNsTitle: '表单历史记录',
+  StoreNsTitle: '表单草稿记录',
   idFieldName: 'id',
   nameFieldName: 'name',
   searchRecords,
