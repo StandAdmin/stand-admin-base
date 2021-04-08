@@ -244,9 +244,16 @@ export function useStandUpsertForm({
       onCancel: handleCancel,
       afterClose: clearActiveRecord,
     },
+    /**
+     * Normally passed by showRecordForm, and used as match condition in isModalVisible
+     */
     recordFormVisibleTag,
     getInitValues,
     getInitValuesByRecord,
+    /**
+     *  Update or Create
+     *  isUpdate =  activeRecord && activeRecord[idFieldName]
+     */
     isUpdate,
     activeRecord,
     context,
