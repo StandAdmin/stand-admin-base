@@ -52,8 +52,8 @@ export interface IStandModelOptions {
   searchParamsMap?: {
     [key: string]: string;
   };
-  StoreNs: string;
-  StoreNsTitle: string;
+  StoreNs?: string;
+  StoreNsTitle?: string;
   searchRecords?: (params?: ICommonObj) => Promise<IResponseOfSearchRecords>;
   getRecord?: (params?: ICommonObj) => Promise<IResponse>;
   addRecord?: (record: ICommonObj) => Promise<IResponse>;

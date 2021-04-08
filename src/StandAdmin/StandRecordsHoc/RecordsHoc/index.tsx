@@ -14,6 +14,7 @@ import { getConfig } from '../../config';
 import { logInfo, logWarn } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
 import { StandContext } from '../../const';
+import { EmptyConfigModel, EmptyRecordModel } from '../../standModelHelper';
 import {
   IRecordsProps,
   IRecordsHocParams,
@@ -27,7 +28,9 @@ import {
   IStandContextProps,
 } from '../../interface';
 
-import { StandConnectHoc } from '../utils';
+import { getAutoIdGenerator } from '../../utils/util';
+
+import { StandConnectHoc } from '../connect';
 
 import styles from '../styles';
 
@@ -35,15 +38,14 @@ export type TRecordsHocCompProps = IRecordsHocBaseParams & ICommonObj;
 
 export type TRecordsHocComp = React.ComponentType<TRecordsHocCompProps>;
 
-let baseMountId = 1;
-
-const getNewMountId = () => {
-  baseMountId += 1;
-  return baseMountId;
-};
+const getNewMountId = getAutoIdGenerator();
 
 export default function(hocParams: IRecordsHocParams) {
-  const { recordModel, configModel, ...restHocParams } = hocParams;
+  const {
+    recordModel = EmptyRecordModel,
+    configModel = EmptyConfigModel,
+    ...restHocParams
+  } = hocParams;
 
   const {
     idFieldName = 'id',

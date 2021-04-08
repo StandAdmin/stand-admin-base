@@ -2,7 +2,9 @@ import React from 'react';
 import { notification, Modal } from 'antd';
 import { merge, get } from 'lodash';
 // import Localforage from 'localforage';
-import { ConfigLoadingFld, ConfigLoadingMethod } from './const';
+import { ConfigLoadingFld, ModelNsPre, ConfigLoadingMethod } from './const';
+
+import { getAutoIdGenerator } from './utils/util';
 
 import {
   IResponse,
@@ -594,8 +596,21 @@ export function getStandConfigModel(opts: IStandConfigModelOptions) {
   };
 }
 
-export function buildStandRecordModelPkg(opts: IStandModelOptions): IModelPkg {
-  const { idFieldName, nameFieldName, StoreNs, StoreNsTitle } = opts;
+const getAutoId = getAutoIdGenerator();
+
+export function getAutoStoreNs(key: string) {
+  return `_Auto${getAutoId()}_${ModelNsPre}${key}`;
+}
+
+export function buildStandRecordModelPkg(
+  opts: IStandModelOptions = {},
+): IModelPkg {
+  const {
+    idFieldName = 'id',
+    nameFieldName = 'name',
+    StoreNs = getAutoStoreNs('Record'),
+    StoreNsTitle = '记录',
+  } = opts;
 
   return {
     StoreNs,
@@ -612,7 +627,7 @@ export function buildStandRecordModelPkg(opts: IStandModelOptions): IModelPkg {
 export function buildStandConfigModelPkg(
   opts: IStandConfigModelOptions,
 ): IModelPkg {
-  const { StoreNs, StoreNsTitle } = opts;
+  const { StoreNs = getAutoStoreNs('Config'), StoreNsTitle = '配置' } = opts;
 
   return {
     StoreNs,
@@ -620,3 +635,20 @@ export function buildStandConfigModelPkg(
     default: getStandConfigModel({ ...opts, StoreNs }),
   };
 }
+
+export const EmptyConfigModel = buildStandConfigModelPkg({
+  StoreNs: `${ModelNsPre}EmptyConfig`,
+  StoreNsTitle: '空配置',
+  getConfig: [],
+});
+
+export const EmptyRecordModel = buildStandRecordModelPkg({
+  StoreNs: `${ModelNsPre}EmptyRecord`,
+  StoreNsTitle: '空实体',
+  idFieldName: 'id',
+  nameFieldName: 'name',
+  searchRecords: async () => ({
+    success: true,
+    data: { list: [], total: 0, pageNum: 1, pageSize: 1 },
+  }),
+});
