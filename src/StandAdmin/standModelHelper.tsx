@@ -195,6 +195,7 @@ export function getStandModel(opts: IStandModelOptions) {
         removingRecord: null,
         records: [],
         searchParams: {},
+        searchLoading: false,
         pagination: { total: 0, current: 1, pageSize: 10 },
         recordFormVisibleTag: false,
       },
@@ -252,18 +253,24 @@ export function getStandModel(opts: IStandModelOptions) {
 
           const reqParams = { pageNum: 1, pageSize: 10, ...params };
 
+          yield put({
+            type: 'saveState',
+            payload: {
+              searchLoading: true,
+            },
+          });
+
           const response: IResponse = yield call(
             searchRecords,
             filterParams(reqParams),
           );
 
+          const newPayload = {};
+
           if (!response || !response.success) {
             if (updateSearchParamsEvenError) {
-              yield put({
-                type: 'saveState',
-                payload: {
-                  searchParams: params,
-                },
+              Object.assign(newPayload, {
+                searchParams: params,
               });
             }
 
@@ -278,15 +285,17 @@ export function getStandModel(opts: IStandModelOptions) {
 
             const total = origTotal !== undefined ? origTotal : list.length;
 
-            yield put({
-              type: 'saveState',
-              payload: {
-                searchParams: params,
-                records: list,
-                pagination: { current: pageNum, pageSize, total },
-              },
+            Object.assign(newPayload, {
+              searchParams: params,
+              records: list,
+              pagination: { current: pageNum, pageSize, total },
             });
           }
+
+          yield put({
+            type: 'saveState',
+            payload: { ...newPayload, searchLoading: false },
+          });
 
           return response;
         },

@@ -100,10 +100,11 @@ const hocParams: IRecordsHocParams = {
   configModel,
 
   syncParamsToUrl: false,
+  passContextAsProps: false,
   /**
    * 默认的查询参数
    */
-  defaultSearchParams: {},
+  // defaultSearchParams: {},
 };
 
 const DynamicCompCache: ICommonObj = {};

@@ -10,8 +10,10 @@ import {
   IBatchCheckProps,
   TListCtrlProps,
   TRecordsHocCompProps,
+  IStandContextProps,
 } from '../../interface';
 import IdSelectCtrlHoc from './IdSelectCtrlHoc';
+import { StandContext } from '../../const';
 
 import styles from '../styles';
 
@@ -22,15 +24,16 @@ interface IListCtrlState {
 function defaultModalTriggerRender({
   props,
   showModal,
+  context,
 }: {
   props: TListCtrlProps<any>;
   showModal: () => void;
+  context: IStandContextProps<any>;
 }) {
+  const { recordNsTitle, getRecordId, getRecordName } = context;
+
   const {
     checkedList,
-    recordNsTitle,
-    getRecordId,
-    getRecordName,
     modalTriggerDisabled,
     modalTriggerTitle,
     modalTriggerClassName,
@@ -95,6 +98,8 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
         ...defaultRestHocParams,
       };
 
+      static contextType = StandContext;
+
       static getDerivedStateFromProps(
         props: TListCtrlProps<R>,
         state: IListCtrlState,
@@ -122,7 +127,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
         const { searchRecordsOnMount, isModalMode } = this.props;
 
         if (!isModalMode || this.isModalVisible() || searchRecordsOnMount) {
-          this.props.debouncedSearchRecords();
+          this.context.debouncedSearchRecords();
         }
       }
 
@@ -135,7 +140,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
 
         if (!prevModalVisible && currModalVisible) {
           const { resetSearchParamsOnModalShow } = this.props;
-          this.props.debouncedSearchRecords(
+          this.context.debouncedSearchRecords(
             resetSearchParamsOnModalShow ? {} : undefined,
           );
         }

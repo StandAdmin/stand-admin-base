@@ -7,6 +7,8 @@ import {
   TListCtrlProps,
 } from '../../interface';
 
+import { useStandContext } from '../hooks/useStandContext';
+
 const TagProp = '_cus_tag_';
 
 export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
@@ -16,12 +18,17 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
     const Comp: React.FC<TListCtrlProps<R> & {
       onChangeWithData?: (list: R[]) => void;
     }> = props => {
-      const { getRecordId, idFieldName, nameFieldName } = props;
+      const {
+        getRecordId,
+        idFieldName,
+        nameFieldName,
+        getRecordMapByIdList: defaultGetRecordMapByIdList,
+      } = useStandContext();
 
       const {
         defaultCheckedIdList,
         checkedIdList: origCheckedIdList,
-        getRecordMapByIdList,
+        getRecordMapByIdList = defaultGetRecordMapByIdList,
         onChange: origOnChange,
         onChangeWithData,
         ...rest

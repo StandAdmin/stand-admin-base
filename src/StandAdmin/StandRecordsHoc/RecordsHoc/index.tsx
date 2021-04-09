@@ -63,6 +63,7 @@ export default function(hocParams: IRecordsHocParams) {
     sorterSearchParams: undefined,
     reservedUrlParamNames: [],
     placeholderIfConfigLoading: true,
+    passContextAsProps: true,
     formNamePrefix: 'Form',
     ...restHocParams,
   };
@@ -783,6 +784,7 @@ export default function(hocParams: IRecordsHocParams) {
           decreaseActionCount,
           getActionCount,
           formNamePrefix,
+          passContextAsProps,
         } = this.props;
 
         const contextVal: IStandContextProps = {
@@ -856,7 +858,10 @@ export default function(hocParams: IRecordsHocParams) {
             )}
           >
             <StandContext.Provider value={contextVal}>
-              <WrappedComponent {...restProps} {...contextVal} />
+              <WrappedComponent
+                {...restProps}
+                {...(passContextAsProps ? contextVal : undefined)}
+              />
             </StandContext.Provider>
           </div>
         );

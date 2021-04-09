@@ -177,6 +177,7 @@ export interface IRecordsHocBaseParams extends IRecordCommonHocParams {
   placeholderIfConfigLoading?: boolean | React.ReactNode;
   wrapperClassName?: string;
   formNamePrefix?: string;
+  passContextAsProps?: boolean;
   onRecordFormVisibleTagChange?: (recordFormVisibleTag: any) => void;
   onRefresh?: () => void;
   callStoreActionPayloadFilter?: (action: string, payload: any) => void;
@@ -256,9 +257,8 @@ export interface IActionCounterHocProps {
   getActionCount: (action?: string | string[]) => number;
 }
 
-export interface IStandContextProps<R = any>
-  extends IActionCounterHocProps,
-    Partial<IBatchCheckHocProps<R>> {
+export interface IStandContextProps<R = any> extends IActionCounterHocProps {
+  // Partial<IBatchCheckHocProps<R>>
   StoreNs: string;
   storeRef: IStoreRef;
   configStoreRef: ICommonObj;
