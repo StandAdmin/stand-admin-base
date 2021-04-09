@@ -11,7 +11,7 @@ import {
   isQueryParamsEqual,
 } from '../../utils/urlQueryHelper';
 import { getConfig } from '../../config';
-import { logInfo, logWarn } from '../../utils/logUtils';
+import { logInfo } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
 import { StandContext } from '../../const';
 import { EmptyConfigModel, EmptyRecordModel } from '../../standModelHelper';
@@ -23,7 +23,7 @@ import {
   IStoreActionParams,
   IServiceParams,
   TCommonObjOrEmpty,
-  IRecordsHocBaseParams,
+  TRecordsHocComp,
   ICommonObj,
   IStandContextProps,
 } from '../../interface';
@@ -33,10 +33,6 @@ import { getAutoIdGenerator } from '../../utils/util';
 import { StandConnectHoc } from '../connect';
 
 import styles from '../styles';
-
-export type TRecordsHocCompProps = IRecordsHocBaseParams & ICommonObj;
-
-export type TRecordsHocComp = React.ComponentType<TRecordsHocCompProps>;
 
 const getNewMountId = getAutoIdGenerator();
 
@@ -278,15 +274,26 @@ export default function(hocParams: IRecordsHocParams) {
         return this.latestSearchParams;
       };
 
+      getLocation = (specProps?: IRecordsProps) => {
+        const props = specProps || this.props;
+
+        if (props.location) {
+          return props.location;
+        }
+
+        const { getHistory } = getConfig();
+
+        const history = getHistory();
+
+        return history.location;
+      };
+
       getUrlParams = (specProps?: IRecordsProps) => {
         const props = specProps || this.props;
 
-        if (!props.location) {
-          logInfo('location not exists on props!');
-          return {};
-        }
-
-        return fromUrlQuery(props.location.search, { ns: props.urlParamsNs });
+        return fromUrlQuery(this.getLocation(specProps).search, {
+          ns: props.urlParamsNs,
+        });
       };
 
       getSearchParams = (specProps?: IRecordsProps) => {
@@ -319,64 +326,59 @@ export default function(hocParams: IRecordsHocParams) {
           urlParamsNs,
         } = this.props;
 
-        const { getHistory } = getConfig();
-
         const urlQueryOpts = { ns: urlParamsNs };
 
         if (syncParamsToUrl) {
-          if (this.props.location) {
-            const reservedParams = {};
+          const reservedParams = {};
 
-            const oldQueryParams = fromUrlQuery(
-              this.props.location.search,
-              urlQueryOpts,
+          const searchInLocation = this.getLocation().search;
+
+          const oldQueryParams = fromUrlQuery(searchInLocation, urlQueryOpts);
+
+          if (reservedUrlParamNames && reservedUrlParamNames.length > 0) {
+            Object.assign(
+              reservedParams,
+              pick(oldQueryParams, reservedUrlParamNames),
             );
+          }
 
-            if (reservedUrlParamNames && reservedUrlParamNames.length > 0) {
-              Object.assign(
-                reservedParams,
-                pick(oldQueryParams, reservedUrlParamNames),
-              );
-            }
+          const newQueryParams = { ...reservedParams, ...params };
 
-            const newQueryParams = { ...reservedParams, ...params };
-
-            if (isQueryParamsEqual(oldQueryParams, newQueryParams)) {
-              if (passSearchWhenParamsEqual) {
-                return;
-              }
-
-              this.searchRecords(params);
+          if (isQueryParamsEqual(oldQueryParams, newQueryParams)) {
+            if (passSearchWhenParamsEqual) {
               return;
             }
 
-            const history = getHistory();
-
-            const searchQuery = [toUrlQuery(newQueryParams, urlQueryOpts)];
-
-            if (urlParamsNs) {
-              // Keep "unrelated" params
-              const extraSearchQuery = toUrlQuery(
-                pickBy(
-                  fromUrlQuery(this.props.location.search),
-                  (value, key) => key !== urlParamsNs,
-                ),
-              );
-
-              if (extraSearchQuery) {
-                searchQuery.push(extraSearchQuery);
-              }
-            }
-
-            history.push({
-              pathname: history.location.pathname,
-              search: searchQuery.join('&'),
-            });
-
+            this.searchRecords(params);
             return;
-          } else {
-            logWarn('location not in props');
           }
+
+          const searchQuery = [toUrlQuery(newQueryParams, urlQueryOpts)];
+
+          if (urlParamsNs) {
+            // Keep "unrelated" params
+            const extraSearchQuery = toUrlQuery(
+              pickBy(
+                fromUrlQuery(searchInLocation),
+                (value, key) => key !== urlParamsNs,
+              ),
+            );
+
+            if (extraSearchQuery) {
+              searchQuery.push(extraSearchQuery);
+            }
+          }
+
+          const { getHistory } = getConfig();
+
+          const history = getHistory();
+
+          history.push({
+            pathname: history.location.pathname,
+            search: searchQuery.join('&'),
+          });
+
+          return;
         }
 
         this.searchRecords(params);
