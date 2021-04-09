@@ -298,7 +298,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
       };
 
       renderModal = (mainContent: React.ReactElement) => {
-        const { recordNsTitle } = this.props;
+        const { recordNsTitle } = this.context;
 
         const { modalProps, modalWrapperClassName } = this.props;
 
