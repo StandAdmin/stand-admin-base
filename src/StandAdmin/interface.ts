@@ -324,3 +324,7 @@ export type TListCtrlProps<R> = IListCtrlProps<R> &
   IStandContextProps &
   IBatchCheckHocProps<R> &
   IBatchCheckProps<R>;
+
+export type TRecordsHocCompProps = IRecordsHocBaseParams & ICommonObj;
+
+export type TRecordsHocComp = React.ComponentType<TRecordsHocCompProps>;

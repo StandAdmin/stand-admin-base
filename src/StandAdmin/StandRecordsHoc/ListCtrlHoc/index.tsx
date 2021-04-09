@@ -2,13 +2,14 @@ import React, { Fragment } from 'react';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { Button, Modal, Tag } from 'antd';
 import classNames from 'classnames';
-import StandRecordsHoc, { TRecordsHocCompProps } from '../RecordsHoc';
+import StandRecordsHoc from '../RecordsHoc';
 import BatchCheckHoc from '../../BatchCheckHoc';
 import {
   IListCtrlHocParams,
   IListCtrlProps,
   IBatchCheckProps,
   TListCtrlProps,
+  TRecordsHocCompProps,
 } from '../../interface';
 import IdSelectCtrlHoc from './IdSelectCtrlHoc';
 

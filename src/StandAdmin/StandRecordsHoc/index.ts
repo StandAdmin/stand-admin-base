@@ -1,6 +1,7 @@
 import { StandContext } from '../const';
 import StandListCtrlHoc from './ListCtrlHoc';
 import StandRecordsHoc from './RecordsHoc';
+import StandRecordInfoHoc from './RecordInfoHoc';
 import { IRecordCommonHocParams } from '../interface';
 import { StandConfigLoadingHoc, StandConnectHoc } from './connect';
 
@@ -10,6 +11,7 @@ export {
   StandRecordsHoc,
   StandContext,
   StandListCtrlHoc,
+  StandRecordInfoHoc,
   styles as standStyles,
   StandConfigLoadingHoc,
   StandConnectHoc,
