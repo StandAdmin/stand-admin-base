@@ -163,7 +163,11 @@ export function getStandModel(opts: IStandModelOptions) {
     const result: ICommonObj = {};
 
     Object.keys(fldsPathInResp).forEach(key => {
-      result[key] = getFirstNotEmptyVal(resp, fldsPathInResp[key]);
+      const val = getFirstNotEmptyVal(resp, fldsPathInResp[key]);
+
+      if (val !== undefined) {
+        result[key] = val;
+      }
     });
 
     return result;
@@ -220,9 +224,9 @@ export function getStandModel(opts: IStandModelOptions) {
             return false;
           }
 
-          const { list, total } = getCommonFlds(response);
+          const { list = [] } = getCommonFlds(response);
 
-          return total > 0 ? list[0] : null;
+          return list && list.length > 0 ? list[0] : null;
         },
         *getRecord({ params }: { params?: any }, { call }: any) {
           const response: any = yield call(
@@ -244,16 +248,13 @@ export function getStandModel(opts: IStandModelOptions) {
           }: { params?: any; opts: { updateSearchParamsEvenError?: boolean } },
           { call, put }: any,
         ) {
-          // yield put({
-          //   type: 'saveSearchParams',
-          //   params,
-          // });
-
           const { updateSearchParamsEvenError } = options;
+
+          const reqParams = { pageNum: 1, pageSize: 10, ...params };
 
           const response: IResponse = yield call(
             searchRecords,
-            filterParams({ pageNum: 1, pageSize: 10, ...params }),
+            filterParams(reqParams),
           );
 
           if (!response || !response.success) {
@@ -268,7 +269,14 @@ export function getStandModel(opts: IStandModelOptions) {
 
             handleRespError({ response, errorTitle: '获取结果列表失败' });
           } else {
-            const { list, pageSize, total, pageNum } = getCommonFlds(response);
+            const {
+              list = [],
+              total: origTotal,
+              pageSize = reqParams.pageSize,
+              pageNum = reqParams.pageNum,
+            } = getCommonFlds(response);
+
+            const total = origTotal !== undefined ? origTotal : list.length;
 
             yield put({
               type: 'saveState',
@@ -649,6 +657,6 @@ export const EmptyRecordModel = buildStandRecordModelPkg({
   nameFieldName: 'name',
   searchRecords: async () => ({
     success: true,
-    data: { list: [], total: 0, pageNum: 1, pageSize: 1 },
+    data: {},
   }),
 });
