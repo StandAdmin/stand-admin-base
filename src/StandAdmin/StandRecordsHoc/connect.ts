@@ -1,7 +1,11 @@
 import { ConfigLoadingFld, ConfigLoadingMethod } from '../const';
 import { getConfig } from '../config';
-import { omit } from 'lodash';
+import { memoize, omit } from 'lodash';
 import { IRecordsHocParams } from '../interface';
+
+const filterState = memoize(state => {
+  return omit(state, [ConfigLoadingFld]);
+});
 
 export const StandConnectHoc = (hocParams: Partial<IRecordsHocParams>) => {
   const { getConnect } = getConfig();
@@ -28,8 +32,8 @@ export const StandConnectHoc = (hocParams: Partial<IRecordsHocParams>) => {
 
       return {
         storeRef: storeRefState,
-        configStoreRef: omit(configStoreRefState, [ConfigLoadingFld]),
-        searchLoading: loading.effects[`${StoreNs}/search`],
+        configStoreRef: filterState(configStoreRefState),
+        searchLoading: storeRefState.searchLoading, // loading.effects[`${StoreNs}/search`],
         configLoading:
           loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`] ||
           !!configStoreRefState[ConfigLoadingFld],
