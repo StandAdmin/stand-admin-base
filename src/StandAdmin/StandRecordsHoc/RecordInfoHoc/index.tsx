@@ -13,7 +13,10 @@ import { set, omit } from 'lodash';
 import { useStandContext } from '../hooks/useStandContext';
 
 import StandRecordsHoc from '../RecordsHoc';
-import { buildStandRecordModelPkg } from '../../standModelHelper';
+import {
+  buildStandRecordModelPkg,
+  getAutoStoreNs,
+} from '../../standModelHelper';
 
 export default function(hocParams: IRecordsHocParams) {
   const { recordModel = EmptyRecordModel } = hocParams;
@@ -40,6 +43,7 @@ export default function(hocParams: IRecordsHocParams) {
       ...hocParams,
       recordModel: buildStandRecordModelPkg({
         ...recordModel.modelOpts,
+        StoreNs: getAutoStoreNs(`Info_${recordModel.StoreNs}`),
         searchRecords: params => {
           const {
             getRecord,

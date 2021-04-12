@@ -17,18 +17,18 @@ export const StandConnectHoc = (hocParams: Partial<IRecordsHocParams>) => {
   const { StoreNs: ConfigStoreNs } = configModel || {};
 
   return (WrappedComponent: React.ComponentType<any>) =>
-    getConnect()((props: any) => {
+    getConnect()((state: any) => {
       const storeRefState = StoreNs
-        ? props[StoreNs] || (recordModel && recordModel.default.state) || {}
+        ? state[StoreNs] || (recordModel && recordModel.default.state) || {}
         : {};
 
       const configStoreRefState = ConfigStoreNs
-        ? props[ConfigStoreNs] ||
+        ? state[ConfigStoreNs] ||
           (configModel && configModel.default.state) ||
           {}
         : {};
 
-      const { loading } = props;
+      const { loading } = state;
 
       return {
         storeRef: storeRefState,
