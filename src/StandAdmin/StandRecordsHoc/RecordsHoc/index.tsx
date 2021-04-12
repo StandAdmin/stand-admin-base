@@ -730,19 +730,7 @@ export default function(hocParams: IRecordsHocParams) {
 
       getRecordName = (record: any) => record && record[nameFieldName];
 
-      render() {
-        const { configLoading, placeholderIfConfigLoading } = this.props;
-
-        if (configLoading && placeholderIfConfigLoading) {
-          return placeholderIfConfigLoading === true ? (
-            <Spin />
-          ) : (
-            placeholderIfConfigLoading
-          );
-        }
-
-        const { wrapperClassName, ...restProps } = this.props;
-
+      getInsMethods = () => {
         const {
           getRecordName,
           clearActiveRecord,
@@ -776,7 +764,46 @@ export default function(hocParams: IRecordsHocParams) {
           blinkRecordById,
         } = this;
 
+        return {
+          getRecordName,
+          clearActiveRecord,
+          hideRecordFormOnly,
+          hideRecordForm: hideRecordFormOnly,
+          updateRecord,
+          addRecord,
+          showRecordForm,
+          deleteRecord,
+          goSearch,
+          getSearchParams,
+          reloadSearch,
+          searchRecords,
+          getRecordMapByIdList,
+          getRecord,
+          loadAndShowRecordForm,
+          getUrlParams,
+          showEmptyRecordForm,
+          callAction,
+          renderPagination,
+          renderEmpty,
+          handleTableChange,
+          getRecordId,
+          getDefaultSearchParams,
+          getSpecSearchParams,
+          callStoreAction,
+          callService,
+          getLatestSearchParams,
+          debouncedSearchRecords,
+          getRecordModelPkg,
+          getConfigModelPkg,
+          blinkRecordById,
+        };
+      };
+
+      render() {
         const {
+          configLoading,
+          placeholderIfConfigLoading,
+          wrapperClassName,
           storeRef,
           configStoreRef,
           searchLoading,
@@ -785,7 +812,16 @@ export default function(hocParams: IRecordsHocParams) {
           getActionCount,
           formNamePrefix,
           passContextAsProps,
+          ...restProps
         } = this.props;
+
+        if (configLoading && placeholderIfConfigLoading) {
+          return placeholderIfConfigLoading === true ? (
+            <Spin />
+          ) : (
+            placeholderIfConfigLoading
+          );
+        }
 
         const contextVal: IStandContextProps = {
           StoreNs,
@@ -794,54 +830,23 @@ export default function(hocParams: IRecordsHocParams) {
           config: configStoreRef,
           searchLoading,
           configLoading,
-          showEmptyRecordForm,
           recordNsTitle: StoreNsTitle,
           StoreNsTitle,
-          blinkRecordById,
-          getUrlParams,
-          clearActiveRecord,
-          hideRecordFormOnly,
-          hideRecordForm: hideRecordFormOnly,
-          updateRecord,
-          addRecord,
-          showRecordForm,
-          loadAndShowRecordForm,
-          getRecordMapByIdList,
-          getRecord,
-          deleteRecord,
-          goSearch,
-          getSearchParams,
-          searchRecords,
-          debouncedSearchRecords,
           idFieldName,
           nameFieldName,
-          callAction,
-          renderPagination,
-          handleTableChange,
-          getRecordId,
-          reloadSearch,
-          getRecordName,
           dispatch: this.props.dispatch,
           increaseActionCount,
           decreaseActionCount,
           getActionCount,
-
-          getRecordModelPkg,
-          getConfigModelPkg,
-
-          getDefaultSearchParams,
-          getSpecSearchParams,
-          callStoreAction,
-          callService,
-          renderEmpty,
           formNamePrefix,
-          getLatestSearchParams,
           isStoreDataStale: !!(
             storeRef &&
             storeRef.mountId &&
             this.mountId !== storeRef.mountId
           ),
           mountId: this.mountId,
+
+          ...this.getInsMethods(),
         };
 
         return (

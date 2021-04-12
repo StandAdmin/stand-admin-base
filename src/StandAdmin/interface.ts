@@ -150,9 +150,13 @@ export interface IRecordCommonHocParams extends IRecordsHocModelParams {
    */
   syncParamsToUrl?: boolean;
   /**
-   * Param namespace to avoid conflict
+   * Url params namespace to avoid conflict
    */
   urlParamsNs?: false | string;
+  /**
+   * Url params to reserve when doing a new search
+   */
+  reservedUrlParamNames?: string[];
   /**
    * Default search params
    */
@@ -162,22 +166,43 @@ export interface IRecordCommonHocParams extends IRecordsHocModelParams {
    */
   specSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
 
+  /**
+   * Sorter params, normally from Table.onChange
+   */
   sorterSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
+  /**
+   * Filter params, normally from Table.onChange
+   */
   filterSearchParams?: TCommonObjOrEmpty | TFnParamsFilter;
+
+  /**
+   * Do searchRecords in didMount, default true
+   */
+  searchRecordsOnMount?: boolean;
+
+  /**
+   * If configModel is loading, render this placeholder
+   */
+  placeholderIfConfigLoading?: boolean | React.ReactNode;
+
+  /**
+   * StandContext will be passed in props, default true
+   */
+  passContextAsProps?: boolean;
+
+  /**
+   * The className for the outer container wrapper
+   */
+  wrapperClassName?: string;
 }
 export interface IRecordsHocBaseParams extends IRecordCommonHocParams {
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
-  searchRecordsOnMount?: boolean;
   takeOverMount?: boolean;
   searchRecordsOnParamsChange?: boolean;
   searchRecordsOnRefresh?: boolean;
   finalSearchParamsFilter?: (params?: TCommonObjOrEmpty) => TCommonObjOrEmpty;
-  reservedUrlParamNames?: string[];
-  placeholderIfConfigLoading?: boolean | React.ReactNode;
-  wrapperClassName?: string;
   formNamePrefix?: string;
-  passContextAsProps?: boolean;
   onRecordFormVisibleTagChange?: (recordFormVisibleTag: any) => void;
   onRefresh?: () => void;
   callStoreActionPayloadFilter?: (action: string, payload: any) => void;
