@@ -1,15 +1,21 @@
 import React from 'react';
 import { TableProps } from 'antd/es/table';
 import { ModalProps } from 'antd/es/modal';
+import FormItem from 'antd/es/form/FormItem';
+import { FormInstance } from 'antd/es/form';
 import { PaginationProps } from 'antd/es/pagination';
 import { Dispatch } from 'dva';
 import { Connect } from 'react-redux';
+
+import standStyles from './StandRecordsHoc/styles';
 
 export type TKey = string | number;
 
 export type TFnAny = (...args: any[]) => any;
 
 export type TAsyncFnAny = (...args: any[]) => Promise<any>;
+
+export type TFnVoid = () => void;
 
 export interface IGlobalConfig {
   getDvaApp?: () => DvaApp;
@@ -204,7 +210,7 @@ export interface IRecordsHocBaseParams extends IRecordCommonHocParams {
   finalSearchParamsFilter?: (params?: TCommonObjOrEmpty) => TCommonObjOrEmpty;
   formNamePrefix?: string;
   onRecordFormVisibleTagChange?: (recordFormVisibleTag: any) => void;
-  onRefresh?: () => void;
+  onRefresh?: TFnVoid;
   callStoreActionPayloadFilter?: (action: string, payload: any) => void;
   getRecordMapByIdList?: (idList: any[]) => Promise<ICommonObj>;
 }
@@ -214,7 +220,7 @@ export interface IRecordsProps extends IRecordsHocBaseParams {
   location?: { search: string };
   dispatch: Dispatch<any>;
   storeRef: IStoreRef;
-  configStoreRef: IStoreRef;
+  configStoreRef: ICommonObj;
   searchLoading: boolean;
   configLoading: boolean;
 }
@@ -241,8 +247,8 @@ export interface IListCtrlProps<R> extends IListCtrlHocParams<R> {
   modalWrapperClassName?: string;
   modalTriggerClassName?: string;
   resetSearchParamsOnModalShow?: boolean;
-  onModalShow?: () => void;
-  onModalHide?: () => void;
+  onModalShow?: TFnVoid;
+  onModalHide?: TFnVoid;
   onModalVisibleChange?: (v: boolean) => void;
   resetCheckedOnModalShow?: boolean;
   onModalOk?: (params: { checkedList: any[] }) => void;
@@ -266,7 +272,7 @@ export interface IBatchCheckHocProps<R> {
   checkAll: (records: R[]) => void;
   uncheckAll: (records: R[]) => void;
   checkReverse: (records: R[]) => void;
-  clearChecked: () => void;
+  clearChecked: TFnVoid;
   toggleChecked: (
     record: R,
     checked: boolean,
@@ -290,13 +296,13 @@ export interface IStandContextProps<R = any> extends IActionCounterHocProps {
   config: ICommonObj;
   searchLoading: boolean;
   configLoading: boolean;
-  showEmptyRecordForm: () => void;
+  showEmptyRecordForm: TFnVoid;
   recordNsTitle: string;
   StoreNsTitle: string;
   getUrlParams: (specProps?: ICommonObj) => ICommonObj;
-  clearActiveRecord: () => void;
-  hideRecordFormOnly: () => void;
-  hideRecordForm: () => void;
+  clearActiveRecord: TFnVoid;
+  hideRecordFormOnly: TFnVoid;
+  hideRecordForm: TFnVoid;
   getRecordMapByIdList: (idList: any[]) => Promise<ICommonObj>;
   getRecord: (specParams?: ICommonObj) => Promise<any>;
   updateRecord: (record: R, callback?: (resp: any) => void) => Promise<any>;
@@ -328,7 +334,7 @@ export interface IStandContextProps<R = any> extends IActionCounterHocProps {
   handleTableChange: TableProps<any>['onChange'];
   getRecordId: (record: R) => TKey;
   getRecordName: (record: R) => TKey;
-  reloadSearch: () => void;
+  reloadSearch: TFnVoid;
   dispatch: Dispatch<any>;
 
   getRecordModelPkg: () => IModelPkg;
@@ -353,3 +359,88 @@ export type TListCtrlProps<R> = IListCtrlProps<R> &
 export type TRecordsHocCompProps = IRecordsHocBaseParams & ICommonObj;
 
 export type TRecordsHocComp = React.ComponentType<TRecordsHocCompProps>;
+
+export interface IFormHistroyTriggerProps {
+  targetFormInfo: { formId: string; form: FormInstance; title: string };
+  formValuesEncoder: {
+    encode: (values: TCommonObjOrEmpty) => TCommonObjOrEmpty;
+    decode: (values: TCommonObjOrEmpty) => TCommonObjOrEmpty;
+  };
+  historyRecordInfo: { nameFieldName: string };
+}
+
+export interface IUseStandSearchFormResult {
+  formId: string;
+  formHistroyTriggerProps: IFormHistroyTriggerProps;
+  renderFormHistroyTrigger: () => React.ReactNode;
+  formProps: {
+    name: string;
+    form: FormInstance;
+    initialValues: ICommonObj;
+    onFinish: (values: ICommonObj) => void;
+  };
+  config: ICommonObj;
+  context: IStandContextProps;
+  form: FormInstance;
+  onFinish: (values: ICommonObj) => void;
+  submitForm: TFnVoid;
+  resetForm: TFnVoid;
+  FormItem: typeof FormItem;
+}
+
+export interface IUseStandUpsertFormResult {
+  formId: string;
+  formHistroyTriggerProps: IFormHistroyTriggerProps;
+  renderFormHistroyTrigger: () => React.ReactNode;
+  formProps: {
+    name: string;
+    form: FormInstance;
+    initialValues: ICommonObj;
+    onFinish: (values: ICommonObj) => void;
+  };
+  modalProps: {
+    title: string;
+    visible: boolean;
+    onOk: TFnVoid;
+    onCancel: TFnVoid;
+    afterClose: TFnVoid;
+  };
+  /**
+   * Normally passed by showRecordForm, and used as match condition in isModalVisible
+   */
+  recordFormVisibleTag: boolean | TKey;
+  getInitValues: (record?: any) => ICommonObj;
+  getInitValuesByRecord: (record: any) => ICommonObj;
+  /**
+   *  Update or Create
+   *  isUpdate =  activeRecord && activeRecord[idFieldName]
+   */
+  isUpdate: boolean;
+  activeRecord: ICommonObj;
+  context: IStandContextProps;
+  config: ICommonObj;
+  form: FormInstance;
+  onFinish: (values: ICommonObj) => void;
+  submitForm: TFnVoid;
+  resetForm: TFnVoid;
+  handleCancel: TFnVoid;
+  clearActiveRecord: TFnVoid;
+}
+
+export interface IStandTableRenderParams extends TableProps<any> {
+  hasPagination?: boolean;
+  noFiltersForDisabledSearchParams?: boolean;
+  autoScrollX?: boolean | { defaultWidth?: number; extraWidth?: number };
+}
+
+export interface IUseStandTableListResult {
+  context: IStandContextProps;
+  config: ICommonObj;
+  records: any[];
+  showRecordForm: IStandContextProps['showRecordForm'];
+  loadAndShowRecordForm: IStandContextProps['loadAndShowRecordForm'];
+  tableListStyles: typeof standStyles;
+  tableListProps: TableProps<any>;
+  searchLoading: boolean;
+  standRender: (params: IStandTableRenderParams) => React.ReactElement;
+}

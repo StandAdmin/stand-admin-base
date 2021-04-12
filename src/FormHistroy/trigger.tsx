@@ -2,13 +2,14 @@ import React from 'react';
 import { HistoryOutlined, SaveOutlined } from '@ant-design/icons';
 import { message, Tooltip } from 'antd';
 import { ITargetFormInfo } from './interface';
+import { IFormHistroyTriggerProps } from '../StandAdmin/interface';
 import { getDynamicComp, RecordFormWrapper } from './main';
 import { useStandContext } from '../StandAdmin/StandRecordsHoc/hooks/useStandContext';
 import { isEmpty } from 'lodash';
 
 import styles from './styles';
 
-const SaveTriggerWrapper = (props: any) => {
+const SaveTriggerWrapper = (props: IFormHistroyTriggerProps) => {
   const { targetFormInfo } = props;
 
   const { showEmptyRecordForm } = useStandContext();
@@ -45,7 +46,7 @@ const modalTrigger = ({ showModal }: any) => (
   </Tooltip>
 );
 
-export default (props: any) => {
+export default (props: IFormHistroyTriggerProps) => {
   const { targetFormInfo } = props;
 
   const { formId, title } = targetFormInfo as ITargetFormInfo;

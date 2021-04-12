@@ -15,6 +15,7 @@ import {
   ICommonObj,
   TCommonObjOrEmpty,
   IStandContextProps,
+  IUseStandSearchFormResult,
 } from '../../interface';
 
 export interface IStandSearchFormOpts {
@@ -56,7 +57,7 @@ export function getOptsForStandSearchForm(props: any): IStandSearchFormOpts {
 
 export function useStandSearchForm(
   props: IStandSearchFormOpts | IStandContextProps,
-) {
+): IUseStandSearchFormResult {
   const stOpts = useMemo(() => {
     return (
       (props && 'debouncedSearchRecords' in props

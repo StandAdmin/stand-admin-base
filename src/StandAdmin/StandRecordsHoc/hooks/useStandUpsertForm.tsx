@@ -4,7 +4,11 @@ import { FormInstance } from 'antd/es/form';
 import { identity, isEqual } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { StandContext } from '../../const';
-import { ICommonObj, TCommonObjOrEmpty } from '../../interface';
+import {
+  ICommonObj,
+  TCommonObjOrEmpty,
+  IUseStandUpsertFormResult,
+} from '../../interface';
 import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 
 import FormHistroyTrigger from '../../../FormHistroy/trigger';
@@ -84,7 +88,7 @@ export function useStandUpsertForm({
   submitValues,
   onSuccess,
   isModalVisible: origIsModalVisible = isTrue,
-}: IStandUpsertFormOpts = {}) {
+}: IStandUpsertFormOpts = {}): IUseStandUpsertFormResult {
   const context = useContext(StandContext);
 
   const {

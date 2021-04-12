@@ -4,15 +4,13 @@ import classNames from 'classnames';
 import { PaginationProps } from 'antd/es/pagination';
 import { TableProps, ColumnsType } from 'antd/es/table';
 import { StandContext } from '../../const';
-import { TListCtrlProps } from '../../interface';
+import {
+  TListCtrlProps,
+  IStandTableRenderParams,
+  IUseStandTableListResult,
+} from '../../interface';
 
 import styles from '../styles';
-
-export interface StandRenderParams extends TableProps<any> {
-  hasPagination?: boolean;
-  noFiltersForDisabledSearchParams?: boolean;
-  autoScrollX?: boolean | { defaultWidth?: number; extraWidth?: number };
-}
 
 export interface IStandTableListOpts {
   disabledSearchParams?: string[];
@@ -50,7 +48,9 @@ export function calColWidth(
   return total;
 }
 
-export function useStandTableList(props: TListCtrlProps<any>) {
+export function useStandTableList(
+  props: TListCtrlProps<any>,
+): IUseStandTableListResult {
   const stOpts = useMemo(() => getOptsForStandTableList(props), [props]);
 
   const { isStandListCtrl, checkedList, maxCheckedLength, isModalMode } = props;
@@ -119,7 +119,7 @@ export function useStandTableList(props: TListCtrlProps<any>) {
     tableListStyles: styles,
     tableListProps,
     searchLoading,
-    standRender: (extraProps: StandRenderParams) => {
+    standRender: (params: IStandTableRenderParams) => {
       const {
         hasPagination = true,
         noFiltersForDisabledSearchParams = true,
@@ -127,7 +127,7 @@ export function useStandTableList(props: TListCtrlProps<any>) {
         scroll = {},
         columns,
         ...restProps
-      } = extraProps;
+      } = params;
 
       // 禁用的搜索项禁用过滤
       if (noFiltersForDisabledSearchParams && stOpts.disabledSearchParams) {
