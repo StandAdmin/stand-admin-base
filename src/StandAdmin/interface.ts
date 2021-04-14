@@ -237,6 +237,9 @@ export interface IListCtrlHocParams<R>
   isStandListCtrl?: boolean;
   defaultModalVisible?: boolean;
   modalVisible?: boolean;
+  clearCheckedAfterClose?: boolean;
+  resetSearchParamsOnModalShow?: boolean;
+  resetCheckedOnModalShow?: boolean;
 }
 
 export interface IListCtrlProps<R> extends IListCtrlHocParams<R> {
@@ -246,13 +249,10 @@ export interface IListCtrlProps<R> extends IListCtrlHocParams<R> {
   modalTriggerTitle?: string;
   modalWrapperClassName?: string;
   modalTriggerClassName?: string;
-  resetSearchParamsOnModalShow?: boolean;
   onModalShow?: TFnVoid;
   onModalHide?: TFnVoid;
   onModalVisibleChange?: (v: boolean) => void;
-  resetCheckedOnModalShow?: boolean;
   onModalOk?: (params: { checkedList: any[] }) => void;
-  clearCheckedAfterClose?: boolean;
 }
 
 export interface IBatchCheckProps<R> {
@@ -405,17 +405,21 @@ export interface IUseStandUpsertFormResult {
     onCancel: TFnVoid;
     afterClose: TFnVoid;
   };
+
   /**
    * Normally passed by showRecordForm, and used as match condition in isModalVisible
    */
   recordFormVisibleTag: boolean | TKey;
+
   getInitValues: (record?: any) => ICommonObj;
   getInitValuesByRecord: (record: any) => ICommonObj;
+
   /**
    *  Update or Create
    *  isUpdate =  activeRecord && activeRecord[idFieldName]
    */
   isUpdate: boolean;
+
   activeRecord: ICommonObj;
   context: IStandContextProps;
   config: ICommonObj;

@@ -85,6 +85,9 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
     isStandListCtrl: true,
     defaultModalVisible: false,
     searchRecordsOnMount: false,
+    clearCheckedAfterClose: false,
+    resetSearchParamsOnModalShow: false,
+    resetCheckedOnModalShow: false,
     ...restHocParams,
   };
 
