@@ -36,7 +36,7 @@ import styles from '../styles';
 
 const getNewMountId = getAutoIdGenerator();
 
-export default function(hocParams: IRecordsHocParams) {
+export default function<R = any>(hocParams: IRecordsHocParams) {
   const {
     recordModel = EmptyRecordModel,
     configModel = EmptyConfigModel,
@@ -68,7 +68,7 @@ export default function(hocParams: IRecordsHocParams) {
     ...restHocParams,
   };
 
-  return (WrappedComponent: React.ComponentType<any>): TRecordsHocComp => {
+  return (WrappedComponent: React.ComponentType<any>): TRecordsHocComp<R> => {
     class Comp extends React.Component<IRecordsProps & IActionCounterHocProps> {
       static defaultProps = {
         ...defaultRestHocParams,
@@ -406,7 +406,7 @@ export default function(hocParams: IRecordsHocParams) {
         return dispatch({
           type: `${StoreNs}/getRecord`,
           params,
-        }) as Promise<any>;
+        }) as Promise<R>;
       };
 
       getRecordMapByIdList = async (idList: any[]) => {
@@ -447,7 +447,7 @@ export default function(hocParams: IRecordsHocParams) {
           });
       };
 
-      showRecordForm = (activeRecord: any, recordFormVisibleTag = true) => {
+      showRecordForm = (activeRecord: R, recordFormVisibleTag = true) => {
         const { dispatch, onRecordFormVisibleTagChange } = this.props;
         (dispatch({
           type: `${StoreNs}/showRecordForm`,
@@ -596,7 +596,7 @@ export default function(hocParams: IRecordsHocParams) {
           ...rest,
         });
 
-      addRecord = (record: any, callback: (resp: any) => void) => {
+      addRecord = (record: R, callback: (resp: any) => void) => {
         return this.callStoreAction({
           action: 'addRecord',
           actionForCount: 'upsertRecord',
@@ -605,7 +605,7 @@ export default function(hocParams: IRecordsHocParams) {
         });
       };
 
-      updateRecord = (record: any, callback: (resp: any) => void) => {
+      updateRecord = (record: R, callback: (resp: any) => void) => {
         return this.callStoreAction({
           action: 'updateRecord',
           actionForCount: 'upsertRecord',

@@ -70,6 +70,7 @@ export async function addRecord(record: IHistoryRecord) {
     .catch(err => ({
       success: false,
       message: err,
+      data: record,
     }));
 }
 
@@ -90,6 +91,7 @@ export async function updateRecord(record: IHistoryRecord) {
     .catch(err => ({
       success: false,
       message: err,
+      data: record,
     }));
 }
 

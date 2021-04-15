@@ -4,7 +4,7 @@ import { ModalProps } from 'antd/es/modal';
 import FormItem from 'antd/es/form/FormItem';
 import { FormInstance } from 'antd/es/form';
 import { PaginationProps } from 'antd/es/pagination';
-import { Dispatch } from 'dva';
+import { Dispatch, Model } from 'dva';
 import { Connect } from 'react-redux';
 
 import standStyles from './StandRecordsHoc/styles';
@@ -18,8 +18,8 @@ export type TAsyncFnAny = (...args: any[]) => Promise<any>;
 export type TFnVoid = () => void;
 
 export interface IGlobalConfig {
-  getDvaApp?: () => DvaApp;
-  getHistory?: () => History;
+  getDvaApp?: () => IDvaApp;
+  getHistory?: () => IHistory;
   getConnect?: () => Connect;
 }
 
@@ -39,9 +39,9 @@ export interface IResponse {
   [key: string]: any;
 }
 
-export interface IResponseOfSearchRecords extends IResponse {
+export interface IResponseOfSearchRecords<R> extends IResponse {
   data?: {
-    list?: any[];
+    list?: R[];
     total?: number;
     pageNum?: number;
     pageSize?: number;
@@ -49,7 +49,13 @@ export interface IResponseOfSearchRecords extends IResponse {
   };
 }
 
-export interface IStandModelOptions {
+export interface IResponseOfGetRecord<R> extends IResponse {
+  data?: R;
+}
+
+export interface IResponseOfAction<R> extends IResponse {}
+
+export interface IStandModelOptions<R> {
   idFieldName?: string;
   nameFieldName?: string;
   fldsPathInResp?: {
@@ -60,22 +66,22 @@ export interface IStandModelOptions {
   };
   StoreNs?: string;
   StoreNsTitle?: string;
-  searchRecords?: (params?: ICommonObj) => Promise<IResponseOfSearchRecords>;
-  getRecord?: (params?: ICommonObj) => Promise<IResponse>;
-  addRecord?: (record: ICommonObj) => Promise<IResponse>;
-  updateRecord?: (record: ICommonObj) => Promise<IResponse>;
-  deleteRecord?: (params: ICommonObj) => Promise<IResponse>;
+  searchRecords?: (params?: ICommonObj) => Promise<IResponseOfSearchRecords<R>>;
+  getRecord?: (params?: ICommonObj) => Promise<IResponseOfGetRecord<R>>;
+  addRecord?: (record: ICommonObj) => Promise<IResponseOfAction<R>>;
+  updateRecord?: (record: ICommonObj) => Promise<IResponseOfAction<R>>;
+  deleteRecord?: (params: ICommonObj) => Promise<IResponseOfAction<R>>;
   extensions?: any;
 }
 
-export interface IModelPkg {
+export interface IModelPkg<R = any> {
   idFieldName?: string;
   nameFieldName?: string;
   StoreNsTitle?: string;
   StoreNs?: string;
   isDynamic?: boolean;
-  modelOpts?: IStandModelOptions;
-  default: any;
+  modelOpts?: IStandModelOptions<R>;
+  default: Model;
 }
 
 export type TGetConfigFn = () => Promise<ICommonObj>;
@@ -127,13 +133,13 @@ export interface IStoreRef {
   removingRecord?: TCommonObjOrEmpty;
 }
 
-export interface DvaApp {
+export interface IDvaApp {
   model: (model: any) => void;
   unmodel: (namespace: string) => void;
   _models: any[];
 }
 
-export interface History {
+export interface IHistory {
   push: TFnAny;
   location: any;
 }
@@ -201,7 +207,7 @@ export interface IRecordCommonHocParams extends IRecordsHocModelParams {
    */
   wrapperClassName?: string;
 }
-export interface IRecordsHocBaseParams extends IRecordCommonHocParams {
+export interface IRecordsHocBaseParams<R = any> extends IRecordCommonHocParams {
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
   takeOverMount?: boolean;
@@ -356,9 +362,22 @@ export type TListCtrlProps<R> = IListCtrlProps<R> &
   IBatchCheckHocProps<R> &
   IBatchCheckProps<R>;
 
-export type TRecordsHocCompProps = IRecordsHocBaseParams & ICommonObj;
+export type TRecordsHocCompProps<R = any> = IRecordsHocBaseParams<R> &
+  ICommonObj;
 
-export type TRecordsHocComp = React.ComponentType<TRecordsHocCompProps>;
+export type TListCtrlHocCompProps<R = any> = TRecordsHocCompProps<R> &
+  IListCtrlProps<R> &
+  IBatchCheckProps<R>;
+
+export type TRecordsHocComp<R = any> = React.ComponentType<
+  Partial<TRecordsHocCompProps<R>>
+>;
+
+export type TListCtrlHocComp<R = any> = React.ComponentType<
+  Partial<TListCtrlHocCompProps<R>>
+> & {
+  IdSelectCtrl: TListCtrlHocComp<R>;
+};
 
 export interface IFormHistroyTriggerProps {
   targetFormInfo: { formId: string; form: FormInstance; title: string };

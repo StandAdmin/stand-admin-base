@@ -23,50 +23,53 @@ export default (props: any) => {
 
   const { deleteRecord, idFieldName, getRecordId, getRecordName } = context;
 
+  const recoverRecord = (record: IHistoryRecord) => {
+    const { decode = decodeFormVals } = formValuesEncoder || {};
+
+    const formValues = decode(record.formVals);
+
+    targetForm.setFieldsValue(formValues);
+
+    const { afterRestore } = actionHooks || {};
+
+    if (afterRestore) {
+      afterRestore({ formValues });
+    }
+
+    toggleModalVisible(false);
+  };
+
   const columns: any = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      fixed: 'left',
-      width: 80,
-    },
+    // {
+    //   title: 'ID',
+    //   dataIndex: 'id',
+    //   fixed: 'left',
+    //   width: 80,
+    // },
     {
       title: '名称',
       dataIndex: 'name',
     },
-
     {
       title: '修改时间',
       dataIndex: 'updateAt',
-      width: 190,
+      width: 200,
     },
     {
       title: '操作',
       key: 'action',
       fixed: 'right',
-      width: 150,
+      width: 170,
       render: (_: any, record: IHistoryRecord) => {
         return (
           <ul className={tableListStyles.actionList}>
-            <li>
+            <li style={{ marginRight: 24 }}>
               <a
                 onClick={() => {
-                  const { decode = decodeFormVals } = formValuesEncoder || {};
-
-                  const formValues = decode(record.formVals);
-
-                  targetForm.setFieldsValue(formValues);
-
-                  const { afterRestore } = actionHooks || {};
-
-                  if (afterRestore) {
-                    afterRestore({ formValues });
-                  }
-
-                  toggleModalVisible(false);
+                  recoverRecord(record);
                 }}
               >
-                还原
+                使用
               </a>
             </li>
 

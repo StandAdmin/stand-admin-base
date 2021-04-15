@@ -6,6 +6,8 @@ import { ConfigLoadingFld, ModelNsPre, ConfigLoadingMethod } from './const';
 
 import { getAutoIdGenerator } from './utils/util';
 
+import { Model } from 'dva';
+
 import {
   IResponse,
   TAsyncFnAny,
@@ -13,6 +15,8 @@ import {
   IStandModelOptions,
   IStandConfigModelOptions,
   IModelPkg,
+  IResponseOfSearchRecords,
+  IResponseOfGetRecord,
 } from './interface';
 
 function delayP(ms: number, val = true) {
@@ -21,6 +25,10 @@ function delayP(ms: number, val = true) {
   });
 }
 
+const emptySearchRecords = async () => ({
+  success: true,
+  data: {},
+});
 // const localforage = Localforage.createInstance({
 //   name: 'StandModel',
 // });
@@ -124,7 +132,7 @@ export function getDynamicModelPkg(modelPkg: IModelPkg, nsPre: string) {
   };
 }
 
-export function getStandModel(opts: IStandModelOptions) {
+export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
   const {
     idFieldName = 'id',
     nameFieldName = 'name',
@@ -142,7 +150,7 @@ export function getStandModel(opts: IStandModelOptions) {
     },
     StoreNs,
     StoreNsTitle,
-    searchRecords,
+    searchRecords = emptySearchRecords,
     getRecord,
     addRecord,
     updateRecord,
@@ -183,391 +191,421 @@ export function getStandModel(opts: IStandModelOptions) {
     handleCommonRespError(StoreNsTitle, response, { errorTitle });
   };
 
-  return merge(
-    {
-      namespace: StoreNs,
-      state: {
-        mountId: null,
-        idFieldName,
-        nameFieldName,
-        blinkRecord: null,
-        activeRecord: null,
-        removingRecord: null,
-        records: [],
-        searchParams: {},
-        searchLoading: false,
-        pagination: { total: 0, current: 1, pageSize: 10 },
-        recordFormVisibleTag: false,
+  const interModel: Model = ({
+    namespace: StoreNs,
+    state: {
+      mountId: null,
+      idFieldName,
+      nameFieldName,
+      blinkRecord: null,
+      activeRecord: null,
+      removingRecord: null,
+      records: [],
+      searchParams: {},
+      searchLoading: false,
+      pagination: { total: 0, current: 1, pageSize: 10 },
+      recordFormVisibleTag: false,
+    },
+    effects: {
+      // *searchWithLastParams(_, { put }) {
+      //   const params = yield put.resolve({
+      //     type: 'getSearchParamsInLocalStore',
+      //   });
+
+      //   return yield put.resolve({
+      //     type: 'search',
+      //     params,
+      //   });
+      // },
+      // *getSearchParamsInLocalStore(_, { cps }) {
+      //   const params = yield cps([localforage, localforage.getItem], LSKey_SearchParams);
+      //   return params;
+      // },
+      *searchOne({ params }: { params?: any }, { call }: any) {
+        if (!searchRecords) {
+          throw new Error(`searchRecords is empty!`);
+        }
+
+        const response: IResponse = (yield call(
+          searchRecords,
+          filterParams({ pageNum: 1, pageSize: 10, ...params }),
+        )) as IResponse;
+
+        if (!response || !response.success) {
+          handleRespError({ response, errorTitle: '查询单一结果失败' });
+          return false;
+        }
+
+        const { list = [] } = getCommonFlds(response);
+
+        return list && list.length > 0 ? list[0] : null;
       },
-      effects: {
-        // *searchWithLastParams(_, { put }) {
-        //   const params = yield put.resolve({
-        //     type: 'getSearchParamsInLocalStore',
-        //   });
+      *getRecord({ params }: { params?: any }, { call }: any) {
+        if (!getRecord) {
+          throw new Error(`getRecord is empty!`);
+        }
 
-        //   return yield put.resolve({
-        //     type: 'search',
-        //     params,
-        //   });
-        // },
-        // *getSearchParamsInLocalStore(_, { cps }) {
-        //   const params = yield cps([localforage, localforage.getItem], LSKey_SearchParams);
-        //   return params;
-        // },
-        *searchOne({ params }: { params?: any }, { call }: any) {
-          const response: any = yield call(
-            searchRecords,
-            filterParams({ pageNum: 1, pageSize: 10, ...params }),
-          );
+        const response: IResponseOfGetRecord<R> = (yield call(
+          getRecord,
+          filterParams({ ...params }),
+        )) as IResponse;
 
-          if (!response || !response.success) {
-            handleRespError({ response, errorTitle: '查询单一结果失败' });
-            return false;
-          }
+        if (!response || !response.success) {
+          handleRespError({ response, errorTitle: '获取单一结果失败' });
+          return false;
+        }
 
-          const { list = [] } = getCommonFlds(response);
+        return response.data;
+      },
+      *search(
+        {
+          params,
+          opts: options = {},
+        }: { params?: any; opts: { updateSearchParamsEvenError?: boolean } },
+        { call, put }: any,
+      ) {
+        const { updateSearchParamsEvenError } = options;
 
-          return list && list.length > 0 ? list[0] : null;
-        },
-        *getRecord({ params }: { params?: any }, { call }: any) {
-          const response: any = yield call(
-            getRecord,
-            filterParams({ ...params }),
-          );
+        const reqParams = { pageNum: 1, pageSize: 10, ...params };
 
-          if (!response || !response.success) {
-            handleRespError({ response, errorTitle: '获取单一结果失败' });
-            return false;
-          }
+        yield put({
+          type: 'saveState',
+          payload: {
+            searchLoading: true,
+          },
+        });
 
-          return response.data;
-        },
-        *search(
-          {
-            params,
-            opts: options = {},
-          }: { params?: any; opts: { updateSearchParamsEvenError?: boolean } },
-          { call, put }: any,
-        ) {
-          const { updateSearchParamsEvenError } = options;
+        if (!searchRecords) {
+          throw new Error(`searchRecords is empty!`);
+        }
 
-          const reqParams = { pageNum: 1, pageSize: 10, ...params };
+        const response: IResponseOfSearchRecords<R> = yield call(
+          searchRecords,
+          filterParams(reqParams),
+        );
 
-          yield put({
-            type: 'saveState',
-            payload: {
-              searchLoading: true,
-            },
-          });
+        const newPayload = {};
 
-          const response: IResponse = yield call(
-            searchRecords,
-            filterParams(reqParams),
-          );
-
-          const newPayload = {};
-
-          if (!response || !response.success) {
-            if (updateSearchParamsEvenError) {
-              Object.assign(newPayload, {
-                searchParams: params,
-              });
-            }
-
-            handleRespError({ response, errorTitle: '获取结果列表失败' });
-          } else {
-            const {
-              list = [],
-              total: origTotal,
-              pageSize = reqParams.pageSize,
-              pageNum = reqParams.pageNum,
-            } = getCommonFlds(response);
-
-            const total = origTotal !== undefined ? origTotal : list.length;
-
+        if (!response || !response.success) {
+          if (updateSearchParamsEvenError) {
             Object.assign(newPayload, {
               searchParams: params,
-              records: list,
-              pagination: { current: pageNum, pageSize, total },
             });
           }
 
-          yield put({
-            type: 'saveState',
-            payload: { ...newPayload, searchLoading: false },
-          });
-
-          return response;
-        },
-        *showRecordForm({ params }: { params: any }, { put }: any) {
-          // const { activeRecord } = params || {};
-
-          yield put({
-            type: 'saveState',
-            payload: { recordFormVisibleTag: true, ...params },
-          });
-
-          return true;
-        },
-        *hideRecordForm(_: any, { put }: any) {
-          // const { recordFormVisibleTag } = params;
-          yield put({
-            type: 'saveState',
-            payload: { activeRecord: null, recordFormVisibleTag: false },
-          });
-
-          return true;
-        },
-        *clearActiveRecord(_: any, { put }: any) {
-          // const { recordFormVisibleTag } = params;
-          yield put({
-            type: 'saveState',
-            payload: { activeRecord: null },
-          });
-
-          return true;
-        },
-        *setRemovingRecord({ record }: { record: any }, { put }: any) {
-          // const { recordFormVisibleTag } = params;
-          yield put({
-            type: 'saveState',
-            payload: { removingRecord: record },
-          });
-
-          return true;
-        },
-        *saveSearchParams({ params }: { params: any }, { put }: any) {
-          // localforage.setItem(
-          //   LSKey_SearchParams,
-          //   omit(
-          //     params,
-          //     ['pageNum', 'pageSize'].map((item) => searchParamsMap[item] || item)
-          //   )
-          // );
-
-          yield put({
-            type: 'saveState',
-            payload: { searchParams: params },
-          });
-
-          return true;
-        },
-        *hideRecordFormOnly(_: any, { put }: any) {
-          // const { recordFormVisibleTag } = params;
-          yield put({
-            type: 'saveState',
-            payload: { recordFormVisibleTag: false },
-          });
-
-          return true;
-        },
-        *findRecordById({ id }: { id: any }, { select }: any) {
-          const records: any[] = yield select(
-            (state: any) => state[StoreNs].records,
-          );
-          return records.find((item: any) => item[idFieldName] === id);
-        },
-        *blinkRecordById(
-          { id, timeout = 1000 }: { id: any; timeout: number },
-          { put }: any,
-        ) {
-          const recordItem: any = yield put.resolve({
-            type: 'findRecordById',
-            id,
-          });
-
-          yield put({
-            type: 'blinkRecord',
-            record: recordItem || null,
-            timeout,
-          });
-
-          return true;
-        },
-        *blinkRecord(
-          { record, timeout = 2000 }: { record: any; timeout?: number },
-          { put, call }: any,
-        ) {
-          // const { recordFormVisibleTag } = params;
-          yield put({
-            type: 'saveState',
-            payload: { blinkRecord: record },
-          });
-
-          yield call(delayP, timeout);
-
-          yield put({
-            type: 'saveState',
-            payload: { blinkRecord: null },
-          });
-
-          return true;
-        },
-        *addRecord(
-          {
-            record,
-            callback,
-          }: { record: any; callback?: (resp: IResponse) => void },
-          { call }: any,
-        ) {
-          const response: IResponse = yield call(addRecord, record);
-
-          if (!response || !response.success) {
-            handleRespError({ response, errorTitle: '新建失败' });
-          }
-
-          if (callback) callback(response);
-
-          return response;
-        },
-        *updateRecord(
-          {
-            record,
-            callback,
-          }: { record: any; callback?: (resp: IResponse) => void },
-          { call }: any,
-        ) {
-          const response: IResponse = yield call(updateRecord, record);
-
-          if (!response || !response.success) {
-            handleRespError({ response, errorTitle: '更新失败' });
-          }
-
-          if (callback) callback(response);
-          return response;
-        },
-        *deleteRecord(
-          {
-            params,
-            callback,
-          }: { params: any; callback?: (resp: IResponse) => void },
-          { call, put }: any,
-        ) {
-          const { [idFieldName]: id } = params;
-
-          const recordItem: any = id
-            ? yield put.resolve({
-                type: 'findRecordById',
-                id,
-              })
-            : null;
-
-          yield put({
-            type: 'setRemovingRecord',
-            record: recordItem || null,
-          });
-
-          const response: IResponse = yield call(deleteRecord, params);
-
-          yield put({
-            type: 'setRemovingRecord',
-            record: null,
-          });
-
-          if (!response || !response.success) {
-            handleRespError({ response, errorTitle: '删除失败' });
-          }
-
-          if (callback) callback(response);
-          return response;
-        },
-        *callService(
-          {
-            serviceTitle,
-            serviceFunction,
-            serviceParams,
-            callback,
-          }: {
-            serviceTitle: string;
-            serviceFunction: TAsyncFnAny;
-            serviceParams: any;
-            callback?: (resp: IResponse) => void;
-          },
-          { call }: any,
-        ) {
-          const response: IResponse = yield call(
-            serviceFunction,
-            ...serviceParams,
-          );
-
-          if (!response || !response.success) {
-            handleRespError({
-              response,
-              errorTitle: `${serviceTitle} 操作失败`,
-            });
-          }
-
-          if (callback) callback(response);
-          return response;
-        },
-      },
-      reducers: {
-        replaceRecord(state: any, action: any) {
-          const { records } = state;
-
+          handleRespError({ response, errorTitle: '获取结果列表失败' });
+        } else {
           const {
-            params: { record, recordList = [] },
-          } = action;
+            list = [],
+            total: origTotal,
+            pageSize = reqParams.pageSize,
+            pageNum = reqParams.pageNum,
+          } = getCommonFlds(response);
 
-          [record, ...recordList].forEach(repItem => {
-            const idx = records.findIndex(
-              (item: any) => item[idFieldName] === repItem[idFieldName],
-            );
+          const total = origTotal !== undefined ? origTotal : list.length;
 
-            if (idx < 0) {
-              // eslint-disable-next-line no-console
-              console.warn('No match record found: ', repItem);
-              return;
-            }
-
-            records[idx] = repItem;
+          Object.assign(newPayload, {
+            searchParams: params,
+            records: list,
+            pagination: { current: pageNum, pageSize, total },
           });
+        }
 
-          return {
-            ...state,
-            records: [...records],
-          };
-        },
+        yield put({
+          type: 'saveState',
+          payload: { ...newPayload, searchLoading: false },
+        });
 
-        resetRecordsState(state: any, action: { mountId: number | null }) {
-          return {
-            ...state,
-            mountId: action.mountId,
-            blinkRecord: null,
-            activeRecord: null,
-            removingRecord: null,
-            records: [],
-            searchParams: {},
-            pagination: { total: 0, current: 1, pageSize: 10 },
-          };
-        },
-        saveState(state: any, action: { payload: any }) {
-          return {
-            ...state,
-            ...action.payload,
-          };
-        },
+        return response;
       },
-      // subscriptions: {
-      //   setup({ dispatch }) {
-      //     console.log(StoreNsTitle);
-      //   },
-      // },
+      *showRecordForm({ params }: { params: any }, { put }: any) {
+        // const { activeRecord } = params || {};
+
+        yield put({
+          type: 'saveState',
+          payload: { recordFormVisibleTag: true, ...params },
+        });
+
+        return true;
+      },
+      *hideRecordForm(_: any, { put }: any) {
+        // const { recordFormVisibleTag } = params;
+        yield put({
+          type: 'saveState',
+          payload: { activeRecord: null, recordFormVisibleTag: false },
+        });
+
+        return true;
+      },
+      *clearActiveRecord(_: any, { put }: any) {
+        // const { recordFormVisibleTag } = params;
+        yield put({
+          type: 'saveState',
+          payload: { activeRecord: null },
+        });
+
+        return true;
+      },
+      *setRemovingRecord({ record }: { record: any }, { put }: any) {
+        // const { recordFormVisibleTag } = params;
+        yield put({
+          type: 'saveState',
+          payload: { removingRecord: record },
+        });
+
+        return true;
+      },
+      *saveSearchParams({ params }: { params: any }, { put }: any) {
+        // localforage.setItem(
+        //   LSKey_SearchParams,
+        //   omit(
+        //     params,
+        //     ['pageNum', 'pageSize'].map((item) => searchParamsMap[item] || item)
+        //   )
+        // );
+
+        yield put({
+          type: 'saveState',
+          payload: { searchParams: params },
+        });
+
+        return true;
+      },
+      *hideRecordFormOnly(_: any, { put }: any) {
+        // const { recordFormVisibleTag } = params;
+        yield put({
+          type: 'saveState',
+          payload: { recordFormVisibleTag: false },
+        });
+
+        return true;
+      },
+      *findRecordById({ id }: { id: any }, { select }: any) {
+        const records: any[] = yield select(
+          (state: any) => state[StoreNs].records,
+        );
+        return records.find((item: any) => item[idFieldName] === id);
+      },
+      *blinkRecordById(
+        { id, timeout = 1000 }: { id: any; timeout: number },
+        { put }: any,
+      ) {
+        const recordItem: R = yield put.resolve({
+          type: 'findRecordById',
+          id,
+        });
+
+        yield put({
+          type: 'blinkRecord',
+          record: recordItem || null,
+          timeout,
+        });
+
+        return true;
+      },
+      *blinkRecord(
+        { record, timeout = 2000 }: { record: any; timeout?: number },
+        { put, call }: any,
+      ) {
+        // const { recordFormVisibleTag } = params;
+        yield put({
+          type: 'saveState',
+          payload: { blinkRecord: record },
+        });
+
+        yield call(delayP, timeout);
+
+        yield put({
+          type: 'saveState',
+          payload: { blinkRecord: null },
+        });
+
+        return true;
+      },
+      *addRecord(
+        {
+          record,
+          callback,
+        }: { record: any; callback?: (resp: IResponse) => void },
+        { call }: any,
+      ) {
+        if (!addRecord) {
+          throw new Error(`addRecord is empty!`);
+        }
+
+        const response: IResponse = yield call(addRecord, record);
+
+        if (!response || !response.success) {
+          handleRespError({ response, errorTitle: '新建失败' });
+        }
+
+        if (callback) callback(response);
+
+        return response;
+      },
+      *updateRecord(
+        {
+          record,
+          callback,
+        }: { record: any; callback?: (resp: IResponse) => void },
+        { call }: any,
+      ) {
+        if (!updateRecord) {
+          throw new Error(`updateRecord is empty!`);
+        }
+
+        const response: IResponse = yield call(updateRecord, record);
+
+        if (!response || !response.success) {
+          handleRespError({ response, errorTitle: '更新失败' });
+        }
+
+        if (callback) callback(response);
+        return response;
+      },
+      *deleteRecord(
+        {
+          params,
+          callback,
+        }: { params: any; callback?: (resp: IResponse) => void },
+        { call, put }: any,
+      ) {
+        const { [idFieldName]: id } = params;
+
+        const recordItem: R = id
+          ? yield put.resolve({
+              type: 'findRecordById',
+              id,
+            }) as R
+          : null;
+
+        yield put({
+          type: 'setRemovingRecord',
+          record: recordItem || null,
+        });
+
+        if (!deleteRecord) {
+          throw new Error(`deleteRecord is empty!`);
+        }
+
+        const response: IResponse = yield call(deleteRecord, params);
+
+        yield put({
+          type: 'setRemovingRecord',
+          record: null,
+        });
+
+        if (!response || !response.success) {
+          handleRespError({ response, errorTitle: '删除失败' });
+        }
+
+        if (callback) callback(response);
+        return response;
+      },
+      *callService(
+        {
+          serviceTitle,
+          serviceFunction,
+          serviceParams,
+          callback,
+        }: {
+          serviceTitle: string;
+          serviceFunction: TAsyncFnAny;
+          serviceParams: any;
+          callback?: (resp: IResponse) => void;
+        },
+        { call }: any,
+      ) {
+        if (!serviceFunction) {
+          throw new Error(`serviceFunction is empty!`);
+        }
+
+        const response: IResponse = yield call(
+          serviceFunction,
+          ...serviceParams,
+        );
+
+        if (!response || !response.success) {
+          handleRespError({
+            response,
+            errorTitle: `${serviceTitle} 操作失败`,
+          });
+        }
+
+        if (callback) callback(response);
+        return response;
+      },
     },
+    reducers: {
+      replaceRecord(state: any, action: any) {
+        const { records } = state;
+
+        const {
+          params: { record, recordList = [] },
+        } = action;
+
+        [record, ...recordList].forEach(repItem => {
+          const idx = records.findIndex(
+            (item: any) => item[idFieldName] === repItem[idFieldName],
+          );
+
+          if (idx < 0) {
+            // eslint-disable-next-line no-console
+            console.warn('No match record found: ', repItem);
+            return;
+          }
+
+          records[idx] = repItem;
+        });
+
+        return {
+          ...state,
+          records: [...records],
+        };
+      },
+
+      resetRecordsState(state: any, action: { mountId: number | null }) {
+        return {
+          ...state,
+          mountId: action.mountId,
+          blinkRecord: null,
+          activeRecord: null,
+          removingRecord: null,
+          records: [],
+          searchParams: {},
+          pagination: { total: 0, current: 1, pageSize: 10 },
+        };
+      },
+      saveState(state: any, action: { payload: any }) {
+        return {
+          ...state,
+          ...action.payload,
+        };
+      },
+    },
+    // subscriptions: {
+    //   setup({ dispatch }) {
+    //     console.log(StoreNsTitle);
+    //   },
+    // },
+  } as unknown) as Model;
+
+  return merge(
+    interModel,
     isFunction(extensions)
       ? extensions({ ...opts, handleRespError })
       : extensions,
   );
 }
 
-export function getStandConfigModel(opts: IStandConfigModelOptions) {
+export function getStandConfigModel(opts: IStandConfigModelOptions): Model {
   const { getConfig, StoreNs } = opts;
 
   if (!StoreNs) {
     throw new Error(`StoreNs should no be empty!`);
   }
 
-  return {
+  return ({
     namespace: StoreNs,
     state: { [ConfigLoadingFld]: true },
     effects: {
@@ -610,7 +648,7 @@ export function getStandConfigModel(opts: IStandConfigModelOptions) {
         });
       },
     },
-  };
+  } as unknown) as Model;
 }
 
 const getAutoId = getAutoIdGenerator();
@@ -619,8 +657,8 @@ export function getAutoStoreNs(key: string) {
   return `_Auto${getAutoId()}_${ModelNsPre}${key}`;
 }
 
-export function buildStandRecordModelPkg(
-  opts: IStandModelOptions = {},
+export function buildStandRecordModelPkg<R = any>(
+  opts: IStandModelOptions<R> = {},
 ): IModelPkg {
   const {
     idFieldName = 'id',
@@ -637,7 +675,7 @@ export function buildStandRecordModelPkg(
     nameFieldName,
 
     modelOpts: opts,
-    default: getStandModel({ ...opts, StoreNs }),
+    default: getStandModel<R>({ ...opts, StoreNs }),
   };
 }
 
@@ -664,8 +702,4 @@ export const EmptyRecordModel = buildStandRecordModelPkg({
   StoreNsTitle: '空实体',
   idFieldName: 'id',
   nameFieldName: 'name',
-  searchRecords: async () => ({
-    success: true,
-    data: {},
-  }),
 });

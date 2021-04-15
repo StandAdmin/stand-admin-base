@@ -6,6 +6,7 @@ import {
   IRecordsHocParams,
   IActionCounterHocProps,
   TRecordsHocComp,
+  IResponseOfGetRecord,
 } from '../../interface';
 
 import { set, omit } from 'lodash';
@@ -18,10 +19,10 @@ import {
   getAutoStoreNs,
 } from '../../standModelHelper';
 
-export default function(hocParams: IRecordsHocParams) {
+export default function<R = any>(hocParams: IRecordsHocParams) {
   const { recordModel = EmptyRecordModel } = hocParams;
 
-  return (WrappedComponent: React.ComponentType<any>): TRecordsHocComp => {
+  return (WrappedComponent: React.ComponentType<any>): TRecordsHocComp<R> => {
     const Comp: React.FC<IRecordsProps & IActionCounterHocProps> = props => {
       const {
         searchLoading,
@@ -39,12 +40,12 @@ export default function(hocParams: IRecordsHocParams) {
       );
     };
 
-    return StandRecordsHoc({
+    return StandRecordsHoc<R>({
       ...hocParams,
       recordModel: buildStandRecordModelPkg({
         ...recordModel.modelOpts,
         StoreNs: getAutoStoreNs(`Info_${recordModel.StoreNs}`),
-        searchRecords: params => {
+        searchRecords: (params: any) => {
           const {
             getRecord,
             searchRecords,
@@ -58,7 +59,7 @@ export default function(hocParams: IRecordsHocParams) {
                 searchParamsMap['pageSize'],
                 searchParamsMap['pageNum'],
               ]),
-            ).then(resp => {
+            ).then((resp: IResponseOfGetRecord<R>) => {
               if (!resp.success) {
                 return resp;
               }

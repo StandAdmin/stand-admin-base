@@ -7,9 +7,8 @@ import BatchCheckHoc from '../../BatchCheckHoc';
 import {
   IListCtrlHocParams,
   IListCtrlProps,
-  IBatchCheckProps,
+  TListCtrlHocComp,
   TListCtrlProps,
-  TRecordsHocCompProps,
   IStandContextProps,
 } from '../../interface';
 import IdSelectCtrlHoc from './IdSelectCtrlHoc';
@@ -66,16 +65,6 @@ function defaultModalTriggerRender({
     </div>
   );
 }
-
-export type TListCtrlHocCompProps<R> = TRecordsHocCompProps &
-  IListCtrlProps<R> &
-  IBatchCheckProps<R>;
-
-export type TListCtrlHocComp<R> = React.ComponentType<
-  TListCtrlHocCompProps<R>
-> & {
-  IdSelectCtrl: TListCtrlHocComp<R>;
-};
 
 export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
   const { ...restHocParams } = hocParams;
@@ -364,7 +353,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
       }
     }
 
-    const standHoc = StandRecordsHoc({
+    const standHoc = StandRecordsHoc<R>({
       ...defaultRestHocParams,
       takeOverMount: true,
     });
