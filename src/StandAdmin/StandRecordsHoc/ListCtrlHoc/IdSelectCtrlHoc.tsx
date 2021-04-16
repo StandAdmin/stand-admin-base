@@ -3,8 +3,9 @@ import { useUnmount, usePersistFn } from '@/StandAdmin/utils/hooks';
 import {
   IListCtrlHocParams,
   ICommonObj,
-  TKey,
+  TRecordId,
   TListCtrlProps,
+  IStandContextProps,
 } from '../../interface';
 
 import { useStandContext } from '../hooks/useStandContext';
@@ -17,13 +18,14 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
   return (WrappedComponent: React.ComponentType<any>) => {
     const Comp: React.FC<TListCtrlProps<R> & {
       onChangeWithData?: (list: R[]) => void;
+      onChange?: (list: TRecordId[]) => void;
     }> = props => {
       const {
         getRecordId,
         idFieldName,
         nameFieldName,
         getRecordMapByIdList: defaultGetRecordMapByIdList,
-      } = useStandContext();
+      } = useStandContext() as IStandContextProps<R>;
 
       const {
         defaultCheckedIdList,
@@ -57,20 +59,22 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
         }
       });
 
-      const tagRecordByIdList = usePersistFn((ids, tag) => {
-        updateRecordCache(
-          ids.reduce((map: { [key in TKey]: any }, id: TKey) => {
-            // eslint-disable-next-line no-param-reassign
-            map[id] = tag ? { [TagProp]: tag } : undefined;
+      const tagRecordByIdList = usePersistFn(
+        (ids: TRecordId[], tag: boolean | string) => {
+          updateRecordCache(
+            ids.reduce((map: { [key in TRecordId]: any }, id: TRecordId) => {
+              // eslint-disable-next-line no-param-reassign
+              map[id] = tag ? { [TagProp]: tag } : undefined;
 
-            return map;
-          }, {}),
-        );
-      });
+              return map;
+            }, {}),
+          );
+        },
+      );
 
-      const onChange = usePersistFn(itemList => {
+      const onChange = usePersistFn((itemList: R[]) => {
         updateRecordCache(
-          itemList.reduce((map: { [key in TKey]: R }, item: R) => {
+          itemList.reduce((map: { [key in TRecordId]: R }, item: R) => {
             // eslint-disable-next-line no-param-reassign
             map[getRecordId(item)] = item;
             return map;
@@ -106,7 +110,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
       }, [checkedIdList]);
 
       const checkedList = useMemo(() => {
-        const getFullRecord = (id: any) => {
+        const getFullRecord = (id: TRecordId) => {
           const record = recordCache[id];
 
           if (record && !record[TagProp]) {
@@ -116,7 +120,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
           return { [idFieldName]: id, [nameFieldName]: '...' };
         };
 
-        return checkedIdList.map((id: any) => getFullRecord(id));
+        return checkedIdList.map(id => getFullRecord(id));
       }, [checkedIdList, recordCache]);
 
       return (

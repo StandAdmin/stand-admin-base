@@ -1,10 +1,14 @@
 import React from 'react';
 import { Popconfirm } from 'antd';
-import { useStandTableList } from '../../StandAdmin/StandRecordsHoc/hooks/useStandTableList';
+import {
+  useStandTableList,
+  getOptsForStandTableList,
+} from '../../StandAdmin/StandRecordsHoc/hooks/useStandTableList';
 import { IHistoryRecord, ITargetFormInfo } from '../interface';
 import { decodeFormVals } from '../../StandAdmin/utils/formEncoder';
+import { IFormHistroyTriggerProps } from '../interface';
 
-export default (props: any) => {
+export default (props: IFormHistroyTriggerProps) => {
   const {
     targetFormInfo,
     formValuesEncoder,
@@ -19,7 +23,9 @@ export default (props: any) => {
     showRecordForm,
     tableListStyles,
     standRender,
-  } = useStandTableList(props);
+  } = useStandTableList<IHistoryRecord>({
+    ...getOptsForStandTableList(props as any),
+  });
 
   const { deleteRecord, idFieldName, getRecordId, getRecordName } = context;
 
@@ -36,7 +42,9 @@ export default (props: any) => {
       afterRestore({ formValues });
     }
 
-    toggleModalVisible(false);
+    if (toggleModalVisible) {
+      toggleModalVisible(false);
+    }
   };
 
   const columns: any = [

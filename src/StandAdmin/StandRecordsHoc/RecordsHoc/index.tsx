@@ -1,10 +1,9 @@
 import React from 'react';
-
 import { LoadingOutlined } from '@ant-design/icons';
 import { Empty, Pagination, message, Modal, Spin } from 'antd';
 import { PaginationProps } from 'antd/es/pagination';
 import classNames from 'classnames';
-import { isEqual, debounce, pick, pickBy } from 'lodash';
+import { isEqual, debounce, pick, pickBy, omit } from 'lodash';
 import {
   toUrlQuery,
   fromUrlQuery,
@@ -18,25 +17,31 @@ import { EmptyConfigModel, EmptyRecordModel } from '../../standModelHelper';
 import {
   IRecordsProps,
   IRecordsHocParams,
-  IActionCounterHocProps,
+  //IActionCounterHocProps,
   // TAsyncFnAny,
   IStoreActionParams,
   IServiceParams,
-  TCommonObjOrEmpty,
+  IResponseOfAction,
+  TParamsOrId,
+  TRecordFormVisibleTag,
   TRecordsHocComp,
   ICommonObj,
+  TRecordId,
   IStandContextProps,
+  IResponseOfSearchRecords,
+  TParams,
+  //IStandConnectHocProps,
 } from '../../interface';
-
 import { getAutoIdGenerator } from '../../utils/util';
-
 import { StandConnectHoc } from '../connect';
 
 import styles from '../styles';
 
 const getNewMountId = getAutoIdGenerator();
 
-export default function<R = any>(hocParams: IRecordsHocParams) {
+export default function<R extends ICommonObj = any>(
+  hocParams: IRecordsHocParams<R>,
+) {
   const {
     recordModel = EmptyRecordModel,
     configModel = EmptyConfigModel,
@@ -63,22 +68,23 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
     sorterSearchParams: undefined,
     reservedUrlParamNames: [],
     placeholderIfConfigLoading: true,
-    passContextAsProps: true,
+    receiveContextAsProps: true,
+
     formNamePrefix: 'Form',
     ...restHocParams,
   };
 
   return (WrappedComponent: React.ComponentType<any>): TRecordsHocComp<R> => {
-    class Comp extends React.Component<IRecordsProps & IActionCounterHocProps> {
+    class Comp extends React.Component<IRecordsProps<R>> {
       static defaultProps = {
         ...defaultRestHocParams,
       };
 
       mountId: number = -1;
 
-      debouncedSearchRecords: (specParams?: any) => Promise<any>;
+      debouncedSearchRecords: (specParams?: ICommonObj) => Promise<any>;
 
-      latestSearchParams: any;
+      latestSearchParams: ICommonObj;
 
       autoRegisteredStoreNsMap: { [key: string]: boolean } = {};
 
@@ -104,7 +110,7 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         }
       }
 
-      componentDidUpdate(prevProps: IRecordsProps) {
+      componentDidUpdate(prevProps: IRecordsProps<R>) {
         const { searchRecordsOnParamsChange } = this.props;
 
         if (searchRecordsOnParamsChange) {
@@ -202,7 +208,10 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         });
       };
 
-      getFinalSearchParams = (specProps?: IRecordsProps, specParams?: any) => {
+      getFinalSearchParams = (
+        specProps?: IRecordsProps<R>,
+        specParams?: ICommonObj,
+      ) => {
         const props = specProps || this.props;
 
         const params = specParams || this.getSearchParams(props);
@@ -222,7 +231,7 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
 
       calcParamsWithProp = (
         propKey: string,
-        specProps?: IRecordsProps,
+        specProps?: IRecordsProps<R>,
         ...rest: any[]
       ) => {
         const props = specProps || this.props;
@@ -256,7 +265,7 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         return this.calcParamsWithProp('filterSearchParams', ...args);
       };
 
-      searchRecords = (specParams?: TCommonObjOrEmpty) => {
+      searchRecords = (specParams?: ICommonObj) => {
         const { dispatch, updateSearchParamsEvenError } = this.props;
 
         this.latestSearchParams = this.getFinalSearchParams(
@@ -268,14 +277,14 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
           type: `${StoreNs}/search`,
           params: this.latestSearchParams,
           opts: { updateSearchParamsEvenError },
-        }) as Promise<any>;
+        }) as Promise<IResponseOfSearchRecords<R>>;
       };
 
       getLatestSearchParams = () => {
         return this.latestSearchParams;
       };
 
-      getLocation = (specProps?: IRecordsProps) => {
+      getLocation = (specProps?: IRecordsProps<R>) => {
         const props = specProps || this.props;
 
         if (props.location) {
@@ -289,7 +298,7 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         return history.location;
       };
 
-      getUrlParams = (specProps?: IRecordsProps) => {
+      getUrlParams = (specProps?: IRecordsProps<R>) => {
         const props = specProps || this.props;
 
         return fromUrlQuery(this.getLocation(specProps).search, {
@@ -297,7 +306,7 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         });
       };
 
-      getSearchParams = (specProps?: IRecordsProps) => {
+      getSearchParams = (specProps?: IRecordsProps<R>) => {
         const props = specProps || this.props;
 
         const { syncParamsToUrl } = props;
@@ -319,7 +328,7 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         this.searchRecords(storeRef.searchParams);
       };
 
-      goSearch = async (params = {}) => {
+      goSearch = async (params: ICommonObj = {}) => {
         const {
           reservedUrlParamNames,
           syncParamsToUrl,
@@ -358,15 +367,15 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
 
           if (urlParamsNs) {
             // Keep "unrelated" params
-            const extraSearchQuery = toUrlQuery(
+            const restSearchQuery = toUrlQuery(
               pickBy(
                 fromUrlQuery(searchInLocation),
                 (value, key) => key !== urlParamsNs,
               ),
             );
 
-            if (extraSearchQuery) {
-              searchQuery.push(extraSearchQuery);
+            if (restSearchQuery) {
+              searchQuery.push(restSearchQuery);
             }
           }
 
@@ -386,12 +395,13 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
       };
 
       showEmptyRecordForm = () => {
-        this.showRecordForm(null);
+        return this.showRecordForm(null);
       };
 
       hideRecordFormOnly = () => {
         const { dispatch, onRecordFormVisibleTagChange } = this.props;
-        (dispatch({
+
+        return (dispatch({
           type: `${StoreNs}/hideRecordFormOnly`,
         }) as Promise<any>).then(() => {
           if (onRecordFormVisibleTagChange) {
@@ -400,16 +410,19 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         });
       };
 
-      getRecord = (params?: TCommonObjOrEmpty) => {
+      getRecord = (paramsOrId: TParamsOrId) => {
         const { dispatch } = this.props;
 
         return dispatch({
           type: `${StoreNs}/getRecord`,
-          params,
+          params:
+            typeof paramsOrId === 'object'
+              ? paramsOrId
+              : { [idFieldName]: paramsOrId },
         }) as Promise<R>;
       };
 
-      getRecordMapByIdList = async (idList: any[]) => {
+      getRecordMapByIdList = async (idList: TRecordId[]) => {
         const { getRecordMapByIdList } = this.props;
 
         if (getRecordMapByIdList) {
@@ -429,27 +442,37 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         return dataMap;
       };
 
-      loadAndShowRecordForm = (params: any, recordFormVisibleTag = true) => {
+      loadAndShowRecordForm = (
+        paramsOrId: TParamsOrId,
+        recordFormVisibleTag = true,
+      ) => {
         const modal = Modal.info({
           content: <Spin />,
           maskClosable: false,
           okButtonProps: { style: { display: 'none' } },
         });
 
-        this.getRecord(params)
+        return this.getRecord(paramsOrId)
           .then(activeRecord => {
             if (activeRecord) {
-              this.showRecordForm(activeRecord, recordFormVisibleTag);
+              return this.showRecordForm(activeRecord, recordFormVisibleTag);
             }
+
+            message.warn('没有找到相关记录！');
+            return Promise.reject(activeRecord);
           })
           .finally(() => {
             modal.destroy();
           });
       };
 
-      showRecordForm = (activeRecord: R, recordFormVisibleTag = true) => {
+      showRecordForm = (
+        activeRecord: R,
+        recordFormVisibleTag: TRecordFormVisibleTag = true,
+      ) => {
         const { dispatch, onRecordFormVisibleTagChange } = this.props;
-        (dispatch({
+
+        return (dispatch({
           type: `${StoreNs}/showRecordForm`,
           params: {
             activeRecord,
@@ -464,13 +487,13 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
 
       clearActiveRecord = () => {
         const { dispatch } = this.props;
-        dispatch({
+        return dispatch({
           type: `${StoreNs}/clearActiveRecord`,
         });
       };
 
       handleActionResponse = (
-        resp: any,
+        resp: IResponseOfAction<R>,
         {
           action,
           actionTitle,
@@ -513,9 +536,9 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         }
       };
 
-      blinkRecordById = (id: any) => {
+      blinkRecordById = (id: TRecordId) => {
         const { dispatch } = this.props;
-        dispatch({
+        return dispatch({
           type: `${StoreNs}/blinkRecordById`,
           id,
         });
@@ -596,7 +619,10 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
           ...rest,
         });
 
-      addRecord = (record: R, callback: (resp: any) => void) => {
+      addRecord = (
+        record: R,
+        callback: (resp: IResponseOfAction<R>) => void,
+      ) => {
         return this.callStoreAction({
           action: 'addRecord',
           actionForCount: 'upsertRecord',
@@ -605,7 +631,10 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         });
       };
 
-      updateRecord = (record: R, callback: (resp: any) => void) => {
+      updateRecord = (
+        record: R,
+        callback: (resp: IResponseOfAction<R>) => void,
+      ) => {
         return this.callStoreAction({
           action: 'updateRecord',
           actionForCount: 'upsertRecord',
@@ -622,7 +651,10 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         });
       };
 
-      deleteRecord = (params: any, callback: (resp: any) => void) => {
+      deleteRecord = (
+        params: TParams,
+        callback: (resp: IResponseOfAction<R>) => void,
+      ) => {
         return this.callStoreAction({
           action: 'deleteRecord',
           actionTitle: `删除${StoreNsTitle}`,
@@ -635,13 +667,13 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
 
         const { pagination } = storeRef;
 
-        this.handleTableChange({ ...pagination, current: 1, pageSize });
+        return this.handleTableChange({ ...pagination, current: 1, pageSize });
       };
 
       showTotal = (total: number) => `共 ${total.toLocaleString('en')} 条`;
 
       handlePageNumChange = (current: number, pageSize: number) => {
-        this.handleTableChange({ current, pageSize });
+        return this.handleTableChange({ current, pageSize });
       };
 
       handleTableChange = (
@@ -726,9 +758,9 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         );
       };
 
-      getRecordId = (record: any) => record && record[idFieldName];
+      getRecordId = (record: R) => record && record[idFieldName];
 
-      getRecordName = (record: any) => record && record[nameFieldName];
+      getRecordName = (record: R) => record && record[nameFieldName];
 
       getInsMethods = () => {
         const {
@@ -799,11 +831,9 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
         };
       };
 
-      render() {
+      getStandContext = () => {
         const {
           configLoading,
-          placeholderIfConfigLoading,
-          wrapperClassName,
           storeRef,
           configStoreRef,
           searchLoading,
@@ -811,19 +841,9 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
           decreaseActionCount,
           getActionCount,
           formNamePrefix,
-          passContextAsProps,
-          ...restProps
         } = this.props;
 
-        if (configLoading && placeholderIfConfigLoading) {
-          return placeholderIfConfigLoading === true ? (
-            <Spin />
-          ) : (
-            placeholderIfConfigLoading
-          );
-        }
-
-        const contextVal: IStandContextProps = {
+        return {
           StoreNs,
           storeRef,
           configStoreRef,
@@ -848,6 +868,28 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
 
           ...this.getInsMethods(),
         };
+      };
+
+      render() {
+        const {
+          configLoading,
+          placeholderIfConfigLoading,
+          wrapperClassName,
+          searchLoading,
+          getActionCount,
+          receiveContextAsProps,
+          ...restProps
+        } = this.props;
+
+        if (configLoading && placeholderIfConfigLoading) {
+          return placeholderIfConfigLoading === true ? (
+            <Spin />
+          ) : (
+            placeholderIfConfigLoading
+          );
+        }
+
+        const contextVal: IStandContextProps<R> = this.getStandContext();
 
         return (
           <div
@@ -864,8 +906,11 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
           >
             <StandContext.Provider value={contextVal}>
               <WrappedComponent
-                {...restProps}
-                {...(passContextAsProps ? contextVal : undefined)}
+                {...omit(restProps, Object.keys(contextVal))}
+                {...(receiveContextAsProps
+                  ? contextVal
+                  : { getStandContext: this.getStandContext })}
+                isStandAdminHoc
               />
             </StandContext.Provider>
           </div>
@@ -873,6 +918,6 @@ export default function<R = any>(hocParams: IRecordsHocParams) {
       }
     }
 
-    return StandConnectHoc(hocParams)(ActionCounterHoc()(Comp as any));
+    return StandConnectHoc<R>(hocParams)(ActionCounterHoc()(Comp as any));
   };
 }

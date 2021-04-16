@@ -23,3 +23,12 @@ export interface ITargetFormInfo {
   form: FormInstance;
   title: string;
 }
+
+export interface IFormHistroyTriggerProps {
+  targetFormInfo: ITargetFormInfo;
+  formValuesEncoder: { encode: (vals: any) => any; decode: (vals: any) => any };
+  historyRecordInfo: { nameFieldName: string };
+  actionHooks: { afterRestore: (vals: any) => any };
+
+  toggleModalVisible?: (v: boolean) => void;
+}

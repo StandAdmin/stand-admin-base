@@ -9,7 +9,8 @@ import {
   IListCtrlProps,
   TListCtrlHocComp,
   TListCtrlProps,
-  IStandContextProps,
+  ModalTriggerOpts,
+  ICommonObj,
 } from '../../interface';
 import IdSelectCtrlHoc from './IdSelectCtrlHoc';
 import { StandContext } from '../../const';
@@ -20,15 +21,11 @@ interface IListCtrlState {
   modalVisible: boolean | undefined;
 }
 
-function defaultModalTriggerRender({
+function defaultModalTriggerRender<R>({
   props,
   showModal,
   context,
-}: {
-  props: TListCtrlProps<any>;
-  showModal: () => void;
-  context: IStandContextProps<any>;
-}) {
+}: ModalTriggerOpts<R>) {
   const { recordNsTitle, getRecordId, getRecordName } = context;
 
   const {
@@ -66,7 +63,9 @@ function defaultModalTriggerRender({
   );
 }
 
-export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
+export default function<R extends ICommonObj = any>(
+  hocParams: IListCtrlHocParams<R>,
+) {
   const { ...restHocParams } = hocParams;
 
   const defaultRestHocParams = {
@@ -358,9 +357,9 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
       takeOverMount: true,
     });
 
-    const CompWithBatchCheck = BatchCheckHoc()(Comp as any);
+    const CompWithBatchCheck = BatchCheckHoc<R>()(Comp);
 
-    const CompWithIdSel = IdSelectCtrlHoc(hocParams)(CompWithBatchCheck);
+    const CompWithIdSel = IdSelectCtrlHoc<R>(hocParams)(CompWithBatchCheck);
 
     const FinalComp = standHoc(CompWithBatchCheck) as TListCtrlHocComp<R>;
 

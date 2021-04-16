@@ -1,7 +1,11 @@
 import React from 'react';
 import { Form, Modal, Button, Input } from 'antd';
 import { cloneDeepWith } from 'lodash';
-import { ITargetFormInfo } from '../interface';
+import {
+  ITargetFormInfo,
+  IFormHistroyTriggerProps,
+  IHistoryRecord,
+} from '../interface';
 import { encodeFormVals } from '../../StandAdmin/utils/formEncoder';
 import {
   useStandUpsertForm,
@@ -63,7 +67,7 @@ const findValidName = (targetVals: any) => {
   return null;
 };
 
-export default (props: any) => {
+export default (props: IFormHistroyTriggerProps) => {
   const { targetFormInfo, historyRecordInfo, formValuesEncoder } = props;
 
   const { formId, form: targetForm } = targetFormInfo as ITargetFormInfo;
@@ -87,28 +91,30 @@ export default (props: any) => {
     return name || '';
   };
 
-  const { context, formProps, modalProps } = useStandUpsertForm({
-    ...getOptsForStandUpsertForm(props, {
-      // 默认值
-      defaultValues: {
-        name: getDefaultName(),
-      },
-    }),
-    // 接口数据（通常来自于列表接口）转换为表单数据
-    recordToValues: record => ({
-      ...record,
-    }),
-    // 表单数据转为接口数据（后续会传递给 addRecord/updateRecord）
-    recordFromValues: values => {
-      const { name } = values;
+  const { context, formProps, modalProps } = useStandUpsertForm<IHistoryRecord>(
+    {
+      ...getOptsForStandUpsertForm(props as any, {
+        // 默认值
+        defaultValues: {
+          name: getDefaultName(),
+        },
+      }),
+      // 接口数据（通常来自于列表接口）转换为表单数据
+      recordToValues: record => ({
+        ...record,
+      }),
+      // 表单数据转为接口数据（后续会传递给 addRecord/updateRecord）
+      recordFromValues: values => {
+        const { name } = values;
 
-      return {
-        name,
-        formId,
-        formVals: getFormVals(),
-      };
+        return {
+          name,
+          formId,
+          formVals: getFormVals(),
+        };
+      },
     },
-  });
+  );
 
   const { getActionCount } = context;
 

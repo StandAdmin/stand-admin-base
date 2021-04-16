@@ -4,6 +4,7 @@ import React from 'react';
 import {
   StandListCtrlHoc,
   StandRecordsHoc,
+  defineCommonHocParams,
 } from '../StandAdmin/StandRecordsHoc';
 
 import { useStandContext } from '../StandAdmin/StandRecordsHoc/hooks/useStandContext';
@@ -18,7 +19,9 @@ import {
 import List from './List';
 import RecordForm from './RecordForm';
 
-import { IRecordsHocParams, ICommonObj } from '../StandAdmin/interface';
+import { IFormHistroyTriggerProps, IHistoryRecord } from './interface';
+
+import { ICommonObj } from '../StandAdmin/interface';
 
 import {
   searchRecords,
@@ -67,7 +70,7 @@ export const recordModel = buildStandRecordModelPkg({
   // },
 });
 
-function MainComp(props: any) {
+function MainComp(props: IFormHistroyTriggerProps) {
   // const { config } = useStandContext();
 
   return (
@@ -83,7 +86,7 @@ function MainComp(props: any) {
 }
 
 export function RecordFormWrapper(props: any) {
-  const context = useStandContext();
+  const context = useStandContext<IHistoryRecord>();
 
   const { trigger } = props;
 
@@ -95,17 +98,17 @@ export function RecordFormWrapper(props: any) {
   );
 }
 
-const hocParams: IRecordsHocParams = {
+const hocParams = defineCommonHocParams({
   recordModel,
   configModel,
 
   syncParamsToUrl: false,
-  passContextAsProps: false,
+  receiveContextAsProps: false,
   /**
    * 默认的查询参数
    */
   // defaultSearchParams: {},
-};
+});
 
 const DynamicCompCache: ICommonObj = {};
 

@@ -1,8 +1,10 @@
 import { useContext } from 'react';
-import { IStandContextProps } from '../../interface';
+import { IStandContextProps, ICommonObj } from '../../interface';
 import { StandContext } from '../../const';
 
-export function useStandContext(): IStandContextProps {
-  const context = useContext(StandContext);
+export function useStandContext<
+  R extends ICommonObj = any
+>(): IStandContextProps<R> {
+  const context: IStandContextProps<R> = useContext(StandContext);
   return context;
 }

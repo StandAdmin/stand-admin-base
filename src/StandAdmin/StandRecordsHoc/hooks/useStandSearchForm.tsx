@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { Form } from 'antd';
 import { FormInstance } from 'antd/es/form';
@@ -7,64 +7,65 @@ import { FormInstance } from 'antd/es/form';
 import { identity } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
-import { StandContext } from '../../const';
-
+import { useStandContext } from './useStandContext';
 import FormHistroyTrigger from '../../../FormHistroy/trigger';
 
 import {
   ICommonObj,
+  TParams,
   TCommonObjOrEmpty,
-  IStandContextProps,
   IUseStandSearchFormResult,
+  TFnParamsFilter,
 } from '../../interface';
 
 export interface IStandSearchFormOpts {
-  defaultSearchParams?: ICommonObj;
-  searchParamsToValues?: (params: ICommonObj) => TCommonObjOrEmpty;
+  defaultSearchParams?: TParams;
+  searchParamsToValues?: (params: TParams) => TCommonObjOrEmpty;
   searchParamsFromValues?: (
     values: ICommonObj,
-    searchParams?: TCommonObjOrEmpty,
+    searchParams?: TParams,
   ) => TCommonObjOrEmpty;
   disabledSearchParams?: string[];
 }
 
-// function getEmptyVal(val: any) {
-//   switch (typeof val) {
-//     case 'string':
-//     case 'number':
-//       return undefined;
-
-//     case 'object':
-//       if (moment.isMoment(val)) {
-//         return undefined;
-//       }
-//       return Array.isArray(val) ? [] : {};
-
-//     default:
-//       return undefined;
-//   }
-// }
-
-export function getOptsForStandSearchForm(props: any): IStandSearchFormOpts {
-  return {
-    disabledSearchParams: props.specSearchParams
-      ? Object.keys(props.specSearchParams).filter(
-          k => props.specSearchParams[k] !== undefined,
-        )
-      : null,
-  };
+export interface IPropsForStandSearchForm {
+  isStandAdminHoc?: boolean;
+  specSearchParams?: TParams | TFnParamsFilter;
 }
 
-export function useStandSearchForm(
-  props: IStandSearchFormOpts | IStandContextProps,
-): IUseStandSearchFormResult {
-  const stOpts = useMemo(() => {
+export function getOptsForStandSearchForm(
+  props: IPropsForStandSearchForm,
+): IStandSearchFormOpts {
+  const { specSearchParams } = props;
+
+  const opts = {};
+
+  if (specSearchParams) {
+    const specParamsMap =
+      typeof specSearchParams === 'function'
+        ? specSearchParams(props)
+        : specSearchParams;
+
+    Object.assign(opts, {
+      disabledSearchParams: Object.keys(specParamsMap).filter(
+        k => specParamsMap[k] !== undefined,
+      ),
+    });
+  }
+
+  return opts;
+}
+
+export function useStandSearchForm<R extends ICommonObj = any>(
+  opts: IStandSearchFormOpts | IPropsForStandSearchForm,
+): IUseStandSearchFormResult<R> {
+  const stOpts: IStandSearchFormOpts = useMemo(() => {
     return (
-      (props && 'debouncedSearchRecords' in props
-        ? getOptsForStandSearchForm(props)
-        : (props as IStandSearchFormOpts)) || {}
+      (opts && 'isStandAdminHoc' in opts
+        ? getOptsForStandSearchForm(opts as IPropsForStandSearchForm)
+        : (opts as IStandSearchFormOpts)) || {}
     );
-  }, [props]);
+  }, [opts]);
 
   const {
     defaultSearchParams = {},
@@ -73,7 +74,7 @@ export function useStandSearchForm(
     disabledSearchParams,
   } = stOpts;
 
-  const context = useContext(StandContext);
+  const context = useStandContext<R>();
 
   const {
     formNamePrefix,

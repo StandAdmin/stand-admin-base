@@ -1,19 +1,22 @@
-import React, { useEffect, useContext, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { Form } from 'antd';
 import { FormInstance } from 'antd/es/form';
 import { identity, isEqual } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
-import { StandContext } from '../../const';
+import { useStandContext } from './useStandContext';
 import {
   ICommonObj,
   TCommonObjOrEmpty,
   IUseStandUpsertFormResult,
+  IStandContextProps,
+  TParams,
+  TFnParamsFilter,
 } from '../../interface';
 import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 
 import FormHistroyTrigger from '../../../FormHistroy/trigger';
 
-export interface IStandUpsertFormOpts {
+export interface IStandUpsertFormOpts<R> {
   // form?: any;
   /**
    * 默认的表单数据
@@ -26,7 +29,7 @@ export interface IStandUpsertFormOpts {
    * 接口数据（通常来自于列表接口）转换为表单数据
    */
   recordToValues?: (
-    record: any,
+    record: R,
     options: { config: TCommonObjOrEmpty; defaultValues: TCommonObjOrEmpty },
   ) => TCommonObjOrEmpty;
 
@@ -54,47 +57,85 @@ export interface IStandUpsertFormOpts {
   isModalVisible?: (recordFormVisibleTag: boolean | string | number) => boolean;
 }
 
-export function getOptsForStandUpsertForm(
-  props: any,
-  {
-    defaultValues,
-  }: { defaultValues?: IStandUpsertFormOpts['defaultValues'] } = {},
-) {
-  const config = props.configStoreRef;
+export interface IPropsForStandUpsertForm {
+  isStandAdminHoc?: boolean;
+  specParamsAsRecordInitialValues?: boolean;
+  recordInitialValues?: ICommonObj;
+  specSearchParams?: TParams | TFnParamsFilter;
+}
 
-  const finalDefaultValues =
-    typeof defaultValues === 'function'
-      ? defaultValues({ config })
-      : defaultValues;
+export interface IExtraOpts {
+  defaultValues?: IStandUpsertFormOpts<any>['defaultValues'];
+}
+
+export function getOptsForStandUpsertForm(
+  props: IPropsForStandUpsertForm,
+  extraOpts: IExtraOpts = {},
+) {
+  const { defaultValues = {} } = extraOpts || {};
+
+  const finalDefaultValues = {};
+
+  const {
+    specSearchParams,
+    specParamsAsRecordInitialValues,
+    recordInitialValues,
+  } = props;
+
+  if (defaultValues) {
+    Object.assign(
+      finalDefaultValues,
+      typeof defaultValues === 'function'
+        ? defaultValues(props)
+        : defaultValues,
+    );
+  }
+
+  if (specParamsAsRecordInitialValues && specSearchParams) {
+    Object.assign(
+      finalDefaultValues,
+      typeof specSearchParams === 'function'
+        ? specSearchParams(props)
+        : specSearchParams,
+    );
+  }
 
   return {
     defaultValues: {
       ...finalDefaultValues,
-      ...(props.specParamsAsRecordInitialValues
-        ? props.specSearchParams
-        : undefined),
-      ...props.recordInitialValues,
+      ...recordInitialValues,
     },
   };
 }
 
 const isTrue = (v: any) => !!v;
 
-export function useStandUpsertForm({
-  // form,
-  defaultValues,
-  recordToValues = identity,
-  recordFromValues = identity,
-  submitValues,
-  onSuccess,
-  isModalVisible: origIsModalVisible = isTrue,
-}: IStandUpsertFormOpts = {}): IUseStandUpsertFormResult {
-  const context = useContext(StandContext);
+export function useStandUpsertForm<R extends ICommonObj = any>(
+  opts: IStandUpsertFormOpts<R> | IPropsForStandUpsertForm,
+): IUseStandUpsertFormResult<R> {
+  const stOpts: IStandUpsertFormOpts<R> = useMemo(() => {
+    return (
+      (opts && 'isStandAdminHoc' in opts
+        ? getOptsForStandUpsertForm(opts as IPropsForStandUpsertForm)
+        : (opts as IStandUpsertFormOpts<R>)) || {}
+    );
+  }, [opts]);
+
+  const {
+    defaultValues,
+    recordToValues = identity,
+    recordFromValues = identity,
+    submitValues,
+    onSuccess,
+    isModalVisible: origIsModalVisible = isTrue,
+  } = stOpts;
+
+  const context: IStandContextProps<R> = useStandContext<R>();
 
   const {
     StoreNsTitle,
     idFieldName,
-    // getRecordId,
+    getRecordId,
     getRecordName,
     nameFieldName,
     formNamePrefix,
@@ -168,7 +209,7 @@ export function useStandUpsertForm({
     };
   }, [isModalVisible, recordFormVisibleTag, activeRecord, form, getInitValues]);
 
-  const isUpdate = activeRecord && activeRecord[idFieldName];
+  const isUpdate = !!getRecordId(activeRecord);
 
   const defaultSubmitValues = usePersistFn(values => {
     if (isUpdate) {

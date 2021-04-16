@@ -1,13 +1,15 @@
 import { ConfigLoadingFld, ConfigLoadingMethod } from '../const';
 import { getConfig } from '../config';
 import { memoize, omit } from 'lodash';
-import { IRecordsHocParams } from '../interface';
+import { IRecordsHocParams, IStandConnectHocProps } from '../interface';
 
 const filterState = memoize(state => {
   return omit(state, [ConfigLoadingFld]);
 });
 
-export const StandConnectHoc = (hocParams: Partial<IRecordsHocParams>) => {
+export const StandConnectHoc = <R = any>(
+  hocParams: Partial<IRecordsHocParams<R>>,
+) => {
   const { getConnect } = getConfig();
 
   const { configModel, recordModel } = hocParams;
@@ -17,28 +19,30 @@ export const StandConnectHoc = (hocParams: Partial<IRecordsHocParams>) => {
   const { StoreNs: ConfigStoreNs } = configModel || {};
 
   return (WrappedComponent: React.ComponentType<any>) =>
-    getConnect()((state: any) => {
-      const storeRefState = StoreNs
-        ? state[StoreNs] || (recordModel && recordModel.default.state) || {}
-        : {};
+    getConnect()(
+      (state: any): IStandConnectHocProps<R> => {
+        const storeRefState = StoreNs
+          ? state[StoreNs] || (recordModel && recordModel.default.state) || {}
+          : {};
 
-      const configStoreRefState = ConfigStoreNs
-        ? state[ConfigStoreNs] ||
-          (configModel && configModel.default.state) ||
-          {}
-        : {};
+        const configStoreRefState = ConfigStoreNs
+          ? state[ConfigStoreNs] ||
+            (configModel && configModel.default.state) ||
+            {}
+          : {};
 
-      const { loading } = state;
+        const { loading } = state;
 
-      return {
-        storeRef: storeRefState,
-        configStoreRef: filterState(configStoreRefState),
-        searchLoading: storeRefState.searchLoading, // loading.effects[`${StoreNs}/search`],
-        configLoading:
-          loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`] ||
-          !!configStoreRefState[ConfigLoadingFld],
-      };
-    })(WrappedComponent);
+        return {
+          storeRef: storeRefState,
+          configStoreRef: filterState(configStoreRefState),
+          searchLoading: storeRefState.searchLoading, // loading.effects[`${StoreNs}/search`],
+          configLoading:
+            loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`] ||
+            !!configStoreRefState[ConfigLoadingFld],
+        };
+      },
+    )(WrappedComponent);
 };
 
 /** @deprecated use StandConnectHoc instead */

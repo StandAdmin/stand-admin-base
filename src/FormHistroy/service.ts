@@ -100,7 +100,6 @@ export async function deleteRecord({ id }: { id: string }) {
     .removeItem(id)
     .then(() => ({
       success: true,
-      data: true,
     }))
     .catch(err => ({
       success: false,

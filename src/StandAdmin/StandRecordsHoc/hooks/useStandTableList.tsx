@@ -1,30 +1,18 @@
-import React, { Fragment, useContext, useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import { Table } from 'antd';
 import classNames from 'classnames';
 import { PaginationProps } from 'antd/es/pagination';
 import { TableProps, ColumnsType } from 'antd/es/table';
-import { StandContext } from '../../const';
+import { useStandContext } from './useStandContext';
 import {
-  TListCtrlProps,
   IStandTableRenderParams,
   IUseStandTableListResult,
+  ICommonObj,
+  TParams,
+  TFnParamsFilter,
 } from '../../interface';
 
 import styles from '../styles';
-
-export interface IStandTableListOpts {
-  disabledSearchParams?: string[];
-}
-
-export function getOptsForStandTableList(props: any): IStandTableListOpts {
-  return {
-    disabledSearchParams: props.specSearchParams
-      ? Object.keys(props.specSearchParams).filter(
-          k => props.specSearchParams[k] !== undefined,
-        )
-      : null,
-  };
-}
 
 export function calColWidth(
   columns: ColumnsType<any>,
@@ -48,14 +36,80 @@ export function calColWidth(
   return total;
 }
 
-export function useStandTableList(
-  props: TListCtrlProps<any>,
-): IUseStandTableListResult {
-  const stOpts = useMemo(() => getOptsForStandTableList(props), [props]);
+export interface IPropsForStandTableList<R> {
+  specSearchParams?: TParams | TFnParamsFilter;
+  isStandListCtrl?: boolean;
+  checkedList?: R[];
+  maxCheckedLength?: number;
+  isModalMode?: boolean;
+  setChecked?: (records: R[]) => void;
+}
 
-  const { isStandListCtrl, checkedList, maxCheckedLength, isModalMode } = props;
+export interface IStandTableListOpts<R> {
+  disabledSearchParams?: string[];
+  isStandListCtrl?: boolean;
+  checkedList?: R[];
+  maxCheckedLength?: number;
+  isModalMode?: boolean;
+  setChecked?: (records: R[]) => void;
+}
 
-  const context = useContext(StandContext);
+export function getOptsForStandTableList<R>(
+  props: IPropsForStandTableList<R>,
+): IStandTableListOpts<R> {
+  const {
+    isStandListCtrl = false,
+    checkedList = [],
+    maxCheckedLength,
+    isModalMode = false,
+    setChecked,
+    specSearchParams,
+  } = props;
+
+  const opts = {
+    isStandListCtrl,
+    checkedList,
+    maxCheckedLength,
+    isModalMode,
+    setChecked,
+  };
+
+  if (specSearchParams) {
+    const specParamsMap =
+      typeof specSearchParams === 'function'
+        ? specSearchParams(props)
+        : specSearchParams;
+
+    Object.assign(opts, {
+      disabledSearchParams: Object.keys(specParamsMap).filter(
+        k => specParamsMap[k] !== undefined,
+      ),
+    });
+  }
+
+  return opts;
+}
+
+export function useStandTableList<R extends ICommonObj = any>(
+  opts: IStandTableListOpts<R> | IPropsForStandTableList<R>,
+): IUseStandTableListResult<R> {
+  const stOpts: IStandTableListOpts<R> = useMemo(() => {
+    return (
+      (opts && 'isStandAdminHoc' in opts
+        ? getOptsForStandTableList(opts as IPropsForStandTableList<R>)
+        : (opts as IStandTableListOpts<R>)) || {}
+    );
+  }, [opts]);
+
+  const {
+    isStandListCtrl = false,
+    checkedList = [],
+    maxCheckedLength,
+    isModalMode = false,
+    setChecked,
+  } = stOpts;
+
+  const context = useStandContext<R>();
 
   const {
     renderPagination,
@@ -78,20 +132,22 @@ export function useStandTableList(
     }, {});
 
     const rowsNotInRecords = checkedList.filter(
-      (item: any) => !recordsIdMap[getRecordId(item)],
+      (item: R) => !recordsIdMap[getRecordId(item)],
     );
 
-    // records.filter((item) => selectedRowKeys.indexOf(getRecordId(item)) >= 0)
-    props.setChecked([...rowsNotInRecords, ...selectedRows]);
+    if (setChecked) {
+      // records.filter((item) => selectedRowKeys.indexOf(getRecordId(item)) >= 0)
+      setChecked([...rowsNotInRecords, ...selectedRows]);
+    }
   };
 
-  const tableListProps: TableProps<any> = {
+  const tableListProps: TableProps<R> = {
     dataSource: records,
     bordered: false,
     size: isModalMode && isStandListCtrl ? 'small' : undefined,
     rowSelection: isStandListCtrl
       ? {
-          selectedRowKeys: checkedList.map((item: any) => getRecordId(item)),
+          selectedRowKeys: checkedList.map((item: R) => getRecordId(item)),
           onChange: onSelectChange,
           type: maxCheckedLength === 1 ? 'radio' : 'checkbox',
         }
@@ -119,7 +175,7 @@ export function useStandTableList(
     tableListStyles: styles,
     tableListProps,
     searchLoading,
-    standRender: (params: IStandTableRenderParams) => {
+    standRender: (params: IStandTableRenderParams<R>) => {
       const {
         hasPagination = true,
         noFiltersForDisabledSearchParams = true,
@@ -134,7 +190,7 @@ export function useStandTableList(
         stOpts.disabledSearchParams.forEach(paramKey => {
           if (columns) {
             const colItem = columns.find(
-              (item: any) => item.dataIndex === paramKey,
+              (item: R) => item.dataIndex === paramKey,
             );
             if (colItem) {
               if (colItem.filters) {
@@ -160,6 +216,7 @@ export function useStandTableList(
 
       const paginationProps: PaginationProps = {
         size: size === 'small' ? 'small' : undefined,
+        ...(typeof hasPagination === 'boolean' ? undefined : hasPagination),
       };
 
       return (

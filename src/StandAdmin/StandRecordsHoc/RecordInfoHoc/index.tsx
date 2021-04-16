@@ -19,11 +19,11 @@ import {
   getAutoStoreNs,
 } from '../../standModelHelper';
 
-export default function<R = any>(hocParams: IRecordsHocParams) {
+export default function<R = any>(hocParams: IRecordsHocParams<R>) {
   const { recordModel = EmptyRecordModel } = hocParams;
 
   return (WrappedComponent: React.ComponentType<any>): TRecordsHocComp<R> => {
-    const Comp: React.FC<IRecordsProps & IActionCounterHocProps> = props => {
+    const Comp: React.FC<IRecordsProps<R> & IActionCounterHocProps> = props => {
       const {
         searchLoading,
         storeRef: { records },

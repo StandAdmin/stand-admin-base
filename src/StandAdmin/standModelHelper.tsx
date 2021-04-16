@@ -226,10 +226,10 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
           throw new Error(`searchRecords is empty!`);
         }
 
-        const response: IResponse = (yield call(
+        const response: IResponseOfSearchRecords<R> = yield call(
           searchRecords,
           filterParams({ pageNum: 1, pageSize: 10, ...params }),
-        )) as IResponse;
+        );
 
         if (!response || !response.success) {
           handleRespError({ response, errorTitle: '查询单一结果失败' });
@@ -245,10 +245,10 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
           throw new Error(`getRecord is empty!`);
         }
 
-        const response: IResponseOfGetRecord<R> = (yield call(
+        const response = (yield call(
           getRecord,
           filterParams({ ...params }),
-        )) as IResponse;
+        )) as IResponseOfGetRecord<R>;
 
         if (!response || !response.success) {
           handleRespError({ response, errorTitle: '获取单一结果失败' });
