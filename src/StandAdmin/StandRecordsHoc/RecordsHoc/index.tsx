@@ -140,8 +140,18 @@ export default function<
 
       async componentWillUnmount() {
         await this.tryUnregisterModels();
+
         this.resetRecordsState(null);
+
+        this.cancleDebouncedSearchRecords();
       }
+
+      cancleDebouncedSearchRecords = () => {
+        const { cancel } = this.debouncedSearchRecords as any;
+        if (cancel) {
+          cancel();
+        }
+      };
 
       resetRecordsState = (mountId?: number | null) => {
         const { dispatch } = this.props;
@@ -196,7 +206,7 @@ export default function<
             return;
           }
 
-          logInfo(`Load model: ${modelPkg.StoreNs}`);
+          logInfo(`${StoreNsTitle}: Load model: ${modelPkg.StoreNs}`);
 
           app.model(modelPkg.default);
 
