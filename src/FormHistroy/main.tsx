@@ -21,7 +21,7 @@ import RecordForm from './RecordForm';
 
 import { IFormHistroyTriggerProps, IHistoryRecord } from './interface';
 
-import { ICommonObj } from '../StandAdmin/interface';
+import { ICommonObj, IRecordCommonHocParams } from '../StandAdmin/interface';
 
 import {
   searchRecords,
@@ -115,7 +115,15 @@ const DynamicCompCache: ICommonObj = {};
 // 动态主组件，支持不同的数据空间
 export const getDynamicComp = (
   namespace: string,
-  { isListCtrl = true, Comp = MainComp } = {},
+  {
+    Comp = MainComp,
+    isListCtrl = true,
+    extraHocParams,
+  }: {
+    isListCtrl?: boolean;
+    Comp?: React.ComponentType<any>;
+    extraHocParams?: IRecordCommonHocParams;
+  } = {},
 ) => {
   if (!DynamicCompCache[namespace]) {
     const hocWrapper = isListCtrl ? StandListCtrlHoc : StandRecordsHoc;
@@ -123,6 +131,7 @@ export const getDynamicComp = (
     DynamicCompCache[namespace] = (hocWrapper as any)({
       ...hocParams,
       recordModel: getDynamicModelPkg(recordModel, namespace),
+      ...extraHocParams,
     })(Comp);
   }
 

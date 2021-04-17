@@ -163,12 +163,12 @@ export interface IRecordsHocModelParams {
   /**
    * Normally returned by buildStandConfigModelPkg
    */
-  configModel: IModelPkg;
+  configModel?: IModelPkg;
 
   /**
    * Normally returned by buildStandRecordModelPkg
    */
-  recordModel: IModelPkg;
+  recordModel?: IModelPkg;
 }
 
 export interface IRecordCommonHocParams extends IRecordsHocModelParams {

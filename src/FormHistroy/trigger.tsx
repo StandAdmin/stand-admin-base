@@ -40,8 +40,8 @@ const SaveTriggerWrapper = (props: IFormHistroyTriggerProps) => {
 
 const modalTrigger = ({ showModal }: any) => (
   <Tooltip placement="left" title="查看草稿记录">
-    <div className={styles['vtoolbox-icon']}>
-      <HistoryOutlined onClick={showModal} />
+    <div className={styles['vtoolbox-icon']} onClick={showModal}>
+      <HistoryOutlined />
     </div>
   </Tooltip>
 );
@@ -56,6 +56,7 @@ export default (props: IFormHistroyTriggerProps) => {
   const SaveTrigger = getDynamicComp(`${formId}-save-trigger`, {
     isListCtrl: false,
     Comp: SaveTriggerWrapper,
+    extraHocParams: { searchRecordsOnMount: false },
   });
 
   return (
