@@ -118,9 +118,9 @@ export const getDynamicComp = (
   { isListCtrl = true, Comp = MainComp } = {},
 ) => {
   if (!DynamicCompCache[namespace]) {
-    DynamicCompCache[namespace] = (isListCtrl
-      ? StandListCtrlHoc
-      : StandRecordsHoc)({
+    const hocWrapper = isListCtrl ? StandListCtrlHoc : StandRecordsHoc;
+
+    DynamicCompCache[namespace] = (hocWrapper as any)({
       ...hocParams,
       recordModel: getDynamicModelPkg(recordModel, namespace),
     })(Comp);

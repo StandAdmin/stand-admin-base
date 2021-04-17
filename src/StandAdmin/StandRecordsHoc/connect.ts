@@ -7,7 +7,10 @@ const filterState = memoize(state => {
   return omit(state, [ConfigLoadingFld]);
 });
 
-export const StandConnectHoc = <R = any>(
+export const StandConnectHoc = <
+  R = any,
+  P extends IStandConnectHocProps<R> = any
+>(
   hocParams: Partial<IRecordsHocParams<R>>,
 ) => {
   const { getConnect } = getConfig();
@@ -18,9 +21,13 @@ export const StandConnectHoc = <R = any>(
 
   const { StoreNs: ConfigStoreNs } = configModel || {};
 
-  return (WrappedComponent: React.ComponentType<any>) =>
+  return (
+    WrappedComponent: React.ComponentType<
+      Omit<P, keyof IStandConnectHocProps<R>>
+    >,
+  ) =>
     getConnect()(
-      (state: any): IStandConnectHocProps<R> => {
+      (state: any): Omit<IStandConnectHocProps<R>, 'dispatch'> => {
         const storeRefState = StoreNs
           ? state[StoreNs] || (recordModel && recordModel.default.state) || {}
           : {};
@@ -42,7 +49,7 @@ export const StandConnectHoc = <R = any>(
             !!configStoreRefState[ConfigLoadingFld],
         };
       },
-    )(WrappedComponent);
+    )(WrappedComponent as any);
 };
 
 /** @deprecated use StandConnectHoc instead */

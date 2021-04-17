@@ -6,9 +6,9 @@ import StandRecordsHoc from '../RecordsHoc';
 import BatchCheckHoc from '../../BatchCheckHoc';
 import {
   IListCtrlHocParams,
-  IListCtrlProps,
   TListCtrlHocComp,
-  TListCtrlProps,
+  IListCtrlHocProps,
+  IRecordCommonHocProps,
   ModalTriggerOpts,
   ICommonObj,
 } from '../../interface';
@@ -63,9 +63,10 @@ function defaultModalTriggerRender<R>({
   );
 }
 
-export default function<R extends ICommonObj = any>(
-  hocParams: IListCtrlHocParams<R>,
-) {
+export default function<
+  R extends ICommonObj = any,
+  P extends IRecordCommonHocProps<R> = any
+>(hocParams: IListCtrlHocParams<R>) {
   const { ...restHocParams } = hocParams;
 
   const defaultRestHocParams = {
@@ -83,16 +84,19 @@ export default function<R extends ICommonObj = any>(
     defaultRestHocParams.syncParamsToUrl = !defaultRestHocParams.isModalMode;
   }
 
-  return (WrappedComponent: React.ComponentType<any>): TListCtrlHocComp<R> => {
-    class Comp extends React.Component<TListCtrlProps<R>, IListCtrlState> {
+  return (WrappedComponent: React.ComponentType<P>): TListCtrlHocComp<R, P> => {
+    type TInnerCompProps = IListCtrlHocProps<R> & P;
+
+    class Comp extends React.Component<TInnerCompProps, IListCtrlState> {
       static defaultProps = {
         ...defaultRestHocParams,
       };
 
       static contextType = StandContext;
+      context!: React.ContextType<typeof StandContext>;
 
       static getDerivedStateFromProps(
-        props: TListCtrlProps<R>,
+        props: TInnerCompProps,
         state: IListCtrlState,
       ) {
         if ('modalVisible' in props) {
@@ -104,7 +108,7 @@ export default function<R extends ICommonObj = any>(
         return null;
       }
 
-      constructor(props: TListCtrlProps<R>) {
+      constructor(props: TInnerCompProps) {
         super(props);
         this.state = {
           modalVisible:
@@ -123,7 +127,7 @@ export default function<R extends ICommonObj = any>(
       }
 
       componentDidUpdate(
-        prevProps: IListCtrlProps<R>,
+        prevProps: TInnerCompProps,
         prevState: IListCtrlState,
       ) {
         const prevModalVisible = this.isModalVisible(prevProps, prevState);
@@ -138,7 +142,7 @@ export default function<R extends ICommonObj = any>(
       }
 
       isModalVisible = (
-        specProps?: IListCtrlProps<R>,
+        specProps?: TInnerCompProps,
         specState?: IListCtrlState,
       ) => {
         const { modalProps = {} } = specProps || this.props;
@@ -206,12 +210,13 @@ export default function<R extends ICommonObj = any>(
       renderFooter = () => {
         const {
           isStandListCtrl,
-          storeRef,
           checkedList,
           checkAll,
           isAllChecked,
           maxCheckedLength,
         } = this.props;
+
+        const { storeRef } = this.context;
 
         const { records = [] } = storeRef || {};
 
@@ -277,7 +282,7 @@ export default function<R extends ICommonObj = any>(
       onModalAfterClose = () => {
         const { modalProps = {}, clearCheckedAfterClose } = this.props;
 
-        const { afterClose: origAfterClose } = modalProps || {};
+        const { afterClose: origAfterClose } = modalProps || ({} as any);
 
         if (clearCheckedAfterClose) {
           this.clearChecked();
@@ -332,7 +337,7 @@ export default function<R extends ICommonObj = any>(
 
         const mainContent = (
           <WrappedComponent
-            {...restProps}
+            {...(restProps as P)}
             {...{
               isModalMode,
               syncParamsToUrl: !isModalMode,
@@ -352,18 +357,24 @@ export default function<R extends ICommonObj = any>(
       }
     }
 
-    const standHoc = StandRecordsHoc<R>({
+    const CompWithBatchCheck = BatchCheckHoc<R, TInnerCompProps>()(Comp as any);
+
+    const CompWithIdSel = IdSelectCtrlHoc<R, TInnerCompProps>(hocParams)(
+      CompWithBatchCheck as any,
+    );
+
+    const standHoc = StandRecordsHoc<R, P>({
       ...defaultRestHocParams,
       takeOverMount: true,
     });
 
-    const CompWithBatchCheck = BatchCheckHoc<R>()(Comp);
+    const FinalComp = (standHoc(
+      CompWithBatchCheck as any,
+    ) as unknown) as TListCtrlHocComp<R, P>;
 
-    const CompWithIdSel = IdSelectCtrlHoc<R>(hocParams)(CompWithBatchCheck);
-
-    const FinalComp = standHoc(CompWithBatchCheck) as TListCtrlHocComp<R>;
-
-    FinalComp.IdSelectCtrl = standHoc(CompWithIdSel) as TListCtrlHocComp<R>;
+    FinalComp.IdSelectCtrl = (standHoc(
+      CompWithIdSel as any,
+    ) as unknown) as TListCtrlHocComp<R, P>;
 
     return FinalComp;
   };

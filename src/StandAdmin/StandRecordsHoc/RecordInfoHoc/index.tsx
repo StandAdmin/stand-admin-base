@@ -2,11 +2,11 @@ import React from 'react';
 
 import { EmptyRecordModel } from '../../standModelHelper';
 import {
-  IRecordsProps,
+  IRecordCommonHocProps,
   IRecordsHocParams,
-  IActionCounterHocProps,
   TRecordsHocComp,
   IResponseOfGetRecord,
+  ICommonObj,
 } from '../../interface';
 
 import { set, omit } from 'lodash';
@@ -19,19 +19,22 @@ import {
   getAutoStoreNs,
 } from '../../standModelHelper';
 
-export default function<R = any>(hocParams: IRecordsHocParams<R>) {
+export default function<
+  R extends ICommonObj = any,
+  P extends IRecordCommonHocProps<R> = any
+>(hocParams: IRecordsHocParams<R>) {
   const { recordModel = EmptyRecordModel } = hocParams;
 
-  return (WrappedComponent: React.ComponentType<any>): TRecordsHocComp<R> => {
-    const Comp: React.FC<IRecordsProps<R> & IActionCounterHocProps> = props => {
+  return (WrappedComponent: React.ComponentType<P>): TRecordsHocComp<R, P> => {
+    const Comp: React.FC<P> = props => {
       const {
         searchLoading,
         storeRef: { records },
-      } = useStandContext();
+      } = useStandContext<R>();
 
       return (
         <WrappedComponent
-          {...props}
+          {...(props as P)}
           {...{
             recordInfoLoading: searchLoading,
             recordInfo: records && records[0],

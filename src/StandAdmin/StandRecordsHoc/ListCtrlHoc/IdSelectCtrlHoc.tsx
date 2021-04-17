@@ -4,7 +4,7 @@ import {
   IListCtrlHocParams,
   ICommonObj,
   TRecordId,
-  TListCtrlProps,
+  IRecordCommonHocProps,
   IStandContextProps,
 } from '../../interface';
 
@@ -12,11 +12,14 @@ import { useStandContext } from '../hooks/useStandContext';
 
 const TagProp = '_cus_tag_';
 
-export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
+export default function<
+  R extends ICommonObj = any,
+  P extends IRecordCommonHocProps<R> = any
+>(hocParams: IListCtrlHocParams<R>) {
   const globalRecordCache: ICommonObj = {};
 
-  return (WrappedComponent: React.ComponentType<any>) => {
-    const Comp: React.FC<TListCtrlProps<R> & {
+  return (WrappedComponent: React.ComponentType<P>) => {
+    const Comp: React.FC<IRecordCommonHocProps<R> & {
       onChangeWithData?: (list: R[]) => void;
       onChange?: (list: TRecordId[]) => void;
     }> = props => {
@@ -131,7 +134,7 @@ export default function<R = any>(hocParams: IListCtrlHocParams<R>) {
               : 'defaultCheckedList']: checkedList,
             onChange,
           }}
-          {...rest}
+          {...(rest as P)}
         />
       );
     };

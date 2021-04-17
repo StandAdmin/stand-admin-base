@@ -6,3 +6,7 @@ export function getAutoIdGenerator(base = 0) {
     return baseId;
   };
 }
+
+export function getDisplayName<T>(WrappedComponent: React.ComponentType<T>) {
+  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+}

@@ -15,8 +15,11 @@ import ActionCounterHoc from '../../ActionCounterHoc';
 import { StandContext } from '../../const';
 import { EmptyConfigModel, EmptyRecordModel } from '../../standModelHelper';
 import {
-  IRecordsProps,
+  IRecordsHocProps,
+  IRecordCommonHocProps,
   IRecordsHocParams,
+  IRecordsInjectProps,
+  IRecordsInjectMethods,
   //IActionCounterHocProps,
   // TAsyncFnAny,
   IStoreActionParams,
@@ -39,9 +42,10 @@ import styles from '../styles';
 
 const getNewMountId = getAutoIdGenerator();
 
-export default function<R extends ICommonObj = any>(
-  hocParams: IRecordsHocParams<R>,
-) {
+export default function<
+  R extends ICommonObj = any,
+  P extends IRecordCommonHocProps<R> = any
+>(hocParams: IRecordsHocParams<R>) {
   const {
     recordModel = EmptyRecordModel,
     configModel = EmptyConfigModel,
@@ -69,13 +73,15 @@ export default function<R extends ICommonObj = any>(
     reservedUrlParamNames: [],
     placeholderIfConfigLoading: true,
     receiveContextAsProps: true,
-
     formNamePrefix: 'Form',
     ...restHocParams,
   };
 
-  return (WrappedComponent: React.ComponentType<any>): TRecordsHocComp<R> => {
-    class Comp extends React.Component<IRecordsProps<R>> {
+  return (WrappedComponent: React.ComponentType<P>): TRecordsHocComp<R, P> => {
+    type TInnerCompProps = IRecordsHocProps<R> &
+      Omit<P, keyof IRecordsInjectProps<R>>;
+
+    class Comp extends React.Component<TInnerCompProps> {
       static defaultProps = {
         ...defaultRestHocParams,
       };
@@ -110,14 +116,17 @@ export default function<R extends ICommonObj = any>(
         }
       }
 
-      componentDidUpdate(prevProps: IRecordsProps<R>) {
+      componentDidUpdate(prevProps: TInnerCompProps) {
         const { searchRecordsOnParamsChange } = this.props;
 
         if (searchRecordsOnParamsChange) {
-          const searchParamsChanged = !isEqual(
-            this.getFinalSearchParams(prevProps),
-            this.getFinalSearchParams(this.props),
+          const prevSearchParams = this.getFinalSearchParams(prevProps);
+          const currentSearchParams = this.getFinalSearchParams(
+            this.props as TInnerCompProps,
           );
+          const searchParamsChanged =
+            !isEqual(prevSearchParams, currentSearchParams) &&
+            !isEqual(currentSearchParams, this.latestSearchParams);
 
           if (searchParamsChanged) {
             const { searchLoading } = this.props;
@@ -209,12 +218,13 @@ export default function<R extends ICommonObj = any>(
       };
 
       getFinalSearchParams = (
-        specProps?: IRecordsProps<R>,
+        specProps?: TInnerCompProps,
         specParams?: ICommonObj,
       ) => {
         const props = specProps || this.props;
 
-        const params = specParams || this.getSearchParams(props);
+        const params =
+          specParams || this.getSearchParams(props as TInnerCompProps);
 
         const finalParams = {
           ...this.getDefaultSearchParams(props),
@@ -231,7 +241,7 @@ export default function<R extends ICommonObj = any>(
 
       calcParamsWithProp = (
         propKey: string,
-        specProps?: IRecordsProps<R>,
+        specProps?: TInnerCompProps,
         ...rest: any[]
       ) => {
         const props = specProps || this.props;
@@ -269,7 +279,7 @@ export default function<R extends ICommonObj = any>(
         const { dispatch, updateSearchParamsEvenError } = this.props;
 
         this.latestSearchParams = this.getFinalSearchParams(
-          this.props,
+          this.props as TInnerCompProps,
           specParams,
         );
 
@@ -284,7 +294,7 @@ export default function<R extends ICommonObj = any>(
         return this.latestSearchParams;
       };
 
-      getLocation = (specProps?: IRecordsProps<R>) => {
+      getLocation = (specProps?: TInnerCompProps) => {
         const props = specProps || this.props;
 
         if (props.location) {
@@ -298,7 +308,7 @@ export default function<R extends ICommonObj = any>(
         return history.location;
       };
 
-      getUrlParams = (specProps?: IRecordsProps<R>) => {
+      getUrlParams = (specProps?: TInnerCompProps) => {
         const props = specProps || this.props;
 
         return fromUrlQuery(this.getLocation(specProps).search, {
@@ -306,7 +316,7 @@ export default function<R extends ICommonObj = any>(
         });
       };
 
-      getSearchParams = (specProps?: IRecordsProps<R>) => {
+      getSearchParams = (specProps?: TInnerCompProps) => {
         const props = specProps || this.props;
 
         const { syncParamsToUrl } = props;
@@ -314,7 +324,7 @@ export default function<R extends ICommonObj = any>(
         let params;
 
         if (syncParamsToUrl) {
-          params = this.getUrlParams(props);
+          params = this.getUrlParams(props as TInnerCompProps);
         } else {
           const { storeRef } = props;
           params = storeRef.searchParams;
@@ -762,7 +772,7 @@ export default function<R extends ICommonObj = any>(
 
       getRecordName = (record: R) => record && record[nameFieldName];
 
-      getInsMethods = () => {
+      getInsMethods = (): IRecordsInjectMethods<R> => {
         const {
           getRecordName,
           clearActiveRecord,
@@ -831,7 +841,7 @@ export default function<R extends ICommonObj = any>(
         };
       };
 
-      getStandContext = () => {
+      getStandContext = (): IStandContextProps<R> => {
         const {
           configLoading,
           storeRef,
@@ -876,7 +886,6 @@ export default function<R extends ICommonObj = any>(
           placeholderIfConfigLoading,
           wrapperClassName,
           searchLoading,
-          getActionCount,
           receiveContextAsProps,
           ...restProps
         } = this.props;
@@ -889,7 +898,15 @@ export default function<R extends ICommonObj = any>(
           );
         }
 
-        const contextVal: IStandContextProps<R> = this.getStandContext();
+        const contextVal = this.getStandContext();
+
+        const finalProps: any = {
+          isStandAdminHoc: true,
+          ...omit(restProps, Object.keys(contextVal)),
+          ...(receiveContextAsProps
+            ? contextVal
+            : { getStandContext: this.getStandContext }),
+        };
 
         return (
           <div
@@ -899,25 +916,23 @@ export default function<R extends ICommonObj = any>(
                 [styles.searchLoading]: searchLoading,
                 [styles.configLoading]: configLoading,
                 [styles.loading]:
-                  searchLoading || configLoading || getActionCount() > 0,
+                  searchLoading ||
+                  configLoading ||
+                  contextVal.getActionCount() > 0,
               },
               wrapperClassName,
             )}
           >
             <StandContext.Provider value={contextVal}>
-              <WrappedComponent
-                {...omit(restProps, Object.keys(contextVal))}
-                {...(receiveContextAsProps
-                  ? contextVal
-                  : { getStandContext: this.getStandContext })}
-                isStandAdminHoc
-              />
+              <WrappedComponent {...finalProps} />
             </StandContext.Provider>
           </div>
         );
       }
     }
 
-    return StandConnectHoc<R>(hocParams)(ActionCounterHoc()(Comp as any));
+    return StandConnectHoc<R>(hocParams)(
+      ActionCounterHoc<TInnerCompProps>()(Comp as any),
+    );
   };
 }

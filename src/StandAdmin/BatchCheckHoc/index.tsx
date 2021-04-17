@@ -1,39 +1,31 @@
 import React from 'react';
 import { pullAll, uniqWith, isEqual } from 'lodash';
-import { IBatchCheckProps } from '../interface';
+import {
+  IBatchCheckHocProps,
+  IBatchCheckProps,
+  IBatchCheckInjectProps,
+} from '../interface';
 // import { Icon } from 'antd';
+import { getDisplayName } from '../utils/util';
+import { StandContext } from '../const';
 
 interface IBatchCheckState<R> {
   checkedList: R[];
 }
 
-export interface IRecordMatchOptions<R> {
-  getRecordId?: IBatchCheckProps<R>['getRecordId'];
-}
-
-export interface IBatchCheckHocParams<R> {
-  recordMatch?: (a: R, b: R, options?: IRecordMatchOptions<R>) => boolean;
-}
-
-export default function<R = any>(hocParams: IBatchCheckHocParams<R> = {}) {
-  const {
-    // eslint-disable-next-line func-names
-    recordMatch = function(a: R, b: R, options: IRecordMatchOptions<R> = {}) {
-      const { getRecordId } = options;
-
-      if (getRecordId) {
-        return getRecordId(a) === getRecordId(b);
-      }
-
-      return isEqual(a, b);
-    },
-  } = hocParams;
-
-  return (WrappedComponent: React.ComponentType<any>) =>
-    class Comp extends React.Component<
-      IBatchCheckProps<R>,
+export default function<R = any, P extends IBatchCheckHocProps<R> = any>() {
+  return (WrappedComponent: React.ComponentType<P>) =>
+    class BatchCheck extends React.Component<
+      Omit<P, keyof IBatchCheckInjectProps<R>>,
       IBatchCheckState<R>
     > {
+      public static displayName = `BatchCheck_${getDisplayName<P>(
+        WrappedComponent,
+      )}`;
+
+      static contextType = StandContext;
+      context!: React.ContextType<typeof StandContext>;
+
       static defaultProps: IBatchCheckProps<R> = {
         defaultCheckedList: [],
         maxCheckedLength: -1,
@@ -59,7 +51,7 @@ export default function<R = any>(hocParams: IBatchCheckHocParams<R> = {}) {
         return null;
       }
 
-      constructor(props: IBatchCheckProps<R>) {
+      constructor(props: Omit<P, keyof IBatchCheckInjectProps<R>>) {
         super(props);
 
         this.state = {
@@ -98,8 +90,19 @@ export default function<R = any>(hocParams: IBatchCheckHocParams<R> = {}) {
         return checkedList.some(item => this.recordMatch(item, record));
       };
 
-      recordMatch = (r1: R, r2: R) =>
-        recordMatch(r1, r2, { getRecordId: this.props.getRecordId });
+      recordMatch = (a: R, b: R) => {
+        if (a === b) {
+          return true;
+        }
+
+        const { getRecordId } = this.context || {};
+
+        if (getRecordId) {
+          return getRecordId(a) === getRecordId(b);
+        }
+
+        return isEqual(a, b);
+      };
 
       findMatchRecord = (target: R, list: R[]) =>
         list.find(item => this.recordMatch(item, target));
@@ -191,7 +194,7 @@ export default function<R = any>(hocParams: IBatchCheckHocParams<R> = {}) {
           batchToggleChecked,
         } = this;
 
-        const checkedCxt = {
+        const hocProps = {
           checkedList,
           setChecked,
           isAllChecked,
@@ -205,7 +208,7 @@ export default function<R = any>(hocParams: IBatchCheckHocParams<R> = {}) {
           getCheckedList,
         };
 
-        return <WrappedComponent {...restProps} {...checkedCxt} />;
+        return <WrappedComponent {...(restProps as P)} {...hocProps} />;
       }
     };
 }
