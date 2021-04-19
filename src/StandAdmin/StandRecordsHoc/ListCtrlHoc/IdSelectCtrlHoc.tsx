@@ -4,7 +4,8 @@ import {
   IListCtrlHocParams,
   ICommonObj,
   TRecordId,
-  IRecordCommonHocProps,
+  IListCtrlHocInjectProps,
+  IIdSelectCtrlHocProps,
   IStandContextProps,
 } from '../../interface';
 
@@ -14,15 +15,15 @@ const TagProp = '_cus_tag_';
 
 export default function<
   R extends ICommonObj = any,
-  P extends IRecordCommonHocProps<R> = any
+  P extends IListCtrlHocInjectProps<R> = any
 >(hocParams: IListCtrlHocParams<R>) {
   const globalRecordCache: ICommonObj = {};
 
   return (WrappedComponent: React.ComponentType<P>) => {
-    const Comp: React.FC<IRecordCommonHocProps<R> & {
-      onChangeWithData?: (list: R[]) => void;
-      onChange?: (list: TRecordId[]) => void;
-    }> = props => {
+    type OuterProps = Omit<P, keyof IListCtrlHocInjectProps<R>> &
+      IIdSelectCtrlHocProps<R>;
+
+    const Comp: React.FC<OuterProps> = props => {
       const {
         getRecordId,
         idFieldName,

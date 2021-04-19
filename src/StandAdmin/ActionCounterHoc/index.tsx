@@ -1,15 +1,17 @@
 import React from 'react';
 
-import { IActionCounterHocProps } from '../interface';
+import { IActionCounterHocInjectProps } from '../interface';
 import { getDisplayName } from '../utils/util';
 interface IActionCounterState {
   counterMap: { [key: string]: number };
 }
 
-export default function<P extends IActionCounterHocProps = any>() {
-  return (WrappedComponent: React.ComponentType<P>) =>
-    class ActionCounter extends React.Component<
-      Omit<P, keyof IActionCounterHocProps>,
+export default function<P extends IActionCounterHocInjectProps = any>() {
+  return (WrappedComponent: React.ComponentType<P>) => {
+    type OuterProps = Omit<P, keyof IActionCounterHocInjectProps>;
+
+    return class ActionCounter extends React.Component<
+      OuterProps,
       IActionCounterState
     > {
       public static displayName = `ActionCounter_${getDisplayName<P>(
@@ -68,7 +70,7 @@ export default function<P extends IActionCounterHocProps = any>() {
           getActionCount,
         } = this;
 
-        const hocProps: IActionCounterHocProps = {
+        const hocProps: IActionCounterHocInjectProps = {
           increaseActionCount,
           decreaseActionCount,
           getActionCount,
@@ -77,4 +79,5 @@ export default function<P extends IActionCounterHocProps = any>() {
         return <WrappedComponent {...(this.props as P)} {...hocProps} />;
       }
     };
+  };
 }

@@ -4,11 +4,19 @@ import {
   useStandTableList,
   getOptsForStandTableList,
 } from '../../StandAdmin/StandRecordsHoc/hooks/useStandTableList';
-import { IHistoryRecord, ITargetFormInfo } from '../interface';
-import { decodeFormVals } from '../../StandAdmin/utils/formEncoder';
-import { IFormHistroyTriggerProps } from '../interface';
+import {
+  IFormHistroyTriggerProps,
+  IHistoryRecord,
+  ITargetFormInfo,
+} from '../interface';
 
-export default (props: IFormHistroyTriggerProps) => {
+import { IListCtrlHocInjectProps } from '../../StandAdmin/interface';
+
+import { decodeFormVals } from '../../StandAdmin/utils/formEncoder';
+
+export default (
+  props: IFormHistroyTriggerProps & IListCtrlHocInjectProps<IHistoryRecord>,
+) => {
   const {
     targetFormInfo,
     formValuesEncoder,

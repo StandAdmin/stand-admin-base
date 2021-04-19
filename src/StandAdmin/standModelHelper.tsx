@@ -148,8 +148,8 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
       pageNum: 'pageNum',
       pageSize: 'pageSize',
     },
-    StoreNs,
-    StoreNsTitle,
+    StoreNs = getAutoStoreNs('Record'),
+    StoreNsTitle = '记录',
     searchRecords = emptySearchRecords,
     getRecord,
     addRecord,
@@ -599,7 +599,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
 }
 
 export function getStandConfigModel(opts: IStandConfigModelOptions): Model {
-  const { getConfig, StoreNs } = opts;
+  const { getConfig = [], StoreNs = getAutoStoreNs('Config') } = opts;
 
   if (!StoreNs) {
     throw new Error(`StoreNs should no be empty!`);
@@ -659,7 +659,7 @@ export function getAutoStoreNs(key: string) {
 
 export function buildStandRecordModelPkg<R = any>(
   opts: IStandModelOptions<R> = {},
-): IModelPkg {
+): IModelPkg<R> {
   const {
     idFieldName = 'id',
     nameFieldName = 'name',

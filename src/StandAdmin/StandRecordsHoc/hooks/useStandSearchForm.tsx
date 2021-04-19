@@ -12,25 +12,25 @@ import FormHistroyTrigger from '../../../FormHistroy/trigger';
 
 import {
   ICommonObj,
-  TParams,
+  TSearchParams,
   TCommonObjOrEmpty,
   IUseStandSearchFormResult,
   TFnParamsFilter,
 } from '../../interface';
 
 export interface IStandSearchFormOpts {
-  defaultSearchParams?: TParams;
-  searchParamsToValues?: (params: TParams) => TCommonObjOrEmpty;
+  defaultSearchParams?: TSearchParams;
+  searchParamsToValues?: (params: TSearchParams) => TCommonObjOrEmpty;
   searchParamsFromValues?: (
     values: ICommonObj,
-    searchParams?: TParams,
+    searchParams?: TSearchParams,
   ) => TCommonObjOrEmpty;
   disabledSearchParams?: string[];
 }
 
 export interface IPropsForStandSearchForm {
   isStandAdminHoc?: boolean;
-  specSearchParams?: TParams | TFnParamsFilter;
+  specSearchParams?: TSearchParams | TFnParamsFilter;
 }
 
 export function getOptsForStandSearchForm(

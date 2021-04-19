@@ -8,7 +8,7 @@ import {
   IStandTableRenderParams,
   IUseStandTableListResult,
   ICommonObj,
-  TParams,
+  TSearchParams,
   TFnParamsFilter,
 } from '../../interface';
 
@@ -37,7 +37,7 @@ export function calColWidth(
 }
 
 export interface IPropsForStandTableList<R> {
-  specSearchParams?: TParams | TFnParamsFilter;
+  specSearchParams?: TSearchParams | TFnParamsFilter;
   isStandListCtrl?: boolean;
   checkedList?: R[];
   maxCheckedLength?: number;

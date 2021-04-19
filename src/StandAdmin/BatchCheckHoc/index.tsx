@@ -1,10 +1,6 @@
 import React from 'react';
 import { pullAll, uniqWith, isEqual } from 'lodash';
-import {
-  IBatchCheckHocProps,
-  IBatchCheckProps,
-  IBatchCheckInjectProps,
-} from '../interface';
+import { IBatchCheckHocProps, IBatchCheckHocInjectProps } from '../interface';
 // import { Icon } from 'antd';
 import { getDisplayName } from '../utils/util';
 import { StandContext } from '../const';
@@ -13,10 +9,15 @@ interface IBatchCheckState<R> {
   checkedList: R[];
 }
 
-export default function<R = any, P extends IBatchCheckHocProps<R> = any>() {
-  return (WrappedComponent: React.ComponentType<P>) =>
-    class BatchCheck extends React.Component<
-      Omit<P, keyof IBatchCheckInjectProps<R>>,
+export default function<
+  R = any,
+  P extends IBatchCheckHocInjectProps<R> = any
+>() {
+  return (WrappedComponent: React.ComponentType<P>) => {
+    type OuterProps = IBatchCheckHocProps<R> &
+      Omit<P, keyof IBatchCheckHocInjectProps<R>>;
+    return class BatchCheck extends React.Component<
+      OuterProps,
       IBatchCheckState<R>
     > {
       public static displayName = `BatchCheck_${getDisplayName<P>(
@@ -26,9 +27,9 @@ export default function<R = any, P extends IBatchCheckHocProps<R> = any>() {
       static contextType = StandContext;
       context!: React.ContextType<typeof StandContext>;
 
-      static defaultProps: IBatchCheckProps<R> = {
+      static defaultProps: IBatchCheckHocProps<R> = {
         defaultCheckedList: [],
-        maxCheckedLength: -1,
+        //maxCheckedLength: -1,
       };
 
       state: IBatchCheckState<R> = {
@@ -36,7 +37,7 @@ export default function<R = any, P extends IBatchCheckHocProps<R> = any>() {
       };
 
       static getDerivedStateFromProps(
-        props: IBatchCheckProps<R>,
+        props: OuterProps,
         state: IBatchCheckState<R>,
       ) {
         if ('checkedList' in props) {
@@ -51,7 +52,7 @@ export default function<R = any, P extends IBatchCheckHocProps<R> = any>() {
         return null;
       }
 
-      constructor(props: Omit<P, keyof IBatchCheckInjectProps<R>>) {
+      constructor(props: OuterProps) {
         super(props);
 
         this.state = {
@@ -211,4 +212,5 @@ export default function<R = any, P extends IBatchCheckHocProps<R> = any>() {
         return <WrappedComponent {...(restProps as P)} {...hocProps} />;
       }
     };
+  };
 }

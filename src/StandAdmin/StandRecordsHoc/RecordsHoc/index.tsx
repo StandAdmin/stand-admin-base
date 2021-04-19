@@ -13,26 +13,31 @@ import { getConfig } from '../../config';
 import { logInfo } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
 import { StandContext } from '../../const';
-import { EmptyConfigModel, EmptyRecordModel } from '../../standModelHelper';
 import {
+  EmptyConfigModel,
+  EmptyRecordModel,
+  getDynamicModelPkg,
+} from '../../standModelHelper';
+import {
+  IRecordsHocInjectProps,
   IRecordsHocProps,
-  IRecordCommonHocProps,
-  IRecordsHocParams,
-  IRecordsInjectProps,
-  IRecordsInjectMethods,
+  IRecordsHocFullParams,
+  IRecordsContextMethods,
+  IStandConnectInjectProps,
   //IActionCounterHocProps,
   // TAsyncFnAny,
   IStoreActionParams,
   IServiceParams,
   IResponseOfAction,
-  TParamsOrId,
+  TSearchParamsOrId,
   TRecordFormVisibleTag,
-  TRecordsHocComp,
+  TRecordsHocComponent,
   ICommonObj,
   TRecordId,
   IStandContextProps,
   IResponseOfSearchRecords,
-  TParams,
+  TSearchParams,
+  IActionCounterHocInjectProps,
   //IStandConnectHocProps,
 } from '../../interface';
 import { getAutoIdGenerator } from '../../utils/util';
@@ -44,13 +49,19 @@ const getNewMountId = getAutoIdGenerator();
 
 export default function<
   R extends ICommonObj = any,
-  P extends IRecordCommonHocProps<R> = any
->(hocParams: IRecordsHocParams<R>) {
+  P extends IRecordsHocInjectProps<R> = any
+>(hocParams: IRecordsHocFullParams<R>) {
   const {
-    recordModel = EmptyRecordModel,
+    makeRecordModelPkgDynamic,
+    recordModel: origRecordModel = EmptyRecordModel,
     configModel = EmptyConfigModel,
     ...restHocParams
   } = hocParams;
+
+  const recordModel =
+    makeRecordModelPkgDynamic && origRecordModel && origRecordModel.modelOpts
+      ? getDynamicModelPkg(origRecordModel, makeRecordModelPkgDynamic)
+      : origRecordModel;
 
   const {
     idFieldName = 'id',
@@ -77,11 +88,15 @@ export default function<
     ...restHocParams,
   };
 
-  return (WrappedComponent: React.ComponentType<P>): TRecordsHocComp<R, P> => {
-    type TInnerCompProps = IRecordsHocProps<R> &
-      Omit<P, keyof IRecordsInjectProps<R>>;
+  return (
+    WrappedComponent: React.ComponentType<P>,
+  ): TRecordsHocComponent<R, P> => {
+    type OuterProps = IRecordsHocProps<R> &
+      Omit<P, keyof IRecordsHocInjectProps<R>> &
+      IStandConnectInjectProps<R> &
+      IActionCounterHocInjectProps;
 
-    class Comp extends React.Component<TInnerCompProps> {
+    class Comp extends React.Component<OuterProps> {
       static defaultProps = {
         ...defaultRestHocParams,
       };
@@ -116,13 +131,13 @@ export default function<
         }
       }
 
-      componentDidUpdate(prevProps: TInnerCompProps) {
+      componentDidUpdate(prevProps: OuterProps) {
         const { searchRecordsOnParamsChange } = this.props;
 
         if (searchRecordsOnParamsChange) {
           const prevSearchParams = this.getFinalSearchParams(prevProps);
           const currentSearchParams = this.getFinalSearchParams(
-            this.props as TInnerCompProps,
+            this.props as OuterProps,
           );
           const searchParamsChanged =
             !isEqual(prevSearchParams, currentSearchParams) &&
@@ -221,6 +236,8 @@ export default function<
 
         this.getRelModelPkgs().forEach(modelPkg => {
           if (this.autoRegisteredStoreNsMap[modelPkg.StoreNs]) {
+            logInfo(`${StoreNsTitle}: Unload model: ${modelPkg.StoreNs}`);
+
             app.unmodel(modelPkg.StoreNs);
             delete this.autoRegisteredStoreNsMap[modelPkg.StoreNs];
           }
@@ -228,13 +245,12 @@ export default function<
       };
 
       getFinalSearchParams = (
-        specProps?: TInnerCompProps,
+        specProps?: OuterProps,
         specParams?: ICommonObj,
       ) => {
         const props = specProps || this.props;
 
-        const params =
-          specParams || this.getSearchParams(props as TInnerCompProps);
+        const params = specParams || this.getSearchParams(props as OuterProps);
 
         const finalParams = {
           ...this.getDefaultSearchParams(props),
@@ -251,7 +267,7 @@ export default function<
 
       calcParamsWithProp = (
         propKey: string,
-        specProps?: TInnerCompProps,
+        specProps?: OuterProps,
         ...rest: any[]
       ) => {
         const props = specProps || this.props;
@@ -289,7 +305,7 @@ export default function<
         const { dispatch, updateSearchParamsEvenError } = this.props;
 
         this.latestSearchParams = this.getFinalSearchParams(
-          this.props as TInnerCompProps,
+          this.props as OuterProps,
           specParams,
         );
 
@@ -304,7 +320,7 @@ export default function<
         return this.latestSearchParams;
       };
 
-      getLocation = (specProps?: TInnerCompProps) => {
+      getLocation = (specProps?: OuterProps) => {
         const props = specProps || this.props;
 
         if (props.location) {
@@ -318,7 +334,7 @@ export default function<
         return history.location;
       };
 
-      getUrlParams = (specProps?: TInnerCompProps) => {
+      getUrlParams = (specProps?: OuterProps) => {
         const props = specProps || this.props;
 
         return fromUrlQuery(this.getLocation(specProps).search, {
@@ -326,7 +342,7 @@ export default function<
         });
       };
 
-      getSearchParams = (specProps?: TInnerCompProps) => {
+      getSearchParams = (specProps?: OuterProps) => {
         const props = specProps || this.props;
 
         const { syncParamsToUrl } = props;
@@ -334,7 +350,7 @@ export default function<
         let params;
 
         if (syncParamsToUrl) {
-          params = this.getUrlParams(props as TInnerCompProps);
+          params = this.getUrlParams(props as OuterProps);
         } else {
           const { storeRef } = props;
           params = storeRef.searchParams;
@@ -430,7 +446,7 @@ export default function<
         });
       };
 
-      getRecord = (paramsOrId: TParamsOrId) => {
+      getRecord = (paramsOrId: TSearchParamsOrId) => {
         const { dispatch } = this.props;
 
         return dispatch({
@@ -463,7 +479,7 @@ export default function<
       };
 
       loadAndShowRecordForm = (
-        paramsOrId: TParamsOrId,
+        paramsOrId: TSearchParamsOrId,
         recordFormVisibleTag = true,
       ) => {
         const modal = Modal.info({
@@ -672,7 +688,7 @@ export default function<
       };
 
       deleteRecord = (
-        params: TParams,
+        params: TSearchParams,
         callback: (resp: IResponseOfAction<R>) => void,
       ) => {
         return this.callStoreAction({
@@ -782,7 +798,7 @@ export default function<
 
       getRecordName = (record: R) => record && record[nameFieldName];
 
-      getInsMethods = (): IRecordsInjectMethods<R> => {
+      getInsMethods = (): IRecordsContextMethods<R> => {
         const {
           getRecordName,
           clearActiveRecord,
@@ -912,10 +928,9 @@ export default function<
 
         const finalProps: any = {
           isStandAdminHoc: true,
+          getStandContext: this.getStandContext,
           ...omit(restProps, Object.keys(contextVal)),
-          ...(receiveContextAsProps
-            ? contextVal
-            : { getStandContext: this.getStandContext }),
+          ...(receiveContextAsProps ? contextVal : undefined),
         };
 
         return (
@@ -941,8 +956,8 @@ export default function<
       }
     }
 
-    return StandConnectHoc<R>(hocParams)(
-      ActionCounterHoc<TInnerCompProps>()(Comp as any),
+    return StandConnectHoc<R>({ configModel, recordModel })(
+      ActionCounterHoc<OuterProps>()(Comp as any),
     );
   };
 }

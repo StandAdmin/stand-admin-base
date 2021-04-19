@@ -9,7 +9,7 @@ import {
   TCommonObjOrEmpty,
   IUseStandUpsertFormResult,
   IStandContextProps,
-  TParams,
+  TSearchParams,
   TFnParamsFilter,
 } from '../../interface';
 import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
@@ -61,7 +61,7 @@ export interface IPropsForStandUpsertForm {
   isStandAdminHoc?: boolean;
   specParamsAsRecordInitialValues?: boolean;
   recordInitialValues?: ICommonObj;
-  specSearchParams?: TParams | TFnParamsFilter;
+  specSearchParams?: TSearchParams | TFnParamsFilter;
 }
 
 export interface IExtraOpts {

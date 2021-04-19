@@ -29,16 +29,16 @@ export type TCommonObjOrEmpty = ICommonObj | TEmpty;
 
 export type TRecordFormVisibleTag = boolean | TKey;
 
-export type TParams = ICommonObj;
+export type TSearchParams = ICommonObj;
 
-export type TParamsOrId = TParams | TRecordId;
+export type TSearchParamsOrId = TSearchParams | TRecordId;
 
 export type TFnParamsFilter = (...args: any[]) => TCommonObjOrEmpty;
 
 export interface IGlobalConfig {
-  getDvaApp?: () => IDvaApp;
-  getHistory?: () => IHistory;
-  getConnect?: () => Connect;
+  getDvaApp: () => IDvaApp;
+  getHistory: () => IHistory;
+  getConnect: () => Connect;
 }
 
 export interface IResponse {
@@ -67,7 +67,7 @@ export interface IResponseOfAction<R> extends IResponse {
   data?: R;
 }
 
-export interface IStandModelOptions<R extends ICommonObj> {
+export interface IStandModelOptions<R> {
   idFieldName?: string;
   nameFieldName?: string;
   fldsPathInResp?: {
@@ -78,11 +78,13 @@ export interface IStandModelOptions<R extends ICommonObj> {
   };
   StoreNs?: string;
   StoreNsTitle?: string;
-  searchRecords?: (params?: ICommonObj) => Promise<IResponseOfSearchRecords<R>>;
-  getRecord?: (params?: ICommonObj) => Promise<IResponseOfGetRecord<R>>;
+  searchRecords?: (
+    params?: TSearchParams,
+  ) => Promise<IResponseOfSearchRecords<R>>;
+  getRecord?: (params?: TSearchParamsOrId) => Promise<IResponseOfGetRecord<R>>;
   addRecord?: (record: ICommonObj) => Promise<IResponseOfAction<R>>;
   updateRecord?: (record: ICommonObj) => Promise<IResponseOfAction<R>>;
-  deleteRecord?: (params: ICommonObj) => Promise<IResponseOfAction<R>>;
+  deleteRecord?: (params: TSearchParams) => Promise<IResponseOfAction<R>>;
   extensions?: any;
 }
 
@@ -96,14 +98,14 @@ export interface IModelPkg<R = any> {
   default: Model;
 }
 
-export type TGetConfigFn = () => Promise<ICommonObj>;
+export type TStandConfigGetConfigFn = () => Promise<ICommonObj>;
 
-export type TGetConfigItem = TGetConfigFn | ICommonObj;
+export type TStandConfigGetConfigItem = TStandConfigGetConfigFn | ICommonObj;
 
 export interface IStandConfigModelOptions {
   StoreNsTitle?: string;
   StoreNs?: string;
-  getConfig: TGetConfigItem | TGetConfigItem[];
+  getConfig?: TStandConfigGetConfigItem | TStandConfigGetConfigItem[];
 }
 
 export interface IStoreActionParams {
@@ -139,7 +141,7 @@ export interface IStoreRef<R> {
   nameFieldName: string;
 
   records: R[];
-  searchParams: ICommonObj;
+  searchParams: TSearchParams;
   pagination: IPagination;
   recordFormVisibleTag: TRecordFormVisibleTag;
 
@@ -171,7 +173,7 @@ export interface IRecordsHocModelParams {
   recordModel?: IModelPkg;
 }
 
-export interface IRecordCommonHocParams extends IRecordsHocModelParams {
+export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
   /**
    * Whether sync search params to url
    */
@@ -187,20 +189,20 @@ export interface IRecordCommonHocParams extends IRecordsHocModelParams {
   /**
    * Default search params
    */
-  defaultSearchParams?: TParams | TFnParamsFilter;
+  defaultSearchParams?: TSearchParams | TFnParamsFilter;
   /**
    * Special search params, which can not be overide
    */
-  specSearchParams?: TParams | TFnParamsFilter;
+  specSearchParams?: TSearchParams | TFnParamsFilter;
 
   /**
    * Sorter params, normally from Table.onChange
    */
-  sorterSearchParams?: TParams | TFnParamsFilter;
+  sorterSearchParams?: TSearchParams | TFnParamsFilter;
   /**
    * Filter params, normally from Table.onChange
    */
-  filterSearchParams?: TParams | TFnParamsFilter;
+  filterSearchParams?: TSearchParams | TFnParamsFilter;
 
   /**
    * Do searchRecords in didMount, default true
@@ -222,13 +224,15 @@ export interface IRecordCommonHocParams extends IRecordsHocModelParams {
    */
   wrapperClassName?: string;
 }
-export interface IRecordsHocBaseParams<R = any> extends IRecordCommonHocParams {
+export interface IRecordsHocFullParams<R = any>
+  extends IRecordsHocCommonParams {
+  makeRecordModelPkgDynamic?: string;
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
   takeOverMount?: boolean;
   searchRecordsOnParamsChange?: boolean;
   searchRecordsOnRefresh?: boolean;
-  finalSearchParamsFilter?: (params?: TParams) => TParams;
+  finalSearchParamsFilter?: (params?: TSearchParams) => TSearchParams;
   formNamePrefix?: string;
   onRecordFormVisibleTagChange?: (
     recordFormVisibleTag: TRecordFormVisibleTag,
@@ -244,9 +248,7 @@ export interface IRecordsHocBaseParams<R = any> extends IRecordCommonHocParams {
   >;
 }
 
-export interface IRecordsHocParams<R = any> extends IRecordsHocBaseParams<R> {}
-
-export interface IStandConnectHocProps<R> {
+export interface IStandConnectInjectProps<R> {
   storeRef: IStoreRef<R>;
   configStoreRef: ICommonObj;
   searchLoading: boolean;
@@ -254,9 +256,12 @@ export interface IStandConnectHocProps<R> {
   dispatch: Dispatch<any>;
 }
 
-export interface IRecordsProps<R = any> extends IRecordsHocBaseParams<R> {}
+export interface IRecordsHocInjectProps<R = any> {
+  isStandAdminHoc: boolean;
+  getStandContext: () => IStandContextProps<R>;
+}
 
-export interface IRecordsInjectMethods<R> {
+export interface IRecordsContextMethods<R> {
   getRecordMapByIdList: (
     idList: TRecordId[],
   ) => Promise<
@@ -265,17 +270,17 @@ export interface IRecordsInjectMethods<R> {
     }
   >;
 
-  getUrlParams: (specProps?: TParams) => ICommonObj;
+  getUrlParams: (specProps?: TSearchParams) => ICommonObj;
   showEmptyRecordForm: TFnVoid;
   showRecordForm: (
     activeRecord?: R | TEmpty,
     recordFormVisibleTag?: TRecordFormVisibleTag,
   ) => void;
   loadAndShowRecordForm: (
-    params: TParamsOrId,
+    params: TSearchParamsOrId,
     recordFormVisibleTag?: TRecordFormVisibleTag,
   ) => void;
-  goSearch: (params?: TParams) => void;
+  goSearch: (params?: TSearchParams) => void;
   getSearchParams: (specProps?: ICommonObj) => object;
   searchRecords: (
     specParams?: ICommonObj,
@@ -283,7 +288,7 @@ export interface IRecordsInjectMethods<R> {
   debouncedSearchRecords: (specParams?: ICommonObj) => void;
   blinkRecordById: (id: TRecordId) => void;
 
-  getRecord: (specParams?: TParams) => Promise<R>;
+  getRecord: (specParams?: TSearchParams) => Promise<R>;
   updateRecord: (
     record: R,
     callback?: (resp: IResponseOfAction<R>) => void,
@@ -323,30 +328,14 @@ export interface IRecordsInjectMethods<R> {
   callStoreAction: (params: IStoreActionParams) => Promise<IResponse>;
   callService: (params: IServiceParams) => Promise<IResponse>;
   renderEmpty: () => React.ReactNode;
-  getLatestSearchParams: () => TParams;
+  getLatestSearchParams: () => TSearchParams;
 }
 
-export interface IRecordsInjectProps<R> {
-  //  extends Omit<Partial<IRecordsInjectMethods<R>>, 'getRecordMapByIdList'>
-  isStandAdminHoc: boolean;
-  getStandContext?: () => IStandContextProps<R>;
-}
-export interface IRecordsHocProps<R>
-  extends IRecordsProps<R>,
-    IActionCounterHocProps,
-    IRecordsInjectProps<R>,
-    IStandConnectHocProps<R> {
+export interface IRecordsHocProps<R> extends IRecordsHocFullParams<R> {
   location?: { search: string };
 }
 
-export interface IIdSelCtrlHocParams {
-  checkedIdList?: TRecordId[];
-  defaultCheckedIdList?: TRecordId[];
-}
-
-export interface IListCtrlHocParams<R>
-  extends IRecordsHocParams<R>,
-    IIdSelCtrlHocParams {
+export interface IListCtrlHocParams<R> extends IRecordsHocFullParams<R> {
   isModalMode?: boolean;
   isStandListCtrl?: boolean;
   defaultModalVisible?: boolean;
@@ -357,14 +346,24 @@ export interface IListCtrlHocParams<R>
 }
 
 export interface ModalTriggerOpts<R> {
-  props: IListCtrlHocProps<R>;
+  props: IListCtrlHocProps<R> &
+    IBatchCheckHocInjectProps<R> &
+    IBatchCheckHocProps<R>;
   showModal: () => void;
   hideModal: () => void;
   toggleVisible: (v: boolean) => void;
   context: IStandContextProps<R>;
 }
 
-export interface IListCtrlProps<R> extends IListCtrlHocParams<R> {
+export interface IListCtrlHocInjectProps<R = any>
+  extends IRecordsHocInjectProps<R> {
+  isModalMode: boolean;
+  toggleModalVisible?: (v: boolean) => void;
+}
+export interface IListCtrlHocProps<R>
+  extends IListCtrlHocParams<R>,
+    IRecordsHocProps<R>,
+    IBatchCheckHocProps<R> {
   modalProps?: ModalProps;
   modalTrigger?: (
     opts: ModalTriggerOpts<R>,
@@ -379,13 +378,27 @@ export interface IListCtrlProps<R> extends IListCtrlHocParams<R> {
   onModalOk?: (params: { checkedList: R[] }) => void;
 }
 
-export interface IBatchCheckProps<R> {
+export interface IIdSelectCtrlHocProps<R = any>
+  extends Omit<IListCtrlHocProps<R>, 'onChange'> {
+  checkedIdList?: TRecordId[];
+  defaultCheckedIdList?: TRecordId[];
+  onChangeWithData?: (list: R[]) => void;
+  onChange?: (list: TRecordId[]) => void;
+}
+
+export interface IRecordInfoHocInjectProps<R = any>
+  extends IRecordsHocInjectProps<R> {
+  recordInfoLoading: boolean;
+  recordInfo: R;
+}
+
+export interface IBatchCheckHocProps<R> {
   defaultCheckedList?: R[];
   maxCheckedLength?: number;
   onChange?: (list: R[]) => void;
   checkedList?: R[];
 }
-export interface IBatchCheckInjectProps<R> {
+export interface IBatchCheckHocInjectProps<R> {
   isAllChecked: (records: R[]) => boolean;
   isRecordChecked: (record: R) => boolean;
   setChecked: (records: R[]) => void;
@@ -401,20 +414,16 @@ export interface IBatchCheckInjectProps<R> {
   batchToggleChecked: (records: R[], checked: boolean) => void;
   getCheckedList: () => R[];
 }
-export interface IBatchCheckHocProps<R>
-  extends IBatchCheckInjectProps<R>,
-    IBatchCheckProps<R> {}
 
-export interface IActionCounterInjectProps {
+export interface IActionCounterHocInjectProps {
   increaseActionCount: (action?: string, num?: number) => void;
   decreaseActionCount: (action?: string, num?: number) => void;
   getActionCount: (action?: string | string[]) => number;
 }
 
-export interface IActionCounterHocProps extends IActionCounterInjectProps {}
 export interface IStandContextProps<R = any>
-  extends IActionCounterHocProps,
-    IRecordsInjectMethods<R> {
+  extends IActionCounterHocInjectProps,
+    IRecordsContextMethods<R> {
   // Partial<IBatchCheckHocProps<R>>
   StoreNs: string;
   storeRef: IStoreRef<R>;
@@ -432,33 +441,34 @@ export interface IStandContextProps<R = any>
   mountId: TKey;
 }
 
-export interface IListCtrlHocProps<R>
-  extends IListCtrlProps<R>,
-    IRecordsHocProps<R>,
-    IBatchCheckHocProps<R> {}
-
-export interface IRecordCommonHocProps<R>
-  extends IListCtrlProps<R>,
-    IRecordsProps<R>,
-    IBatchCheckProps<R> {}
-
-export type TRecordsHocComp<R = any, P = any> = React.ComponentType<
-  P & IRecordCommonHocProps<R>
+export type TRecordsHocComponent<R = any, P = any> = React.ComponentType<
+  P & IRecordsHocProps<R>
 >;
 
-export type TListCtrlHocComp<R = any, P = any> = React.ComponentType<
-  P & IRecordCommonHocProps<R>
+export type TIdSelectCtrlHocComponent<R = any, P = any> = React.ComponentType<
+  P & IIdSelectCtrlHocProps<R>
+>;
+
+export type TListCtrlHocComponent<R = any, P = any> = React.ComponentType<
+  P & IListCtrlHocProps<R>
 > & {
-  IdSelectCtrl: TListCtrlHocComp<R, P>;
+  IdSelectCtrl: TIdSelectCtrlHocComponent<R, P>;
 };
 
+export interface ITargetFormInfo {
+  formId: string;
+  form: FormInstance;
+  title: string;
+}
+
 export interface IFormHistroyTriggerProps {
-  targetFormInfo: { formId: string; form: FormInstance; title: string };
-  formValuesEncoder: {
-    encode: (values: TCommonObjOrEmpty) => TCommonObjOrEmpty;
-    decode: (values: TCommonObjOrEmpty) => TCommonObjOrEmpty;
-  };
+  targetFormInfo: ITargetFormInfo;
   historyRecordInfo: { nameFieldName: string };
+  formValuesEncoder?: {
+    encode?: (vals: any) => any;
+    decode?: (vals: any) => any;
+  };
+  actionHooks?: { afterRestore: (vals: any) => any };
 }
 
 export interface IUseStandSearchFormResult<R> {

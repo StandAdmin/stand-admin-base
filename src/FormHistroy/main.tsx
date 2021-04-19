@@ -12,7 +12,6 @@ import { useStandContext } from '../StandAdmin/StandRecordsHoc/hooks/useStandCon
 import {
   buildStandRecordModelPkg,
   buildStandConfigModelPkg,
-  getDynamicModelPkg,
 } from '../StandAdmin/standModelHelper';
 
 // import ToolBar from './ToolBar';
@@ -21,7 +20,12 @@ import RecordForm from './RecordForm';
 
 import { IFormHistroyTriggerProps, IHistoryRecord } from './interface';
 
-import { ICommonObj, IRecordCommonHocParams } from '../StandAdmin/interface';
+import {
+  ICommonObj,
+  IListCtrlHocInjectProps,
+  IRecordsHocCommonParams,
+  IStandContextProps,
+} from '../StandAdmin/interface';
 
 import {
   searchRecords,
@@ -70,7 +74,9 @@ export const recordModel = buildStandRecordModelPkg({
   // },
 });
 
-function MainComp(props: IFormHistroyTriggerProps) {
+function MainComp(
+  props: IFormHistroyTriggerProps & IListCtrlHocInjectProps<IHistoryRecord>,
+) {
   // const { config } = useStandContext();
 
   return (
@@ -85,7 +91,11 @@ function MainComp(props: IFormHistroyTriggerProps) {
   );
 }
 
-export function RecordFormWrapper(props: any) {
+export function RecordFormWrapper(
+  props: IFormHistroyTriggerProps & {
+    trigger: (context: IStandContextProps<IHistoryRecord>) => React.ReactNode;
+  },
+) {
   const context = useStandContext<IHistoryRecord>();
 
   const { trigger } = props;
@@ -122,7 +132,7 @@ export const getDynamicComp = (
   }: {
     isListCtrl?: boolean;
     Comp?: React.ComponentType<any>;
-    extraHocParams?: IRecordCommonHocParams;
+    extraHocParams?: IRecordsHocCommonParams;
   } = {},
 ) => {
   if (!DynamicCompCache[namespace]) {
@@ -130,7 +140,7 @@ export const getDynamicComp = (
 
     DynamicCompCache[namespace] = (hocWrapper as any)({
       ...hocParams,
-      recordModel: getDynamicModelPkg(recordModel, namespace),
+      makeRecordModelPkgDynamic: namespace,
       ...extraHocParams,
     })(Comp);
   }

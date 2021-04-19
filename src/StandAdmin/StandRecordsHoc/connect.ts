@@ -1,7 +1,7 @@
 import { ConfigLoadingFld, ConfigLoadingMethod } from '../const';
 import { getConfig } from '../config';
 import { memoize, omit } from 'lodash';
-import { IRecordsHocParams, IStandConnectHocProps } from '../interface';
+import { IRecordsHocModelParams, IStandConnectInjectProps } from '../interface';
 
 const filterState = memoize(state => {
   return omit(state, [ConfigLoadingFld]);
@@ -9,9 +9,9 @@ const filterState = memoize(state => {
 
 export const StandConnectHoc = <
   R = any,
-  P extends IStandConnectHocProps<R> = any
+  P extends IStandConnectInjectProps<R> = any
 >(
-  hocParams: Partial<IRecordsHocParams<R>>,
+  hocParams: Partial<IRecordsHocModelParams>,
 ) => {
   const { getConnect } = getConfig();
 
@@ -23,11 +23,11 @@ export const StandConnectHoc = <
 
   return (
     WrappedComponent: React.ComponentType<
-      Omit<P, keyof IStandConnectHocProps<R>>
+      Omit<P, keyof IStandConnectInjectProps<R>>
     >,
   ) =>
     getConnect()(
-      (state: any): Omit<IStandConnectHocProps<R>, 'dispatch'> => {
+      (state: any): Omit<IStandConnectInjectProps<R>, 'dispatch'> => {
         const storeRefState = StoreNs
           ? state[StoreNs] || (recordModel && recordModel.default.state) || {}
           : {};

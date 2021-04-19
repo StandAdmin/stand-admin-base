@@ -2,9 +2,9 @@ import React from 'react';
 
 import { EmptyRecordModel } from '../../standModelHelper';
 import {
-  IRecordCommonHocProps,
-  IRecordsHocParams,
-  TRecordsHocComp,
+  IRecordInfoHocInjectProps,
+  IRecordsHocFullParams,
+  TRecordsHocComponent,
   IResponseOfGetRecord,
   ICommonObj,
 } from '../../interface';
@@ -21,11 +21,13 @@ import {
 
 export default function<
   R extends ICommonObj = any,
-  P extends IRecordCommonHocProps<R> = any
->(hocParams: IRecordsHocParams<R>) {
+  P extends IRecordInfoHocInjectProps<R> = any
+>(hocParams: IRecordsHocFullParams<R>) {
   const { recordModel = EmptyRecordModel } = hocParams;
 
-  return (WrappedComponent: React.ComponentType<P>): TRecordsHocComp<R, P> => {
+  return (
+    WrappedComponent: React.ComponentType<P>,
+  ): TRecordsHocComponent<R, P> => {
     const Comp: React.FC<P> = props => {
       const {
         searchLoading,
