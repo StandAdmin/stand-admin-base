@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo } from 'react';
 
 import { Form } from 'antd';
-import { FormInstance } from 'antd/es/form';
+import { FormInstance, FormItemProps } from 'antd/es/form';
 // import moment from 'moment';
 // import classNames from 'classnames';
-import { identity } from 'lodash';
+import { identity, isEqual } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 import { useStandContext } from './useStandContext';
@@ -16,6 +16,8 @@ import {
   TCommonObjOrEmpty,
   IUseStandSearchFormResult,
   TFnParamsFilter,
+  TRenderFormHistroyTriggerOpts,
+  IFormHistroyTriggerProps,
 } from '../../interface';
 
 export interface IStandSearchFormOpts {
@@ -86,6 +88,7 @@ export function useStandSearchForm<R extends ICommonObj = any>(
     StoreNsTitle,
     getDefaultSearchParams,
     getSpecSearchParams,
+    config,
   } = context;
 
   const [form]: [FormInstance] = Form.useForm();
@@ -137,50 +140,66 @@ export function useStandSearchForm<R extends ICommonObj = any>(
     onFinish(newValues);
   });
 
-  const FormItem = usePersistFn(itemProps => {
-    const { children, ...restProps } = itemProps;
+  const FormItem = usePersistFn(
+    (itemProps: FormItemProps<any>): React.ReactElement => {
+      const { children, ...restProps } = itemProps;
 
-    let finalChildren = children;
+      let finalChildren = children;
 
-    const disabled =
-      disabledSearchParams && disabledSearchParams.indexOf(itemProps.name) >= 0;
+      const disabled = !!(
+        disabledSearchParams &&
+        disabledSearchParams.find(disabledName =>
+          isEqual(itemProps.name, disabledName),
+        )
+      );
 
-    if (disabled) {
-      if (React.isValidElement(children)) {
-        finalChildren = React.cloneElement(
-          children as React.ReactElement<any>,
-          { disabled: true },
-        );
-      } else {
-        console.error('Disable will not work', itemProps);
+      if (disabled) {
+        if (React.isValidElement(children)) {
+          finalChildren = React.cloneElement(
+            children as React.ReactElement<any>,
+            { disabled: true },
+          );
+        } else {
+          console.error('Disable will not work', itemProps);
+        }
       }
-    }
 
-    return <Form.Item {...restProps}>{finalChildren}</Form.Item>;
-  });
+      return <Form.Item {...restProps}>{finalChildren}</Form.Item>;
+    },
+  );
 
   const formId = `${formNamePrefix}_${StoreNs}_Search`;
 
-  const formHistroyTriggerProps = {
-    targetFormInfo: { formId, form, title: `${StoreNsTitle}查询` },
-    formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
-    historyRecordInfo: { nameFieldName },
-    actionHooks: { afterRestore: submitForm },
-  };
+  const renderFormHistroyTrigger = usePersistFn(
+    (renderOpts: TRenderFormHistroyTriggerOpts) => {
+      const formHistroyTriggerProps: IFormHistroyTriggerProps = {
+        targetFormInfo: { formId, form, title: `${StoreNsTitle}查询` },
+        formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
+        historyRecordInfo: { nameFieldName },
+        actionHooks: { afterRestore: submitForm },
+      };
+
+      return (
+        <FormHistroyTrigger
+          {...formHistroyTriggerProps}
+          {...(typeof renderOpts === 'function'
+            ? renderOpts(formHistroyTriggerProps)
+            : renderOpts)}
+        />
+      );
+    },
+  );
 
   return {
     formId,
-    formHistroyTriggerProps,
-    renderFormHistroyTrigger: () => (
-      <FormHistroyTrigger {...formHistroyTriggerProps} />
-    ),
+    renderFormHistroyTrigger,
     formProps: {
       name: `${formId}_${mountId}`,
       form,
       initialValues: getInitValues(),
       onFinish,
     },
-    config: context.configStoreRef,
+    config,
     context,
     form,
     onFinish,

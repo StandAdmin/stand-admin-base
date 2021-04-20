@@ -427,7 +427,10 @@ export interface IStandContextProps<R = any>
   // Partial<IBatchCheckHocProps<R>>
   StoreNs: string;
   storeRef: IStoreRef<R>;
+
+  /** @deprecated use config instead */
   configStoreRef: ICommonObj;
+
   config: ICommonObj;
   searchLoading: boolean;
   configLoading: boolean;
@@ -471,10 +474,15 @@ export interface IFormHistroyTriggerProps {
   actionHooks?: { afterRestore: (vals: any) => any };
 }
 
+export type TRenderFormHistroyTriggerOpts =
+  | Partial<IFormHistroyTriggerProps>
+  | ((props: IFormHistroyTriggerProps) => Partial<IFormHistroyTriggerProps>);
+
 export interface IUseStandSearchFormResult<R> {
   formId: string;
-  formHistroyTriggerProps: IFormHistroyTriggerProps;
-  renderFormHistroyTrigger: () => React.ReactNode;
+  renderFormHistroyTrigger: (
+    opts?: TRenderFormHistroyTriggerOpts,
+  ) => React.ReactNode;
   formProps: {
     name: string;
     form: FormInstance;
@@ -492,8 +500,9 @@ export interface IUseStandSearchFormResult<R> {
 
 export interface IUseStandUpsertFormResult<R> {
   formId: string;
-  formHistroyTriggerProps: IFormHistroyTriggerProps;
-  renderFormHistroyTrigger: () => React.ReactNode;
+  renderFormHistroyTrigger: (
+    opts?: TRenderFormHistroyTriggerOpts,
+  ) => React.ReactNode;
   formProps: {
     name: string;
     form: FormInstance;

@@ -29,7 +29,7 @@ export default function<
         idFieldName,
         nameFieldName,
         getRecordMapByIdList: defaultGetRecordMapByIdList,
-      } = useStandContext() as IStandContextProps<R>;
+      } = useStandContext<R>() as IStandContextProps<R>;
 
       const {
         defaultCheckedIdList,

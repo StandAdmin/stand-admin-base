@@ -11,6 +11,8 @@ import {
   IStandContextProps,
   TSearchParams,
   TFnParamsFilter,
+  TRenderFormHistroyTriggerOpts,
+  IFormHistroyTriggerProps,
 } from '../../interface';
 import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 
@@ -144,6 +146,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     addRecord,
     updateRecord,
     mountId,
+    config,
   } = context;
 
   const [form]: [FormInstance] = Form.useForm();
@@ -151,8 +154,6 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
   // if (!form) {
   //   [form] = Form.useForm();
   // }
-
-  const config = context.configStoreRef;
 
   const { activeRecord, recordFormVisibleTag } = storeRef;
 
@@ -251,7 +252,9 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
   });
 
   const clearActiveRecord = usePersistFn(() => {
-    context.clearActiveRecord();
+    if (activeRecord) {
+      context.clearActiveRecord();
+    }
   });
 
   const activeRecordName = getRecordName(activeRecord);
@@ -260,18 +263,28 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     typeof recordFormVisibleTag !== 'boolean' ? '_' + recordFormVisibleTag : ''
   }`;
 
-  const formHistroyTriggerProps = {
-    targetFormInfo: { formId, form, title: `${StoreNsTitle}` },
-    formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
-    historyRecordInfo: { nameFieldName },
-  };
+  const renderFormHistroyTrigger = usePersistFn(
+    (renderOpts: TRenderFormHistroyTriggerOpts) => {
+      const formHistroyTriggerProps: IFormHistroyTriggerProps = {
+        targetFormInfo: { formId, form, title: `${StoreNsTitle}` },
+        formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
+        historyRecordInfo: { nameFieldName },
+      };
+
+      return (
+        <FormHistroyTrigger
+          {...formHistroyTriggerProps}
+          {...(typeof renderOpts === 'function'
+            ? renderOpts(formHistroyTriggerProps)
+            : renderOpts)}
+        />
+      );
+    },
+  );
 
   return {
     formId,
-    formHistroyTriggerProps,
-    renderFormHistroyTrigger: () => (
-      <FormHistroyTrigger {...formHistroyTriggerProps} />
-    ),
+    renderFormHistroyTrigger,
     formProps: {
       name: `${formId}_${mountId}`,
       form,

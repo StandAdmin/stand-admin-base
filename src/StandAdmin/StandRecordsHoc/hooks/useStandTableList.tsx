@@ -168,7 +168,7 @@ export function useStandTableList<R extends ICommonObj = any>(
 
   return {
     context,
-    config: context.configStoreRef,
+    config: context.config,
     records,
     showRecordForm,
     loadAndShowRecordForm,

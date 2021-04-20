@@ -1,7 +1,7 @@
 import React from 'react';
 import { HistoryOutlined, SaveOutlined } from '@ant-design/icons';
 import { message, Tooltip } from 'antd';
-import { ITargetFormInfo } from './interface';
+import { ITargetFormInfo, IHistoryRecord } from './interface';
 import { IFormHistroyTriggerProps } from '../StandAdmin/interface';
 import { getDynamicComp, RecordFormWrapper } from './main';
 import { useStandContext } from '../StandAdmin/StandRecordsHoc/hooks/useStandContext';
@@ -12,7 +12,7 @@ import styles from './styles';
 const SaveTriggerWrapper = (props: IFormHistroyTriggerProps) => {
   const { targetFormInfo } = props;
 
-  const { showEmptyRecordForm } = useStandContext();
+  const { showEmptyRecordForm } = useStandContext<IHistoryRecord>();
 
   const { form: targetForm } = targetFormInfo as ITargetFormInfo;
 
