@@ -312,7 +312,7 @@ export default function<
         return dispatch({
           type: `${StoreNs}/search`,
           params: this.latestSearchParams,
-          opts: { updateSearchParamsEvenError },
+          opts: { updateSearchParamsEvenError, mountId: this.mountId },
         }) as Promise<IResponseOfSearchRecords<R>>;
       };
 
@@ -874,7 +874,7 @@ export default function<
 
         return !!(
           storeRef &&
-          // storeRef.mountId &&
+          storeRef.mountId &&
           this.mountId !== storeRef.mountId
         );
       };

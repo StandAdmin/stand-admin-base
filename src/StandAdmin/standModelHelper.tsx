@@ -261,10 +261,13 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
         {
           params,
           opts: options = {},
-        }: { params?: any; opts: { updateSearchParamsEvenError?: boolean } },
+        }: {
+          params?: any;
+          opts: { updateSearchParamsEvenError?: boolean; mountId?: number };
+        },
         { call, put }: any,
       ) {
-        const { updateSearchParamsEvenError } = options;
+        const { updateSearchParamsEvenError, mountId } = options;
 
         const reqParams = { pageNum: 1, pageSize: 10, ...params };
 
@@ -272,6 +275,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
           type: 'saveState',
           payload: {
             searchLoading: true,
+            ...(mountId ? { mountId } : undefined),
           },
         });
 
