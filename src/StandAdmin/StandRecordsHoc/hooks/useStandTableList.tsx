@@ -39,19 +39,15 @@ export function calColWidth(
 export interface IPropsForStandTableList<R> {
   specSearchParams?: TSearchParams | TFnParamsFilter;
   isStandListCtrl?: boolean;
-  checkedList?: R[];
   maxCheckedLength?: number;
   isModalMode?: boolean;
-  setChecked?: (records: R[]) => void;
 }
 
 export interface IStandTableListOpts<R> {
   disabledSearchParams?: string[];
   isStandListCtrl?: boolean;
-  checkedList?: R[];
   maxCheckedLength?: number;
   isModalMode?: boolean;
-  setChecked?: (records: R[]) => void;
 }
 
 export function getOptsForStandTableList<R>(
@@ -59,19 +55,15 @@ export function getOptsForStandTableList<R>(
 ): IStandTableListOpts<R> {
   const {
     isStandListCtrl = false,
-    checkedList = [],
     maxCheckedLength,
     isModalMode = false,
-    setChecked,
     specSearchParams,
   } = props;
 
   const opts = {
     isStandListCtrl,
-    checkedList,
     maxCheckedLength,
     isModalMode,
-    setChecked,
   };
 
   if (specSearchParams) {
@@ -103,13 +95,13 @@ export function useStandTableList<R extends ICommonObj = any>(
 
   const {
     isStandListCtrl = false,
-    checkedList = [],
     maxCheckedLength,
     isModalMode = false,
-    setChecked,
   } = stOpts;
 
   const context = useStandContext<R>();
+
+  const { checkedList = [], setChecked } = context;
 
   const {
     renderPagination,

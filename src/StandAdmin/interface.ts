@@ -331,7 +331,9 @@ export interface IRecordsContextMethods<R> {
   getLatestSearchParams: () => TSearchParams;
 }
 
-export interface IRecordsHocProps<R> extends IRecordsHocFullParams<R> {
+export interface IRecordsHocProps<R>
+  extends IRecordsHocFullParams<R>,
+    IBatchCheckHocProps<R> {
   location?: { search: string };
 }
 
@@ -346,9 +348,7 @@ export interface IListCtrlHocParams<R> extends IRecordsHocFullParams<R> {
 }
 
 export interface ModalTriggerOpts<R> {
-  props: IListCtrlHocProps<R> &
-    IBatchCheckHocInjectProps<R> &
-    IBatchCheckHocProps<R>;
+  props: IListCtrlHocProps<R>;
   showModal: () => void;
   hideModal: () => void;
   toggleVisible: (v: boolean) => void;
@@ -362,8 +362,7 @@ export interface IListCtrlHocInjectProps<R = any>
 }
 export interface IListCtrlHocProps<R>
   extends IListCtrlHocParams<R>,
-    IRecordsHocProps<R>,
-    IBatchCheckHocProps<R> {
+    IRecordsHocProps<R> {
   modalProps?: ModalProps;
   modalTrigger?: (
     opts: ModalTriggerOpts<R>,
@@ -399,6 +398,7 @@ export interface IBatchCheckHocProps<R> {
   checkedList?: R[];
 }
 export interface IBatchCheckHocInjectProps<R> {
+  checkedList: R[];
   isAllChecked: (records: R[]) => boolean;
   isRecordChecked: (record: R) => boolean;
   setChecked: (records: R[]) => void;
@@ -406,11 +406,7 @@ export interface IBatchCheckHocInjectProps<R> {
   uncheckAll: (records: R[]) => void;
   checkReverse: (records: R[]) => void;
   clearChecked: TFnVoid;
-  toggleChecked: (
-    record: R,
-    checked: boolean,
-    callback?: (checkedList: R[]) => void,
-  ) => void;
+  toggleChecked: (record: R | R[], checked: boolean) => void;
   batchToggleChecked: (records: R[], checked: boolean) => void;
   getCheckedList: () => R[];
 }
@@ -423,8 +419,8 @@ export interface IActionCounterHocInjectProps {
 
 export interface IStandContextProps<R = any>
   extends IActionCounterHocInjectProps,
+    IBatchCheckHocInjectProps<R>,
     IRecordsContextMethods<R> {
-  // Partial<IBatchCheckHocProps<R>>
   StoreNs: string;
   storeRef: IStoreRef<R>;
 

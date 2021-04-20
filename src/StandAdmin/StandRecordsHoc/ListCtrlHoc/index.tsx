@@ -3,14 +3,12 @@ import { PlusCircleOutlined } from '@ant-design/icons';
 import { Button, Modal, Tag } from 'antd';
 import classNames from 'classnames';
 import StandRecordsHoc from '../RecordsHoc';
-import BatchCheckHoc from '../../BatchCheckHoc';
 import {
   IListCtrlHocInjectProps,
   IListCtrlHocParams,
   TListCtrlHocComponent,
   IListCtrlHocProps,
   ModalTriggerOpts,
-  IBatchCheckHocInjectProps,
   ICommonObj,
   TIdSelectCtrlHocComponent,
 } from '../../interface';
@@ -28,14 +26,13 @@ function defaultModalTriggerRender<R>({
   showModal,
   context,
 }: ModalTriggerOpts<R>) {
-  const { recordNsTitle, getRecordId, getRecordName } = context;
+  const { recordNsTitle, toggleChecked, getRecordId, getRecordName } = context;
 
   const {
     checkedList,
     modalTriggerDisabled,
     modalTriggerTitle,
     modalTriggerClassName,
-    toggleChecked,
   } = props;
 
   return (
@@ -90,8 +87,7 @@ export default function<
     WrappedComponent: React.ComponentType<P>,
   ): TListCtrlHocComponent<R, P> => {
     type OuterProps = Omit<P, keyof IListCtrlHocInjectProps<R>> &
-      IListCtrlHocProps<R> &
-      IBatchCheckHocInjectProps<R>;
+      IListCtrlHocProps<R>;
 
     class Comp extends React.Component<OuterProps, IListCtrlState> {
       static defaultProps = {
@@ -173,8 +169,9 @@ export default function<
           onModalVisibleChange,
           resetCheckedOnModalShow,
           defaultCheckedList,
-          setChecked,
         } = this.props;
+
+        const { setChecked } = this.context;
 
         if (v) {
           if (resetCheckedOnModalShow) {
@@ -204,19 +201,13 @@ export default function<
       };
 
       clearChecked = () => {
-        this.props.clearChecked();
+        this.context.clearChecked();
       };
 
       renderFooter = () => {
-        const {
-          isStandListCtrl,
-          checkedList,
-          checkAll,
-          isAllChecked,
-          maxCheckedLength,
-        } = this.props;
+        const { isStandListCtrl, checkedList, maxCheckedLength } = this.props;
 
-        const { storeRef } = this.context;
+        const { storeRef, checkAll, isAllChecked } = this.context;
 
         const { records = [] } = storeRef || {};
 
@@ -276,7 +267,7 @@ export default function<
       };
 
       onCheckChange = (checked: boolean, record: R) => {
-        this.props.toggleChecked(record, checked);
+        this.context.toggleChecked(record, checked);
       };
 
       onModalAfterClose = () => {
@@ -355,13 +346,9 @@ export default function<
       }
     }
 
-    const CompWithBatchCheck = BatchCheckHoc<R, IBatchCheckHocInjectProps<R>>()(
-      Comp as any,
-    );
-
     const CompWithIdSel = IdSelectCtrlHoc<R, IListCtrlHocInjectProps<R>>(
       defaultRestHocParams,
-    )(CompWithBatchCheck as any);
+    )(Comp as any);
 
     const standHocParams = {
       ...defaultRestHocParams,
@@ -371,7 +358,7 @@ export default function<
     const FinalComp = (StandRecordsHoc<R, P>({
       makeRecordModelPkgDynamic: 'ListCtrl',
       ...standHocParams,
-    })(CompWithBatchCheck as any) as unknown) as TListCtrlHocComponent<R, P>;
+    })(Comp as any) as unknown) as TListCtrlHocComponent<R, P>;
 
     FinalComp.IdSelectCtrl = (StandRecordsHoc<R, P>({
       makeRecordModelPkgDynamic: 'IdSelectCtrl',

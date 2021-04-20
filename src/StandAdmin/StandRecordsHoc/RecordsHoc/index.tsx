@@ -12,6 +12,7 @@ import {
 import { getConfig } from '../../config';
 import { logInfo } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
+import BatchCheckHoc from '../../BatchCheckHoc';
 import { StandContext } from '../../const';
 import {
   EmptyConfigModel,
@@ -38,9 +39,10 @@ import {
   IResponseOfSearchRecords,
   TSearchParams,
   IActionCounterHocInjectProps,
+  IBatchCheckHocInjectProps,
   //IStandConnectHocProps,
 } from '../../interface';
-import { getAutoIdGenerator } from '../../utils/util';
+import { getAutoIdGenerator, getDisplayName } from '../../utils/util';
 import { StandConnectHoc } from '../connect';
 
 import styles from '../styles';
@@ -94,9 +96,14 @@ export default function<
     type OuterProps = IRecordsHocProps<R> &
       Omit<P, keyof IRecordsHocInjectProps<R>> &
       IStandConnectInjectProps<R> &
-      IActionCounterHocInjectProps;
+      IActionCounterHocInjectProps &
+      IBatchCheckHocInjectProps<R>;
 
     class Comp extends React.Component<OuterProps> {
+      public static displayName = `Records_${getDisplayName<P>(
+        WrappedComponent,
+      )}`;
+
       static defaultProps = {
         ...defaultRestHocParams,
       };
@@ -879,15 +886,56 @@ export default function<
         );
       };
 
+      getBatchCheckHocInject = (): IBatchCheckHocInjectProps<R> => {
+        const {
+          checkedList,
+          isAllChecked,
+          isRecordChecked,
+          setChecked,
+          checkAll,
+          uncheckAll,
+          checkReverse,
+          clearChecked,
+          toggleChecked,
+          batchToggleChecked,
+          getCheckedList,
+        } = this.props;
+
+        return {
+          checkedList,
+          isAllChecked,
+          isRecordChecked,
+          setChecked,
+          checkAll,
+          uncheckAll,
+          checkReverse,
+          clearChecked,
+          toggleChecked,
+          batchToggleChecked,
+          getCheckedList,
+        };
+      };
+
+      getActionCounterHocInject = (): IActionCounterHocInjectProps => {
+        const {
+          increaseActionCount,
+          decreaseActionCount,
+          getActionCount,
+        } = this.props;
+
+        return {
+          increaseActionCount,
+          decreaseActionCount,
+          getActionCount,
+        };
+      };
+
       getStandContext = (): IStandContextProps<R> => {
         const {
           configLoading,
           storeRef,
           configStoreRef,
           searchLoading,
-          increaseActionCount,
-          decreaseActionCount,
-          getActionCount,
           formNamePrefix,
         } = this.props;
 
@@ -902,14 +950,15 @@ export default function<
           StoreNsTitle,
           idFieldName,
           nameFieldName,
-          dispatch: this.props.dispatch,
-          increaseActionCount,
-          decreaseActionCount,
-          getActionCount,
           formNamePrefix,
+
           isStoreDataStale: this.isStoreDataStale(),
           mountId: this.mountId,
 
+          dispatch: this.props.dispatch,
+
+          ...this.getActionCounterHocInject(),
+          ...this.getBatchCheckHocInject(),
           ...this.getInsMethods(),
         };
       };
@@ -965,7 +1014,7 @@ export default function<
     }
 
     return StandConnectHoc<R>({ configModel, recordModel })(
-      ActionCounterHoc<OuterProps>()(Comp as any),
+      BatchCheckHoc<R>()(ActionCounterHoc()(Comp as any)),
     );
   };
 }

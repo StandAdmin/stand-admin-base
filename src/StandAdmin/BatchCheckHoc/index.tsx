@@ -132,14 +132,6 @@ export default function<
         this.setState(() => this.getNewCheckedState(records));
       };
 
-      batchToggleChecked = (records: R[], selected: boolean) => {
-        if (selected) {
-          this.checkAll(records);
-        } else {
-          this.uncheckAll(records);
-        }
-      };
-
       clearChecked = () => {
         this.setState(this.getNewCheckedState([]));
       };
@@ -154,25 +146,18 @@ export default function<
         });
       };
 
-      toggleChecked = (record: R, checked: boolean) => {
-        this.setState(state => {
-          const { checkedList } = state;
+      batchToggleChecked = (records: R[], checked: boolean) => {
+        return this.toggleChecked(records, checked);
+      };
 
-          let newCheckedList: R[];
+      toggleChecked = (record: R | R[], checked: boolean) => {
+        const targets = Array.isArray(record) ? record : [record];
 
-          if (checked) {
-            newCheckedList = uniqWith(
-              [...checkedList, record],
-              this.recordMatch,
-            );
-          } else {
-            newCheckedList = checkedList.filter(
-              item => !this.recordMatch(item, record),
-            );
-          }
-
-          return this.getNewCheckedState(newCheckedList);
-        });
+        if (checked) {
+          return this.checkAll(targets);
+        } else {
+          return this.uncheckAll(targets);
+        }
       };
 
       getCheckedList = () => this.state.checkedList;
@@ -195,7 +180,7 @@ export default function<
           batchToggleChecked,
         } = this;
 
-        const hocProps = {
+        const hocProps: IBatchCheckHocInjectProps<R> = {
           checkedList,
           setChecked,
           isAllChecked,
