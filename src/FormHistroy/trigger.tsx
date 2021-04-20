@@ -70,7 +70,7 @@ export default (props: IFormHistroyTriggerProps) => {
           title: `表单草稿记录 - ${title}`,
           footer: null,
         }}
-        isStandListCtrl={false}
+        listRowSelectionSupport={false}
         {...props}
       />
     </div>

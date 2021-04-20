@@ -60,7 +60,7 @@ export interface IStandUpsertFormOpts<R> {
 }
 
 export interface IPropsForStandUpsertForm {
-  isStandAdminHoc?: boolean;
+  isStandAdminHoc: boolean;
   specParamsAsRecordInitialValues?: boolean;
   recordInitialValues?: ICommonObj;
   specSearchParams?: TSearchParams | TFnParamsFilter;

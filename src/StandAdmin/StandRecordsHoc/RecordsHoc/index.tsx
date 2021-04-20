@@ -72,7 +72,7 @@ export default function<
     StoreNs,
   } = recordModel || {};
 
-  const defaultRestHocParams = {
+  const defaultRestHocParams: IRecordsHocFullParams<R> = {
     updateSearchParamsEvenError: false,
     passSearchWhenParamsEqual: false,
     syncParamsToUrl: true,
@@ -86,6 +86,7 @@ export default function<
     reservedUrlParamNames: [],
     placeholderIfConfigLoading: true,
     receiveContextAsProps: true,
+    listRowSelectionSupport: false,
     formNamePrefix: 'Form',
     ...restHocParams,
   };

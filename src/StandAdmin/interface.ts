@@ -223,6 +223,11 @@ export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
    * The className for the outer container wrapper
    */
   wrapperClassName?: string;
+
+  /**
+   * Row Select support for the standRender of useStandTableList
+   */
+  listRowSelectionSupport?: boolean;
 }
 export interface IRecordsHocFullParams<R = any>
   extends IRecordsHocCommonParams {

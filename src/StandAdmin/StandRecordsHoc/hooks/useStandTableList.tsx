@@ -37,15 +37,16 @@ export function calColWidth(
 }
 
 export interface IPropsForStandTableList<R> {
+  isStandAdminHoc: boolean;
   specSearchParams?: TSearchParams | TFnParamsFilter;
-  isStandListCtrl?: boolean;
+  listRowSelectionSupport?: boolean;
   maxCheckedLength?: number;
   isModalMode?: boolean;
 }
 
 export interface IStandTableListOpts<R> {
   disabledSearchParams?: string[];
-  isStandListCtrl?: boolean;
+  listRowSelectionSupport?: boolean;
   maxCheckedLength?: number;
   isModalMode?: boolean;
 }
@@ -54,14 +55,14 @@ export function getOptsForStandTableList<R>(
   props: IPropsForStandTableList<R>,
 ): IStandTableListOpts<R> {
   const {
-    isStandListCtrl = false,
+    listRowSelectionSupport = false,
     maxCheckedLength,
     isModalMode = false,
     specSearchParams,
   } = props;
 
   const opts = {
-    isStandListCtrl,
+    listRowSelectionSupport,
     maxCheckedLength,
     isModalMode,
   };
@@ -94,7 +95,7 @@ export function useStandTableList<R extends ICommonObj = any>(
   }, [opts]);
 
   const {
-    isStandListCtrl = false,
+    listRowSelectionSupport = false,
     maxCheckedLength,
     isModalMode = false,
   } = stOpts;
@@ -136,8 +137,8 @@ export function useStandTableList<R extends ICommonObj = any>(
   const tableListProps: TableProps<R> = {
     dataSource: records,
     bordered: false,
-    size: isModalMode && isStandListCtrl ? 'small' : undefined,
-    rowSelection: isStandListCtrl
+    size: isModalMode && listRowSelectionSupport ? 'small' : undefined,
+    rowSelection: listRowSelectionSupport
       ? {
           selectedRowKeys: checkedList.map((item: R) => getRecordId(item)),
           onChange: onSelectChange,

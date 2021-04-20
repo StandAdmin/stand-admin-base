@@ -68,9 +68,10 @@ export default function<
 >(hocParams: IListCtrlHocParams<R>) {
   const { ...restHocParams } = hocParams;
 
-  const defaultRestHocParams = {
+  const defaultRestHocParams: IListCtrlHocParams<R> = {
     isModalMode: true,
     isStandListCtrl: true,
+    listRowSelectionSupport: true,
     defaultModalVisible: false,
     searchRecordsOnMount: false,
     clearCheckedAfterClose: false,
@@ -205,7 +206,11 @@ export default function<
       };
 
       renderFooter = () => {
-        const { isStandListCtrl, checkedList, maxCheckedLength } = this.props;
+        const {
+          listRowSelectionSupport,
+          checkedList,
+          maxCheckedLength,
+        } = this.props;
 
         const { storeRef, checkAll, isAllChecked } = this.context;
 
@@ -213,7 +218,7 @@ export default function<
 
         return (
           <div className={styles.footer}>
-            {isStandListCtrl && (
+            {listRowSelectionSupport && (
               <>
                 <div className={styles.block}>
                   {maxCheckedLength > 0 ? `限选 ${maxCheckedLength}，` : ''}已选{' '}

@@ -23,7 +23,7 @@ export default function<
     type OuterProps = Omit<P, keyof IListCtrlHocInjectProps<R>> &
       IIdSelectCtrlHocProps<R>;
 
-    const Comp: React.FC<OuterProps> = props => {
+    const Comp = (props: OuterProps) => {
       const {
         getRecordId,
         idFieldName,

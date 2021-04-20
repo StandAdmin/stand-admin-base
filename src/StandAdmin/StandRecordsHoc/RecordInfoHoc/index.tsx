@@ -28,7 +28,7 @@ export default function<
   return (
     WrappedComponent: React.ComponentType<P>,
   ): TRecordsHocComponent<R, P> => {
-    const Comp: React.FC<P> = props => {
+    const Comp = (props: P) => {
       const {
         searchLoading,
         storeRef: { records },

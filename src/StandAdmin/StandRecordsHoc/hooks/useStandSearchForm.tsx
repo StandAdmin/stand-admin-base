@@ -31,7 +31,7 @@ export interface IStandSearchFormOpts {
 }
 
 export interface IPropsForStandSearchForm {
-  isStandAdminHoc?: boolean;
+  isStandAdminHoc: boolean;
   specSearchParams?: TSearchParams | TFnParamsFilter;
 }
 
