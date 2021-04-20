@@ -120,7 +120,7 @@ export default function<
       async componentDidMount() {
         await this.tryRegisterModels();
 
-        this.resetRecordsState();
+        await this.resetRecordsState(this.mountId);
 
         const { takeOverMount, searchRecordsOnMount } = this.props;
 
@@ -154,11 +154,11 @@ export default function<
       }
 
       async componentWillUnmount() {
+        this.cancleDebouncedSearchRecords();
+
         await this.tryUnregisterModels();
 
-        this.resetRecordsState(null);
-
-        this.cancleDebouncedSearchRecords();
+        await this.resetRecordsState(null);
       }
 
       cancleDebouncedSearchRecords = () => {
@@ -171,7 +171,7 @@ export default function<
       resetRecordsState = (mountId?: number | null) => {
         const { dispatch } = this.props;
 
-        dispatch({
+        return dispatch({
           type: `${StoreNs}/resetRecordsState`,
           mountId: mountId !== undefined ? mountId : this.mountId,
         });
@@ -423,6 +423,8 @@ export default function<
             pathname: history.location.pathname,
             search: searchQuery.join('&'),
           });
+
+          this.searchRecords(newQueryParams);
 
           return;
         }
@@ -867,6 +869,16 @@ export default function<
         };
       };
 
+      isStoreDataStale = () => {
+        const { storeRef } = this.props;
+
+        return !!(
+          storeRef &&
+          // storeRef.mountId &&
+          this.mountId !== storeRef.mountId
+        );
+      };
+
       getStandContext = (): IStandContextProps<R> => {
         const {
           configLoading,
@@ -895,11 +907,7 @@ export default function<
           decreaseActionCount,
           getActionCount,
           formNamePrefix,
-          isStoreDataStale: !!(
-            storeRef &&
-            storeRef.mountId &&
-            this.mountId !== storeRef.mountId
-          ),
+          isStoreDataStale: this.isStoreDataStale(),
           mountId: this.mountId,
 
           ...this.getInsMethods(),
