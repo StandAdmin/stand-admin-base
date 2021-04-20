@@ -688,7 +688,7 @@ export default function<
             this.getRecordName(record),
           ]
             .filter(item => !!item)
-            .join('：')}] `,
+            .join(': ')}] `,
           payload: {
             record,
             callback,
@@ -700,9 +700,13 @@ export default function<
         params: TSearchParams,
         callback: (resp: IResponseOfAction<R>) => void,
       ) => {
+        const recordId = this.getRecordId(params as any);
+
         return this.callStoreAction({
           action: 'deleteRecord',
-          actionTitle: `删除${StoreNsTitle}`,
+          actionTitle: `删除${StoreNsTitle}${
+            recordId ? ` [${recordId}] ` : ''
+          }`,
           payload: { params, callback },
         });
       };

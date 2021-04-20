@@ -124,11 +124,12 @@ export default (props: IFormHistroyTriggerProps) => {
     <Modal
       // forceRender
       {...modalProps}
+      // title={`${modalProps.title} - ${title}`}
       width={580}
       footer={null}
     >
       <Form {...formProps} {...formItemLayout}>
-        <FormItem name="name" label="记录名称" rules={[{ required: true }]}>
+        <FormItem name="name" label="草稿名称" rules={[{ required: true }]}>
           <Input allowClear />
         </FormItem>
 

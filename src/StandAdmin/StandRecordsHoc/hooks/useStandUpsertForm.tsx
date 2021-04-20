@@ -293,8 +293,8 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     },
     modalProps: {
       title: !isUpdate
-        ? `创建 ${StoreNsTitle}`
-        : `修改 ${StoreNsTitle}${
+        ? `创建${StoreNsTitle}`
+        : `修改${StoreNsTitle}${
             activeRecordName ? ` - ${activeRecordName}` : ''
           }`,
       visible: isModalVisible(recordFormVisibleTag),
