@@ -163,7 +163,11 @@ export default function<
       getCheckedList = () => this.state.checkedList;
 
       render() {
-        const { checkedList: propCheckedList, ...restProps } = this.props;
+        const {
+          checkedList: propCheckedList,
+          defaultCheckedList,
+          ...restProps
+        } = this.props;
 
         const { checkedList } = this.state;
 
