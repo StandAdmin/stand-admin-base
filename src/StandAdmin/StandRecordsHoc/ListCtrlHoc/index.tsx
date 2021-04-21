@@ -26,10 +26,15 @@ function defaultModalTriggerRender<R>({
   showModal,
   context,
 }: ModalTriggerOpts<R>) {
-  const { recordNsTitle, toggleChecked, getRecordId, getRecordName } = context;
+  const {
+    recordNsTitle,
+    toggleChecked,
+    checkedList,
+    getRecordId,
+    getRecordName,
+  } = context;
 
   const {
-    checkedList,
     modalTriggerDisabled,
     modalTriggerTitle,
     modalTriggerClassName,
@@ -191,7 +196,7 @@ export default function<
       };
 
       handleOK = () => {
-        const { checkedList } = this.props;
+        const { checkedList } = this.context;
 
         this.hideModal();
 
@@ -206,13 +211,9 @@ export default function<
       };
 
       renderFooter = () => {
-        const {
-          listRowSelectionSupport,
-          checkedList,
-          maxCheckedLength,
-        } = this.props;
+        const { listRowSelectionSupport, maxCheckedLength } = this.props;
 
-        const { storeRef, checkAll, isAllChecked } = this.context;
+        const { storeRef, checkedList, checkAll, isAllChecked } = this.context;
 
         const { records = [] } = storeRef || {};
 
