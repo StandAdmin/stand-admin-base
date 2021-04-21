@@ -240,8 +240,28 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
 
         return list && list.length > 0 ? list[0] : null;
       },
-      *getRecord({ params }: { params?: any }, { call }: any) {
+      *getRecord(
+        {
+          params,
+          opts: options = {},
+        }: {
+          params?: any;
+          opts: { searchOneAsBackup?: boolean };
+        },
+        { call, put }: any,
+      ) {
         if (!getRecord) {
+          const { searchOneAsBackup } = options;
+
+          if (searchOneAsBackup) {
+            const result: R = yield put.resolve({
+              type: 'searchOne',
+              params,
+            });
+
+            return result;
+          }
+
           throw new Error(`getRecord is empty!`);
         }
 
