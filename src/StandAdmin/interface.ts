@@ -217,7 +217,12 @@ export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
   /**
    * StandContext will be passed in props, default true
    */
-  receiveContextAsProps?: boolean;
+  receiveContextAsProps?: boolean | string[];
+
+  /**
+   * HocParams will be passed in props, default true
+   */
+  receiveHocParamsAsProps?: boolean | string[];
 
   /**
    * The className for the outer container wrapper

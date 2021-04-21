@@ -369,7 +369,10 @@ export default function<
 
     FinalComp.IdSelectCtrl = (StandRecordsHoc<R, P>({
       ...IdSelectHocParams,
+      makeRecordModelPkgDynamic: 'IdSelectCtrlOuterWrapper',
       searchRecordsOnParamsChange: false,
+      receiveHocParamsAsProps: false,
+      receiveContextAsProps: false,
     })(
       // First StandRecordsHoc hoc, just provide the context IdSelectCtrlHoc needs
       IdSelectCtrlHoc<R, IListCtrlHocInjectProps<R>>()(

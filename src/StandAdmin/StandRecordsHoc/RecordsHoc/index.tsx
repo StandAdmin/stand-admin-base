@@ -87,9 +87,17 @@ export default function<
     defaultSearchParams: undefined,
     specSearchParams: undefined,
     sorterSearchParams: undefined,
+    filterSearchParams: undefined,
     reservedUrlParamNames: [],
     placeholderIfConfigLoading: true,
     receiveContextAsProps: true,
+    receiveHocParamsAsProps: [
+      'defaultSearchParams',
+      'specSearchParams',
+      'sorterSearchParams',
+      'filterSearchParams',
+      'listRowSelectionSupport',
+    ],
     listRowSelectionSupport: false,
     formNamePrefix: 'Form',
     ...restHocParams,
@@ -471,6 +479,7 @@ export default function<
             typeof paramsOrId === 'object'
               ? paramsOrId
               : { [idFieldName]: paramsOrId },
+          opts: { searchOneAsBackup: true },
         }) as Promise<R>;
       };
 
@@ -974,6 +983,18 @@ export default function<
         };
       };
 
+      pickProps = (props: any, keys: boolean | string[]) => {
+        if (!keys) {
+          return [];
+        }
+
+        if (keys === true) {
+          return props;
+        }
+
+        return pick(props, keys);
+      };
+
       render() {
         const {
           configLoading,
@@ -981,6 +1002,7 @@ export default function<
           wrapperClassName,
           searchLoading,
           receiveContextAsProps,
+          receiveHocParamsAsProps,
           ...restProps
         } = this.props;
 
@@ -994,11 +1016,20 @@ export default function<
 
         const contextVal = this.getStandContext();
 
+        const hocParamsKeys = Object.keys(defaultRestHocParams);
+
         const finalProps: any = {
+          ...omit(restProps, [...Object.keys(contextVal), ...hocParamsKeys]),
+
           isStandAdminHoc: true,
           getStandContext: this.getStandContext,
-          ...omit(restProps, Object.keys(contextVal)),
-          ...(receiveContextAsProps ? contextVal : undefined),
+
+          ...this.pickProps(contextVal, receiveContextAsProps),
+
+          ...this.pickProps(
+            pick(restProps, hocParamsKeys),
+            receiveHocParamsAsProps,
+          ),
         };
 
         return (
