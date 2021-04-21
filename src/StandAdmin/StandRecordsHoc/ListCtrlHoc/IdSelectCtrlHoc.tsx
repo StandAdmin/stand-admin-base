@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useUnmount, usePersistFn } from '@/StandAdmin/utils/hooks';
 import {
-  IListCtrlHocParams,
   ICommonObj,
   TRecordId,
   IListCtrlHocInjectProps,
@@ -16,7 +15,7 @@ const TagProp = '_cus_tag_';
 export default function<
   R extends ICommonObj = any,
   P extends IListCtrlHocInjectProps<R> = any
->(hocParams: IListCtrlHocParams<R>) {
+>() {
   const globalRecordCache: ICommonObj = {};
 
   return (WrappedComponent: React.ComponentType<P>) => {
@@ -42,8 +41,11 @@ export default function<
 
       const isControlledMode = 'checkedIdList' in props;
 
-      const checkedIdList =
-        (isControlledMode ? origCheckedIdList : defaultCheckedIdList) || [];
+      const checkedIdList = useMemo(() => {
+        return (
+          (isControlledMode ? origCheckedIdList : defaultCheckedIdList) || []
+        );
+      }, [isControlledMode, origCheckedIdList, defaultCheckedIdList]);
 
       const [recordCache, setRecordCache] = useState(globalRecordCache);
 

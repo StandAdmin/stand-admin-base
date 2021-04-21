@@ -42,7 +42,11 @@ import {
   IBatchCheckHocInjectProps,
   //IStandConnectHocProps,
 } from '../../interface';
-import { getAutoIdGenerator, getDisplayName } from '../../utils/util';
+import {
+  getAutoIdGenerator,
+  getDisplayName,
+  // whyDidYouUpdate,
+} from '../../utils/util';
 import { StandConnectHoc } from '../connect';
 
 import styles from '../styles';
@@ -140,6 +144,8 @@ export default function<
       }
 
       componentDidUpdate(prevProps: OuterProps) {
+        // whyDidYouUpdate(StoreNsTitle, prevProps, this.props);
+
         const { searchRecordsOnParamsChange } = this.props;
 
         if (searchRecordsOnParamsChange) {
@@ -1019,7 +1025,7 @@ export default function<
     }
 
     return StandConnectHoc<R>({ configModel, recordModel })(
-      BatchCheckHoc<R>()(ActionCounterHoc()(Comp as any)),
+      ActionCounterHoc()(BatchCheckHoc<R>()(Comp as any)),
     );
   };
 }

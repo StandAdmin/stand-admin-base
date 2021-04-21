@@ -352,10 +352,6 @@ export default function<
       }
     }
 
-    const CompWithIdSel = IdSelectCtrlHoc<R, IListCtrlHocInjectProps<R>>(
-      defaultRestHocParams,
-    )(Comp as any);
-
     const standHocParams = {
       ...defaultRestHocParams,
       takeOverMount: true,
@@ -366,10 +362,21 @@ export default function<
       ...standHocParams,
     })(Comp as any) as unknown) as TListCtrlHocComponent<R, P>;
 
-    FinalComp.IdSelectCtrl = (StandRecordsHoc<R, P>({
+    const IdSelectHocParams = {
       makeRecordModelPkgDynamic: 'IdSelectCtrl',
       ...standHocParams,
-    })(CompWithIdSel as any) as unknown) as TIdSelectCtrlHocComponent<R, P>;
+    };
+
+    FinalComp.IdSelectCtrl = (StandRecordsHoc<R, P>({
+      ...IdSelectHocParams,
+      searchRecordsOnParamsChange: false,
+    })(
+      // First StandRecordsHoc hoc, just provide the context IdSelectCtrlHoc needs
+      IdSelectCtrlHoc<R, IListCtrlHocInjectProps<R>>()(
+        // Second level, the real core ListHocComp
+        StandRecordsHoc<R, P>(IdSelectHocParams)(Comp as any),
+      ),
+    ) as any) as TIdSelectCtrlHocComponent<R, P>;
 
     return FinalComp;
   };
