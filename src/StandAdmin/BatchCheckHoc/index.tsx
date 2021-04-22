@@ -1,18 +1,20 @@
 import React from 'react';
-import { pullAll, uniqWith, isEqual } from 'lodash';
+import { pullAll, uniqWith } from 'lodash';
 import { IBatchCheckHocProps, IBatchCheckHocInjectProps } from '../interface';
 // import { Icon } from 'antd';
 import { getDisplayName } from '../utils/util';
-import { StandContext } from '../const';
 
 interface IBatchCheckState<R> {
   checkedList: R[];
 }
 
-export default function<
-  R = any,
-  P extends IBatchCheckHocInjectProps<R> = any
->() {
+interface IBatchCheckOpts<R> {
+  recordMatch: (a: R, b: R) => boolean;
+}
+
+export default function<R = any, P extends IBatchCheckHocInjectProps<R> = any>(
+  opts: IBatchCheckOpts<R>,
+) {
   return (WrappedComponent: React.ComponentType<P>) => {
     type OuterProps = IBatchCheckHocProps<R> &
       Omit<P, keyof IBatchCheckHocInjectProps<R>>;
@@ -23,9 +25,6 @@ export default function<
       public static displayName = `BatchCheck_${getDisplayName<P>(
         WrappedComponent,
       )}`;
-
-      static contextType = StandContext;
-      context!: React.ContextType<typeof StandContext>;
 
       static defaultProps: IBatchCheckHocProps<R> = {
         defaultCheckedList: [],
@@ -88,6 +87,7 @@ export default function<
 
       isRecordChecked = (record: R) => {
         const { checkedList } = this.state;
+
         return checkedList.some(item => this.recordMatch(item, record));
       };
 
@@ -96,13 +96,7 @@ export default function<
           return true;
         }
 
-        const { getRecordId } = this.context || {};
-
-        if (getRecordId) {
-          return getRecordId(a) === getRecordId(b);
-        }
-
-        return isEqual(a, b);
+        return opts.recordMatch(a, b);
       };
 
       findMatchRecord = (target: R, list: R[]) =>
@@ -114,6 +108,7 @@ export default function<
             state.checkedList.concat(records),
             this.recordMatch,
           );
+
           return this.getNewCheckedState(newList);
         });
       };

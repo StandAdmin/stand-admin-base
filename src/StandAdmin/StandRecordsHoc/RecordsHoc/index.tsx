@@ -103,6 +103,10 @@ export default function<
     ...restHocParams,
   };
 
+  const getRecordId = (record: R) => record && record[idFieldName];
+
+  const getRecordName = (record: R) => record && record[nameFieldName];
+
   return (
     WrappedComponent: React.ComponentType<P>,
   ): TRecordsHocComponent<R, P> => {
@@ -497,7 +501,7 @@ export default function<
         const dataMap: ICommonObj = {};
 
         recordList.forEach(record => {
-          dataMap[this.getRecordId(record)] = record;
+          dataMap[getRecordId(record)] = record;
         });
 
         return dataMap;
@@ -580,7 +584,7 @@ export default function<
                   const matchRecord = resp.data || payload.record;
 
                   if (matchRecord) {
-                    this.blinkRecordById(this.getRecordId(matchRecord));
+                    this.blinkRecordById(getRecordId(matchRecord));
                   }
                 }
               });
@@ -700,8 +704,8 @@ export default function<
           action: 'updateRecord',
           actionForCount: 'upsertRecord',
           actionTitle: `编辑${StoreNsTitle} [${[
-            this.getRecordId(record),
-            this.getRecordName(record),
+            getRecordId(record),
+            getRecordName(record),
           ]
             .filter(item => !!item)
             .join(': ')}] `,
@@ -716,7 +720,7 @@ export default function<
         params: TSearchParams,
         callback: (resp: IResponseOfAction<R>) => void,
       ) => {
-        const recordId = this.getRecordId(params as any);
+        const recordId = getRecordId(params as any);
 
         return this.callStoreAction({
           action: 'deleteRecord',
@@ -823,13 +827,8 @@ export default function<
         );
       };
 
-      getRecordId = (record: R) => record && record[idFieldName];
-
-      getRecordName = (record: R) => record && record[nameFieldName];
-
       getInsMethods = (): IRecordsContextMethods<R> => {
         const {
-          getRecordName,
           clearActiveRecord,
           hideRecordFormOnly,
           updateRecord,
@@ -849,7 +848,7 @@ export default function<
           renderPagination,
           renderEmpty,
           handleTableChange,
-          getRecordId,
+
           getDefaultSearchParams,
           getSpecSearchParams,
           callStoreAction,
@@ -863,6 +862,7 @@ export default function<
 
         return {
           getRecordName,
+          getRecordId,
           clearActiveRecord,
           hideRecordFormOnly,
           hideRecordForm: hideRecordFormOnly,
@@ -883,7 +883,6 @@ export default function<
           renderPagination,
           renderEmpty,
           handleTableChange,
-          getRecordId,
           getDefaultSearchParams,
           getSpecSearchParams,
           callStoreAction,
@@ -1060,7 +1059,24 @@ export default function<
     }
 
     return StandConnectHoc<R>({ configModel, recordModel })(
-      ActionCounterHoc()(BatchCheckHoc<R>()(Comp as any)),
+      ActionCounterHoc()(
+        BatchCheckHoc<R>({
+          recordMatch: (a: R, b: R) => {
+            if (a === b) {
+              return true;
+            }
+
+            const aId = getRecordId(a);
+            const bId = getRecordId(b);
+
+            if (aId) {
+              return aId === bId;
+            }
+
+            return isEqual(a, b);
+          },
+        })(Comp as any),
+      ),
     );
   };
 }
