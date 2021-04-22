@@ -1018,18 +1018,22 @@ export default function<
 
         const hocParamsKeys = Object.keys(defaultRestHocParams);
 
-        const finalProps: any = {
-          ...omit(restProps, [...Object.keys(contextVal), ...hocParamsKeys]),
-
+        const finalProps: P = {
+          // inject props
           isStandAdminHoc: true,
           getStandContext: this.getStandContext,
 
+          // context props
           ...this.pickProps(contextVal, receiveContextAsProps),
 
+          // hocparams props
           ...this.pickProps(
             pick(restProps, hocParamsKeys),
             receiveHocParamsAsProps,
           ),
+
+          // pass rest props
+          ...omit(restProps, [...Object.keys(contextVal), ...hocParamsKeys]),
         };
 
         return (

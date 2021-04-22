@@ -6,6 +6,7 @@ import StandRecordsHoc from '../RecordsHoc';
 import {
   IListCtrlHocInjectProps,
   IListCtrlHocParams,
+  IRecordsHocFullParams,
   TListCtrlHocComponent,
   IListCtrlHocProps,
   ModalTriggerOpts,
@@ -93,7 +94,10 @@ export default function<
     WrappedComponent: React.ComponentType<P>,
   ): TListCtrlHocComponent<R, P> => {
     type OuterProps = Omit<P, keyof IListCtrlHocInjectProps<R>> &
-      IListCtrlHocProps<R>;
+      Omit<IListCtrlHocProps<R>, keyof IRecordsHocFullParams<R>> & {
+        searchRecordsOnMount?: boolean;
+        listRowSelectionSupport?: boolean;
+      };
 
     class Comp extends React.Component<OuterProps, IListCtrlState> {
       static defaultProps = {
@@ -352,17 +356,19 @@ export default function<
       }
     }
 
-    const standHocParams = {
+    const standHocParams: IListCtrlHocParams<R> = {
       ...defaultRestHocParams,
       takeOverMount: true,
     };
 
-    const FinalComp = (StandRecordsHoc<R, P>({
-      makeRecordModelPkgDynamic: 'ListCtrl',
+    const FinalComp = StandRecordsHoc<R, P>({
+      makeRecordModelPkgDynamic: standHocParams.isModalMode
+        ? 'ListCtrl'
+        : undefined,
       ...standHocParams,
-    })(Comp as any) as unknown) as TListCtrlHocComponent<R, P>;
+    })(Comp as any) as TListCtrlHocComponent<R, P>;
 
-    const IdSelectHocParams = {
+    const IdSelectHocParams: IListCtrlHocParams<R> = {
       makeRecordModelPkgDynamic: 'IdSelectCtrl',
       ...standHocParams,
     };
