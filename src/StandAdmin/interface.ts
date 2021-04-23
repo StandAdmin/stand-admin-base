@@ -242,6 +242,7 @@ export interface IRecordsHocFullParams<R = any>
   takeOverMount?: boolean;
   searchRecordsOnParamsChange?: boolean;
   searchRecordsOnRefresh?: boolean;
+  isSearchParamsEqual?: (paramsA: ICommonObj, paramsB: ICommonObj) => boolean;
   finalSearchParamsFilter?: (params?: TSearchParams) => TSearchParams;
   formNamePrefix?: string;
   onRecordFormVisibleTagChange?: (

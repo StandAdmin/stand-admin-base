@@ -3,7 +3,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Empty, Pagination, message, Modal, Spin } from 'antd';
 import { PaginationProps } from 'antd/es/pagination';
 import classNames from 'classnames';
-import { isEqual, debounce, pick, pickBy, omit } from 'lodash';
+import { isEqual, debounce, pick, pickBy, omit, omitBy } from 'lodash';
 import {
   toUrlQuery,
   fromUrlQuery,
@@ -53,6 +53,12 @@ import styles from '../styles';
 
 const getNewMountId = getAutoIdGenerator();
 
+const isUndefined = (v: any) => v === undefined;
+
+const defaultSearchParamsEqualFn = (a: ICommonObj, b: ICommonObj) => {
+  return isEqual(omitBy(a, isUndefined), omitBy(b, isUndefined));
+};
+
 export default function<
   R extends ICommonObj = any,
   P extends IRecordsHocInjectProps<R> = any
@@ -89,6 +95,7 @@ export default function<
     sorterSearchParams: undefined,
     filterSearchParams: undefined,
     reservedUrlParamNames: [],
+    isSearchParamsEqual: defaultSearchParamsEqualFn,
     placeholderIfConfigLoading: true,
     receiveContextAsProps: true,
     receiveHocParamsAsProps: [
@@ -158,16 +165,21 @@ export default function<
       componentDidUpdate(prevProps: OuterProps) {
         // whyDidYouUpdate(StoreNsTitle, prevProps, this.props);
 
-        const { searchRecordsOnParamsChange } = this.props;
+        const { searchRecordsOnParamsChange, isSearchParamsEqual } = this.props;
 
         if (searchRecordsOnParamsChange) {
           const prevSearchParams = this.getFinalSearchParams(prevProps);
+
           const currentSearchParams = this.getFinalSearchParams(
-            this.props as OuterProps,
+            this.props as any,
           );
+
           const searchParamsChanged =
-            !isEqual(prevSearchParams, currentSearchParams) &&
-            !isEqual(currentSearchParams, this.latestSearchParams);
+            !isSearchParamsEqual(prevSearchParams, currentSearchParams) &&
+            !isSearchParamsEqual(
+              currentSearchParams,
+              this.latestSearchParams || {},
+            );
 
           if (searchParamsChanged) {
             const { searchLoading } = this.props;
@@ -273,7 +285,7 @@ export default function<
       getFinalSearchParams = (
         specProps?: OuterProps,
         specParams?: ICommonObj,
-      ) => {
+      ): ICommonObj => {
         const props = specProps || this.props;
 
         const params = specParams || this.getSearchParams(props as OuterProps);
