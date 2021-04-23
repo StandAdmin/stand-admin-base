@@ -45,8 +45,10 @@ export const StandConnectHoc = <
           configStoreRef: filterState(configStoreRefState),
           searchLoading: storeRefState.searchLoading, // loading.effects[`${StoreNs}/search`],
           configLoading:
-            loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`] ||
-            !!configStoreRefState[ConfigLoadingFld],
+            !!configStoreRefState[ConfigLoadingFld] ||
+            (loading &&
+              loading.effects &&
+              loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`]),
         };
       },
     )(WrappedComponent as any);
