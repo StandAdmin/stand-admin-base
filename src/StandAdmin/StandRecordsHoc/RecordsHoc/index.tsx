@@ -462,7 +462,7 @@ export default function<
 
           history.push({
             pathname: history.location.pathname,
-            search: searchQuery.join('&'),
+            search: `?${searchQuery.join('&')}`,
           });
 
           this.searchRecords(newQueryParams);
