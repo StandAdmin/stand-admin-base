@@ -114,16 +114,18 @@ export default function<
 
   const getRecordName = (record: R) => record && record[nameFieldName];
 
+  type OuterCompProps = Omit<P, keyof IRecordsHocInjectProps<R>>;
+
   return (
     WrappedComponent: React.ComponentType<P>,
-  ): TRecordsHocComponent<R, P> => {
-    type OuterProps = IRecordsHocProps<R> &
-      Omit<P, keyof IRecordsHocInjectProps<R>> &
+  ): TRecordsHocComponent<R, OuterCompProps> => {
+    type InnerCompProps = IRecordsHocProps<R> &
+      OuterCompProps &
       IStandConnectInjectProps<R> &
       IActionCounterHocInjectProps &
       IBatchCheckHocInjectProps<R>;
 
-    class Comp extends React.Component<OuterProps> {
+    class Comp extends React.Component<InnerCompProps> {
       public static displayName = `Records_${getDisplayName<P>(
         WrappedComponent,
       )}`;
@@ -162,7 +164,7 @@ export default function<
         }
       }
 
-      componentDidUpdate(prevProps: OuterProps) {
+      componentDidUpdate(prevProps: InnerCompProps) {
         // whyDidYouUpdate(StoreNsTitle, prevProps, this.props);
 
         const { searchRecordsOnParamsChange, isSearchParamsEqual } = this.props;
@@ -283,12 +285,13 @@ export default function<
       };
 
       getFinalSearchParams = (
-        specProps?: OuterProps,
+        specProps?: InnerCompProps,
         specParams?: ICommonObj,
       ): ICommonObj => {
         const props = specProps || this.props;
 
-        const params = specParams || this.getSearchParams(props as OuterProps);
+        const params =
+          specParams || this.getSearchParams(props as InnerCompProps);
 
         const finalParams = {
           ...this.getDefaultSearchParams(props),
@@ -305,7 +308,7 @@ export default function<
 
       calcParamsWithProp = (
         propKey: string,
-        specProps?: OuterProps,
+        specProps?: InnerCompProps,
         ...rest: any[]
       ) => {
         const props = specProps || this.props;
@@ -343,7 +346,7 @@ export default function<
         const { dispatch, updateSearchParamsEvenError } = this.props;
 
         this.latestSearchParams = this.getFinalSearchParams(
-          this.props as OuterProps,
+          this.props as InnerCompProps,
           specParams,
         );
 
@@ -358,7 +361,7 @@ export default function<
         return this.latestSearchParams;
       };
 
-      getLocation = (specProps?: OuterProps) => {
+      getLocation = (specProps?: InnerCompProps) => {
         const props = specProps || this.props;
 
         if (props.location) {
@@ -372,7 +375,7 @@ export default function<
         return history.location;
       };
 
-      getUrlParams = (specProps?: OuterProps) => {
+      getUrlParams = (specProps?: InnerCompProps) => {
         const props = specProps || this.props;
 
         return fromUrlQuery(this.getLocation(specProps).search, {
@@ -380,7 +383,7 @@ export default function<
         });
       };
 
-      getSearchParams = (specProps?: OuterProps) => {
+      getSearchParams = (specProps?: InnerCompProps) => {
         const props = specProps || this.props;
 
         const { syncParamsToUrl } = props;
@@ -388,7 +391,7 @@ export default function<
         let params;
 
         if (syncParamsToUrl) {
-          params = this.getUrlParams(props as OuterProps);
+          params = this.getUrlParams(props as InnerCompProps);
         } else {
           const { storeRef } = props;
           params = storeRef.searchParams;

@@ -8,10 +8,10 @@ interface IActionCounterState {
 
 export default function<P extends IActionCounterHocInjectProps = any>() {
   return (WrappedComponent: React.ComponentType<P>) => {
-    type OuterProps = Omit<P, keyof IActionCounterHocInjectProps>;
+    type InnerCompProps = Omit<P, keyof IActionCounterHocInjectProps>;
 
     return class ActionCounter extends React.Component<
-      OuterProps,
+      InnerCompProps,
       IActionCounterState
     > {
       public static displayName = `ActionCounter_${getDisplayName<P>(

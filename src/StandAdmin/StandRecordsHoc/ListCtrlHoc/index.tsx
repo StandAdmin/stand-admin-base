@@ -90,16 +90,18 @@ export default function<
     defaultRestHocParams.syncParamsToUrl = !defaultRestHocParams.isModalMode;
   }
 
+  type OuterCompProps = Omit<P, keyof IListCtrlHocInjectProps<R>>;
+
   return (
     WrappedComponent: React.ComponentType<P>,
-  ): TListCtrlHocComponent<R, P> => {
-    type OuterProps = Omit<P, keyof IListCtrlHocInjectProps<R>> &
+  ): TListCtrlHocComponent<R, OuterCompProps> => {
+    type InnerCompProps = OuterCompProps &
       Omit<IListCtrlHocProps<R>, keyof IRecordsHocFullParams<R>> & {
         searchRecordsOnMount?: boolean;
         listRowSelectionSupport?: boolean;
       };
 
-    class Comp extends React.Component<OuterProps, IListCtrlState> {
+    class Comp extends React.Component<InnerCompProps, IListCtrlState> {
       static defaultProps = {
         ...defaultRestHocParams,
       };
@@ -108,7 +110,7 @@ export default function<
       context!: React.ContextType<typeof StandContext>;
 
       static getDerivedStateFromProps(
-        props: OuterProps,
+        props: InnerCompProps,
         state: IListCtrlState,
       ) {
         if ('modalVisible' in props) {
@@ -120,7 +122,7 @@ export default function<
         return null;
       }
 
-      constructor(props: OuterProps) {
+      constructor(props: InnerCompProps) {
         super(props);
         this.state = {
           modalVisible:
@@ -138,7 +140,7 @@ export default function<
         }
       }
 
-      componentDidUpdate(prevProps: OuterProps, prevState: IListCtrlState) {
+      componentDidUpdate(prevProps: InnerCompProps, prevState: IListCtrlState) {
         const prevModalVisible = this.isModalVisible(prevProps, prevState);
         const currModalVisible = this.isModalVisible();
 
@@ -150,7 +152,10 @@ export default function<
         }
       }
 
-      isModalVisible = (specProps?: OuterProps, specState?: IListCtrlState) => {
+      isModalVisible = (
+        specProps?: InnerCompProps,
+        specState?: IListCtrlState,
+      ) => {
         const { modalProps = {} } = specProps || this.props;
 
         if (modalProps.visible !== undefined) {
@@ -366,7 +371,7 @@ export default function<
         ? 'ListCtrl'
         : undefined,
       ...standHocParams,
-    })(Comp as any) as TListCtrlHocComponent<R, P>;
+    })(Comp as any) as TListCtrlHocComponent<R, OuterCompProps>;
 
     const IdSelectHocParams: IListCtrlHocParams<R> = {
       makeRecordModelPkgDynamic: 'IdSelectCtrl',
@@ -383,9 +388,9 @@ export default function<
       // First StandRecordsHoc hoc, just provide the context IdSelectCtrlHoc needs
       IdSelectCtrlHoc<R, IListCtrlHocInjectProps<R>>()(
         // Second level, the real core ListHocComp
-        StandRecordsHoc<R, P>(IdSelectHocParams)(Comp as any),
+        StandRecordsHoc<R, P>(IdSelectHocParams)(Comp as any) as any,
       ),
-    ) as any) as TIdSelectCtrlHocComponent<R, P>;
+    ) as any) as TIdSelectCtrlHocComponent<R, OuterCompProps>;
 
     return FinalComp;
   };

@@ -16,10 +16,10 @@ export default function<R = any, P extends IBatchCheckHocInjectProps<R> = any>(
   opts: IBatchCheckOpts<R>,
 ) {
   return (WrappedComponent: React.ComponentType<P>) => {
-    type OuterProps = IBatchCheckHocProps<R> &
+    type InnerCompProps = IBatchCheckHocProps<R> &
       Omit<P, keyof IBatchCheckHocInjectProps<R>>;
     return class BatchCheck extends React.Component<
-      OuterProps,
+      InnerCompProps,
       IBatchCheckState<R>
     > {
       public static displayName = `BatchCheck_${getDisplayName<P>(
@@ -36,7 +36,7 @@ export default function<R = any, P extends IBatchCheckHocInjectProps<R> = any>(
       };
 
       static getDerivedStateFromProps(
-        props: OuterProps,
+        props: InnerCompProps,
         state: IBatchCheckState<R>,
       ) {
         if ('checkedList' in props) {
@@ -51,7 +51,7 @@ export default function<R = any, P extends IBatchCheckHocInjectProps<R> = any>(
         return null;
       }
 
-      constructor(props: OuterProps) {
+      constructor(props: InnerCompProps) {
         super(props);
 
         this.state = {

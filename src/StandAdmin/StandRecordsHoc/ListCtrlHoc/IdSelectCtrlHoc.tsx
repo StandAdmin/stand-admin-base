@@ -19,10 +19,10 @@ export default function<
   const globalRecordCache: ICommonObj = {};
 
   return (WrappedComponent: React.ComponentType<P>) => {
-    type OuterProps = Omit<P, keyof IListCtrlHocInjectProps<R>> &
+    type InnerCompProps = Omit<P, keyof IListCtrlHocInjectProps<R>> &
       IIdSelectCtrlHocProps<R>;
 
-    const Comp = (props: OuterProps) => {
+    const Comp = (props: InnerCompProps) => {
       const {
         getRecordId,
         idFieldName,

@@ -35,6 +35,7 @@ export {
   IUseStandUpsertFormResult,
   IStandTableRenderParams,
   IUseStandTableListResult,
+  IModelPkg,
 } from './interface';
 
 import BatchCheckHoc from './BatchCheckHoc';
