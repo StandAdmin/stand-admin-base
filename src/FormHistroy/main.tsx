@@ -1,14 +1,10 @@
-/* eslint-disable react/jsx-curly-newline */
 import React from 'react';
-
 import {
   StandListCtrlHoc,
   StandRecordsHoc,
   defineCommonHocParams,
 } from '../StandAdmin/StandRecordsHoc';
-
 import { useStandContext } from '../StandAdmin/StandRecordsHoc/hooks/useStandContext';
-
 import {
   buildStandRecordModelPkg,
   buildStandConfigModelPkg,
@@ -39,15 +35,7 @@ import {
 export const configModel = buildStandConfigModelPkg({
   StoreNs: 'StandAdminFormHistroyConfig',
   StoreNsTitle: 'FormHistroyConfig',
-  getConfig: [
-    // // 静态变量
-    // {
-    //   boolMap: {
-    //     0: 'No',
-    //     1: 'Yes',
-    //   },
-    // },
-  ],
+  getConfig: [],
 });
 
 // 创建RecordModel
@@ -61,24 +49,12 @@ export const recordModel = buildStandRecordModelPkg({
   addRecord,
   updateRecord,
   deleteRecord,
-
-  // fldsPathInResp: {
-  //   pageNum: 'data.pageNum',
-  //   pageSize: 'data.pageSize',
-  //   total: 'data.total',
-  //   list: 'data.list',
-  // },
-  // searchParamsMap: {
-  //   pageNum: 'pageNum',
-  //   pageSize: 'pageSize',
-  // },
 });
 
 function MainComp(
   props: IFormHistroyTriggerProps & IListCtrlHocInjectProps<IHistoryRecord>,
 ) {
   // const { config } = useStandContext();
-
   return (
     <>
       {/* <ToolBar {...props} /> */}

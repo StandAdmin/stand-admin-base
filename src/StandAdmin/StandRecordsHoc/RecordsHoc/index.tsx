@@ -59,6 +59,18 @@ const defaultSearchParamsEqualFn = (a: ICommonObj, b: ICommonObj) => {
   return isEqual(omitBy(a, isUndefined), omitBy(b, isUndefined));
 };
 
+const pickProps = (props: any, keys: boolean | string[]) => {
+  if (!keys) {
+    return [];
+  }
+
+  if (keys === true) {
+    return props;
+  }
+
+  return pick(props, keys);
+};
+
 export default function<
   R extends ICommonObj = any,
   P extends IRecordsHocInjectProps<R> = any
@@ -110,9 +122,17 @@ export default function<
     ...restHocParams,
   };
 
-  const getRecordId = (record: R) => record && record[idFieldName];
+  const getRecordFld = (record: R, fld: string) => {
+    if (record) {
+      return record[fld];
+    }
 
-  const getRecordName = (record: R) => record && record[nameFieldName];
+    return undefined;
+  };
+
+  const getRecordId = (record: R) => getRecordFld(record, idFieldName);
+
+  const getRecordName = (record: R) => getRecordFld(record, nameFieldName);
 
   type OuterCompProps = Omit<P, keyof IRecordsHocInjectProps<R>>;
 
@@ -997,18 +1017,6 @@ export default function<
         };
       };
 
-      pickProps = (props: any, keys: boolean | string[]) => {
-        if (!keys) {
-          return [];
-        }
-
-        if (keys === true) {
-          return props;
-        }
-
-        return pick(props, keys);
-      };
-
       render() {
         const {
           configLoading,
@@ -1038,13 +1046,10 @@ export default function<
           getStandContext: this.getStandContext,
 
           // context props
-          ...this.pickProps(contextVal, receiveContextAsProps),
+          ...pickProps(contextVal, receiveContextAsProps),
 
           // hocparams props
-          ...this.pickProps(
-            pick(restProps, hocParamsKeys),
-            receiveHocParamsAsProps,
-          ),
+          ...pickProps(pick(restProps, hocParamsKeys), receiveHocParamsAsProps),
 
           // pass rest props
           ...omit(restProps, [...Object.keys(contextVal), ...hocParamsKeys]),

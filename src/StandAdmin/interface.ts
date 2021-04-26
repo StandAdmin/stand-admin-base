@@ -6,6 +6,7 @@ import { FormInstance } from 'antd/es/form';
 import { PaginationProps } from 'antd/es/pagination';
 import { Dispatch, Model } from 'dva';
 import { Connect } from 'react-redux';
+import { UndefinedOptional } from './undefinedOptional';
 
 import standStyles from './StandRecordsHoc/styles';
 
@@ -452,15 +453,15 @@ export interface IStandContextProps<R = any>
 }
 
 export type TRecordsHocComponent<R = any, P = any> = React.ComponentType<
-  P & IRecordsHocProps<R>
+  UndefinedOptional<P> & IRecordsHocProps<R>
 >;
 
 export type TIdSelectCtrlHocComponent<R = any, P = any> = React.ComponentType<
-  P & IIdSelectCtrlHocProps<R>
+  UndefinedOptional<P> & IIdSelectCtrlHocProps<R>
 >;
 
 export type TListCtrlHocComponent<R = any, P = any> = React.ComponentType<
-  P & IListCtrlHocProps<R>
+  UndefinedOptional<P> & IListCtrlHocProps<R>
 > & {
   IdSelectCtrl: TIdSelectCtrlHocComponent<R, P>;
 };
