@@ -16,7 +16,7 @@ export function getConfig() {
   return globalConfig;
 }
 
-export function setConfig(config: IGlobalConfig) {
+export function setConfig(config: Partial<IGlobalConfig>) {
   Object.assign(globalConfig, config);
   return globalConfig;
 }
