@@ -59,6 +59,11 @@ const defaultSearchParamsEqualFn = (a: ICommonObj, b: ICommonObj) => {
   return isEqual(omitBy(a, isUndefined), omitBy(b, isUndefined));
 };
 
+const defaultSuccessHandlerFn: IRecordsHocFullParams['successHandler'] = params => {
+  const { successMsg, actionTitle } = params;
+  message.success(successMsg || `${actionTitle}成功！`);
+};
+
 const pickProps = (props: any, keys: boolean | string[]) => {
   if (!keys) {
     return [];
@@ -108,6 +113,7 @@ export default function<
     filterSearchParams: undefined,
     reservedUrlParamNames: [],
     isSearchParamsEqual: defaultSearchParamsEqualFn,
+    successHandler: defaultSuccessHandlerFn,
     placeholderIfConfigLoading: true,
     receiveContextAsProps: true,
     receiveHocParamsAsProps: [
@@ -601,13 +607,25 @@ export default function<
           shouldRefresh = true,
           successMsg,
           blinkRecord = true,
+          StoreNs: specStoreNs,
         }: IStoreActionParams,
       ) => {
         if (resp && resp.success) {
-          const { searchRecordsOnRefresh, onRefresh } = this.props;
+          const {
+            searchRecordsOnRefresh,
+            onRefresh,
+            successHandler,
+          } = this.props;
 
-          if (successMsg !== false) {
-            message.success(successMsg || `${actionTitle}成功！`);
+          if (successMsg !== false && successHandler) {
+            successHandler({
+              StoreNs: specStoreNs || StoreNs,
+              successMsg,
+              action,
+              actionTitle,
+              payload,
+              shouldRefresh,
+            });
           }
 
           const isUpsert = ['addRecord', 'updateRecord'].indexOf(action) >= 0;

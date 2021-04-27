@@ -19,6 +19,8 @@ import {
   IResponseOfGetRecord,
 } from './interface';
 
+const getAutoId = getAutoIdGenerator();
+
 function delayP(ms: number, val = true) {
   return new Promise(resolve => {
     setTimeout(resolve, ms, val);
@@ -122,7 +124,7 @@ export function getDynamicModelPkg(modelPkg: IModelPkg, nsPre: string) {
     throw new Error('modelOpts is missing');
   }
 
-  const newStoreNs = `${nsPre}-${StoreNs}`;
+  const newStoreNs = `${nsPre || `dynamic${getAutoId()}`}-${StoreNs}`;
 
   return {
     ...modelPkg,
@@ -675,8 +677,6 @@ export function getStandConfigModel(opts: IStandConfigModelOptions): Model {
   } as unknown) as Model;
 }
 
-const getAutoId = getAutoIdGenerator();
-
 export function getAutoStoreNs(key: string) {
   return `_Auto${getAutoId()}_${ModelNsPre}${key}`;
 }
@@ -689,6 +689,7 @@ export function buildStandRecordModelPkg<R = any>(
     nameFieldName = 'name',
     StoreNs = getAutoStoreNs('Record'),
     StoreNsTitle = '记录',
+    isDynamic = false,
   } = opts;
 
   return {
@@ -697,6 +698,8 @@ export function buildStandRecordModelPkg<R = any>(
 
     idFieldName,
     nameFieldName,
+
+    isDynamic,
 
     modelOpts: opts,
     default: getStandModel<R>({ ...opts, StoreNs }),

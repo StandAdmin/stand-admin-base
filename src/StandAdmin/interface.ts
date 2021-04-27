@@ -79,6 +79,7 @@ export interface IStandModelOptions<R> {
   };
   StoreNs?: string;
   StoreNsTitle?: string;
+  isDynamic?: boolean;
   searchRecords?: (
     params?: TSearchParams,
   ) => Promise<IResponseOfSearchRecords<R>>;
@@ -221,11 +222,6 @@ export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
   receiveContextAsProps?: boolean | string[];
 
   /**
-   * HocParams will be passed in props, default true
-   */
-  receiveHocParamsAsProps?: boolean | string[];
-
-  /**
    * The className for the outer container wrapper
    */
   wrapperClassName?: string;
@@ -234,16 +230,32 @@ export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
    * Row Select support for the standRender of useStandTableList
    */
   listRowSelectionSupport?: boolean;
+
+  /**
+   * If true, a new recordModel with new namespace will be created
+   */
+  makeRecordModelPkgDynamic?: string;
 }
 export interface IRecordsHocFullParams<R = any>
   extends IRecordsHocCommonParams {
-  makeRecordModelPkgDynamic?: string;
+  /**
+   * HocParams will be passed in props, default true
+   */
+  receiveHocParamsAsProps?: boolean | string[];
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
   takeOverMount?: boolean;
   searchRecordsOnParamsChange?: boolean;
   searchRecordsOnRefresh?: boolean;
   isSearchParamsEqual?: (paramsA: ICommonObj, paramsB: ICommonObj) => boolean;
+  successHandler?: (params: {
+    StoreNs: string;
+    successMsg: string;
+    action: string;
+    actionTitle: string;
+    payload: any;
+    shouldRefresh: boolean;
+  }) => void;
   finalSearchParamsFilter?: (params?: TSearchParams) => TSearchParams;
   formNamePrefix?: string;
   onRecordFormVisibleTagChange?: (
