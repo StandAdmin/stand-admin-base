@@ -323,7 +323,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
             list = [],
             total: origTotal,
             pageSize = reqParams.pageSize,
-            pageNum = reqParams.pageNum,
+            pageNum = reqParams.pageNum || 1,
           } = getCommonFlds(response);
 
           const total = origTotal !== undefined ? origTotal : list.length;
@@ -541,7 +541,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
         { call }: any,
       ) {
         if (!serviceFunction) {
-          throw new Error(`serviceFunction is empty!`);
+          throw new Error(`${serviceTitle}: serviceFunction is empty!`);
         }
 
         const response: IResponse = yield call(
