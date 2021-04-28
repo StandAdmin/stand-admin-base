@@ -1,3 +1,5 @@
+import './antdStyle';
+
 export * from './StandAdmin';
 
 import FormHistroyTrigger from './FormHistroy/trigger';
