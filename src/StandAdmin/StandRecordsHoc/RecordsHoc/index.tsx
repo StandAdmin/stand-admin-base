@@ -114,6 +114,8 @@ export default function<
     reservedUrlParamNames: [],
     isSearchParamsEqual: defaultSearchParamsEqualFn,
     successHandler: defaultSuccessHandlerFn,
+    resetStoreStateWhenUnmount: false,
+    resetStoreStateWhenMount: false,
     placeholderIfConfigLoading: true,
     receiveContextAsProps: true,
     receiveHocParamsAsProps: [
@@ -179,7 +181,9 @@ export default function<
       async componentDidMount() {
         await this.tryRegisterModels();
 
-        await this.resetRecordsState(this.mountId);
+        if (this.props.resetStoreStateWhenMount) {
+          await this.resetRecordsState(this.mountId);
+        }
 
         const { takeOverMount, searchRecordsOnMount } = this.props;
 
@@ -224,7 +228,9 @@ export default function<
 
         await this.tryUnregisterModels();
 
-        await this.resetRecordsState(null);
+        if (this.props.resetStoreStateWhenUnmount) {
+          await this.resetRecordsState(null);
+        }
       }
 
       cancleDebouncedSearchRecords = () => {
@@ -628,11 +634,19 @@ export default function<
             });
           }
 
-          const isUpsert = ['addRecord', 'updateRecord'].indexOf(action) >= 0;
+          const isUpdateRecord = ['updateRecord'].indexOf(action) >= 0;
+
+          const isAddRecord = ['addRecord'].indexOf(action) >= 0;
+
+          const isUpsert = isUpdateRecord || isAddRecord;
 
           if (shouldRefresh) {
             if (searchRecordsOnRefresh) {
-              this.searchRecords().then(() => {
+              const { storeRef: { searchParams = {} } = {} } = this.props;
+
+              this.searchRecords(
+                isAddRecord ? omit(searchParams, ['pageNum']) : searchParams,
+              ).then(() => {
                 if (blinkRecord && isUpsert) {
                   const matchRecord = resp.data || payload.record;
 
@@ -821,7 +835,10 @@ export default function<
           pageSize,
         };
 
-        const withUpdates = !isEqual(newSearchParams, searchParams);
+        const withUpdates = !this.props.isSearchParamsEqual(
+          newSearchParams,
+          searchParams,
+        );
 
         if (withUpdates) {
           this.goSearch({ ...searchParams, ...newSearchParams });

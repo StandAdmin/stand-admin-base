@@ -235,6 +235,9 @@ export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
    * If true, a new recordModel with new namespace will be created
    */
   makeRecordModelPkgDynamic?: string;
+
+  resetStoreStateWhenUnmount?: boolean;
+  resetStoreStateWhenMount?: boolean;
 }
 export interface IRecordsHocFullParams<R = any>
   extends IRecordsHocCommonParams {
