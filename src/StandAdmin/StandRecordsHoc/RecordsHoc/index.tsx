@@ -1057,6 +1057,7 @@ export default function<
           configLoading,
           placeholderIfConfigLoading,
           wrapperClassName,
+          wrapperStyle,
           searchLoading,
           receiveContextAsProps,
           receiveHocParamsAsProps,
@@ -1092,6 +1093,7 @@ export default function<
 
         return (
           <div
+            style={wrapperStyle}
             className={classNames(
               styles.container,
               {

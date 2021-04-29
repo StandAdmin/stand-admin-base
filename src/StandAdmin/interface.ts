@@ -226,6 +226,8 @@ export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
    */
   wrapperClassName?: string;
 
+  wrapperStyle?: React.CSSProperties;
+
   /**
    * Row Select support for the standRender of useStandTableList
    */
