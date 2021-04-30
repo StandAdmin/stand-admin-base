@@ -4,7 +4,7 @@ import { merge, get } from 'lodash';
 // import Localforage from 'localforage';
 import { ConfigLoadingFld, ModelNsPre, ConfigLoadingMethod } from './const';
 
-import { getAutoIdGenerator } from './utils/util';
+import { getAutoIdGenerator, markAndMatch } from './utils/util';
 
 import { Model } from 'dva';
 
@@ -18,6 +18,7 @@ import {
   IResponseOfSearchRecords,
   IResponseOfGetRecord,
 } from './interface';
+import { logWarn } from './utils/logUtils';
 
 const getAutoId = getAutoIdGenerator();
 
@@ -193,6 +194,8 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
     handleCommonRespError(StoreNsTitle, response, { errorTitle });
   };
 
+  const markTag = markAndMatch();
+
   const interModel: Model = ({
     namespace: StoreNs,
     state: {
@@ -279,71 +282,82 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
 
         return response.data;
       },
-      *search(
-        {
-          params,
-          opts: options = {},
-        }: {
-          params?: any;
-          opts: { updateSearchParamsEvenError?: boolean; mountId?: number };
-        },
-        { call, put }: any,
-      ) {
-        const { updateSearchParamsEvenError, mountId } = options;
 
-        const reqParams = { pageNum: 1, pageSize: 10, ...params };
-
-        yield put({
-          type: 'saveState',
-          payload: {
-            searchLoading: true,
-            ...(mountId ? { mountId } : undefined),
+      search: [
+        function*(
+          {
+            params,
+            opts: options = {},
+          }: {
+            params?: any;
+            opts: { updateSearchParamsEvenError?: boolean; mountId?: number };
           },
-        });
+          { call, put }: any,
+        ) {
+          const { updateSearchParamsEvenError, mountId } = options;
 
-        if (!searchRecords) {
-          throw new Error(`searchRecords is empty!`);
-        }
+          const reqParams = { pageNum: 1, pageSize: 10, ...params };
 
-        const response: IResponseOfSearchRecords<R> = yield call(
-          searchRecords,
-          filterParams(reqParams),
-        );
+          yield put({
+            type: 'saveState',
+            payload: {
+              searchLoading: true,
+              ...(mountId ? { mountId } : undefined),
+            },
+          });
 
-        const newPayload = {};
+          if (!searchRecords) {
+            throw new Error(`searchRecords is empty!`);
+          }
 
-        if (!response || !response.success) {
-          if (updateSearchParamsEvenError) {
+          const [tagMatch] = markTag('search');
+
+          const response: IResponseOfSearchRecords<R> = yield call(
+            searchRecords,
+            filterParams(reqParams),
+          );
+
+          if (!tagMatch()) {
+            logWarn('Seemed another search request has been sent!!!');
+          }
+
+          const newPayload = {};
+
+          if (!response || !response.success) {
+            if (updateSearchParamsEvenError) {
+              Object.assign(newPayload, {
+                searchParams: params,
+              });
+            }
+
+            handleRespError({ response, errorTitle: '获取结果列表失败' });
+          } else {
+            const {
+              list = [],
+              total: origTotal,
+              pageSize = reqParams.pageSize,
+              pageNum = reqParams.pageNum || 1,
+            } = getCommonFlds(response);
+
+            const total = origTotal !== undefined ? origTotal : list.length;
+
             Object.assign(newPayload, {
               searchParams: params,
+              records: list,
+              pagination: { current: pageNum, pageSize, total },
             });
           }
 
-          handleRespError({ response, errorTitle: '获取结果列表失败' });
-        } else {
-          const {
-            list = [],
-            total: origTotal,
-            pageSize = reqParams.pageSize,
-            pageNum = reqParams.pageNum || 1,
-          } = getCommonFlds(response);
-
-          const total = origTotal !== undefined ? origTotal : list.length;
-
-          Object.assign(newPayload, {
-            searchParams: params,
-            records: list,
-            pagination: { current: pageNum, pageSize, total },
+          yield put({
+            type: 'saveState',
+            payload: { ...newPayload, searchLoading: false },
           });
-        }
 
-        yield put({
-          type: 'saveState',
-          payload: { ...newPayload, searchLoading: false },
-        });
+          return response;
+        },
+        { type: 'takeLatest' },
+      ],
 
-        return response;
-      },
       *showRecordForm({ params }: { params: any }, { put }: any) {
         // const { activeRecord } = params || {};
 

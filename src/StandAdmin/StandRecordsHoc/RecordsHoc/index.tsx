@@ -197,7 +197,11 @@ export default function<
       componentDidUpdate(prevProps: InnerCompProps) {
         // whyDidYouUpdate(StoreNsTitle, prevProps, this.props);
 
-        const { searchRecordsOnParamsChange, isSearchParamsEqual } = this.props;
+        const {
+          searchRecordsOnParamsChange,
+          isSearchParamsEqual,
+          // searchLoading,
+        } = this.props;
 
         if (searchRecordsOnParamsChange) {
           const prevSearchParams = this.getFinalSearchParams(prevProps);
@@ -214,11 +218,7 @@ export default function<
             );
 
           if (searchParamsChanged) {
-            const { searchLoading } = this.props;
-
-            if (!searchLoading) {
-              this.debouncedSearchRecords();
-            }
+            this.debouncedSearchRecords();
           }
         }
       }

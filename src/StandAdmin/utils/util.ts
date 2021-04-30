@@ -7,6 +7,25 @@ export function getAutoIdGenerator(base = 0) {
   };
 }
 
+export function markAndMatch() {
+  const markMap: { [key: string]: number } = {};
+
+  const getAutoId = getAutoIdGenerator();
+
+  return (tag: string): [() => boolean, number] => {
+    const newTag = getAutoId();
+
+    markMap[tag] = newTag;
+
+    return [
+      () => {
+        return newTag === markMap[tag];
+      },
+      newTag,
+    ];
+  };
+}
+
 export function getDisplayName<T>(WrappedComponent: React.ComponentType<T>) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component';
 }
