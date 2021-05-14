@@ -2,6 +2,8 @@ import { identity } from 'lodash';
 
 import { ICommonObj } from '../interface';
 
+import { toUrlQuery, fromUrlQuery } from './urlQueryHelper';
+
 export default {
   /**
    * map({key:value}) 转 option({value:key,label:value})
@@ -20,4 +22,7 @@ export default {
   arrayToOptions(arr: any[]) {
     return arr.map(value => ({ value, label: value }));
   },
+
+  stringifyQueryParams: toUrlQuery,
+  parseQueryString: fromUrlQuery,
 };
