@@ -179,7 +179,7 @@ export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
   /**
    * Whether sync search params to url
    */
-  syncParamsToUrl?: boolean;
+  syncParamsToUrl?: boolean | 'auto';
   /**
    * Url params namespace to avoid conflict
    */

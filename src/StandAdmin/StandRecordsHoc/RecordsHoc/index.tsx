@@ -102,7 +102,7 @@ export default function<
   const defaultRestHocParams: IRecordsHocFullParams<R> = {
     updateSearchParamsEvenError: false,
     passSearchWhenParamsEqual: false,
-    syncParamsToUrl: true,
+    syncParamsToUrl: 'auto',
     urlParamsNs: false,
     searchRecordsOnMount: true,
     searchRecordsOnParamsChange: true,
@@ -415,14 +415,28 @@ export default function<
         });
       };
 
-      getSearchParams = (specProps?: InnerCompProps) => {
+      isSyncParamsToUrlEnabled = (specProps?: InnerCompProps): boolean => {
         const props = specProps || this.props;
 
         const { syncParamsToUrl } = props;
 
+        if (syncParamsToUrl === 'auto') {
+          const { getHistory } = getConfig();
+
+          const history = getHistory();
+
+          return !!(props.location && history.location === props.location);
+        }
+
+        return !!syncParamsToUrl;
+      };
+
+      getSearchParams = (specProps?: InnerCompProps) => {
+        const props = specProps || this.props;
+
         let params;
 
-        if (syncParamsToUrl) {
+        if (this.isSyncParamsToUrlEnabled(props as InnerCompProps)) {
           params = this.getUrlParams(props as InnerCompProps);
         } else {
           const { storeRef } = props;
@@ -440,14 +454,13 @@ export default function<
       goSearch = async (params: ICommonObj = {}) => {
         const {
           reservedUrlParamNames,
-          syncParamsToUrl,
           passSearchWhenParamsEqual,
           urlParamsNs,
         } = this.props;
 
         const urlQueryOpts = { ns: urlParamsNs };
 
-        if (syncParamsToUrl) {
+        if (this.isSyncParamsToUrlEnabled()) {
           const reservedParams = {};
 
           const searchInLocation = this.getLocation().search;
