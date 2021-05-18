@@ -68,14 +68,30 @@ export interface IResponseOfAction<R> extends IResponse {
   data?: R;
 }
 
+export type TSearchParamsMapKeys = 'pageNum' | 'pageSize';
+
+export type TFldsPathInRespMapKeys =
+  | 'pageNum'
+  | 'pageSize'
+  | 'total'
+  | 'list'
+  | 'errorMsg'
+  | 'permissionApplyUrl';
+
+export type TFldsPathInRespMapValue =
+  | string
+  | ((resp: ICommonObj, field: string) => any);
+
 export interface IStandModelOptions<R> {
   idFieldName?: string;
   nameFieldName?: string;
   fldsPathInResp?: {
-    [key: string]: string[] | string;
+    [key in TFldsPathInRespMapKeys]?:
+      | TFldsPathInRespMapValue[]
+      | TFldsPathInRespMapValue;
   };
   searchParamsMap?: {
-    [key: string]: string;
+    [key in TSearchParamsMapKeys]?: string;
   };
   StoreNs?: string;
   StoreNsTitle?: string;

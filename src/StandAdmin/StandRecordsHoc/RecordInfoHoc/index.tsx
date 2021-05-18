@@ -76,9 +76,19 @@ export default function<
                 success: true,
               };
 
+              const targetListPathItem = Array.isArray(listPath)
+                ? listPath[0]
+                : listPath;
+
+              if (typeof targetListPathItem !== 'string') {
+                throw new Error(
+                  'fldsPathInResp.list is supposed to be a string for RecordInfoHoc!',
+                );
+              }
+
               set(
                 finalResp,
-                (Array.isArray(listPath) ? listPath[0] : listPath).split('.'),
+                targetListPathItem.split('.'),
                 resp.data ? [resp.data] : [],
               );
 

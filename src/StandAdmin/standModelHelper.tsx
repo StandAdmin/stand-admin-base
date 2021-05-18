@@ -17,6 +17,8 @@ import {
   IModelPkg,
   IResponseOfSearchRecords,
   IResponseOfGetRecord,
+  TFldsPathInRespMapValue,
+  TFldsPathInRespMapKeys,
 } from './interface';
 import { logWarn } from './utils/logUtils';
 
@@ -55,7 +57,11 @@ function convertParamsName(
   return newParams;
 }
 
-function getFirstNotEmptyVal(obj: ICommonObj, pathList: string[] | string) {
+function getFirstNotEmptyVal(
+  obj: ICommonObj,
+  key: TFldsPathInRespMapKeys,
+  pathList: TFldsPathInRespMapValue | TFldsPathInRespMapValue[],
+) {
   if (!pathList) {
     throw new Error('pathList is Empty!');
   }
@@ -63,7 +69,10 @@ function getFirstNotEmptyVal(obj: ICommonObj, pathList: string[] | string) {
   const list = Array.isArray(pathList) ? pathList : [pathList];
 
   for (let i = 0, len = list.length; i < len; i += 1) {
-    const val = get(obj, list[i]);
+    const fldPath: TFldsPathInRespMapValue = list[i];
+
+    const val =
+      typeof fldPath === 'string' ? get(obj, fldPath) : fldPath(obj, key);
     if (val) {
       return val;
     }
@@ -93,10 +102,15 @@ export function handleCommonRespError(
     return;
   }
 
-  const errorContent = getFirstNotEmptyVal(response, errorMsgFields);
+  const errorContent = getFirstNotEmptyVal(
+    response,
+    'errorMsg',
+    errorMsgFields,
+  );
 
   const permissionApplyUrl = getFirstNotEmptyVal(
     response,
+    'permissionApplyUrl',
     permissionApplyUrlFields,
   );
 
@@ -173,8 +187,8 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
   const getCommonFlds = (resp: IResponse): any => {
     const result: ICommonObj = {};
 
-    Object.keys(fldsPathInResp).forEach(key => {
-      const val = getFirstNotEmptyVal(resp, fldsPathInResp[key]);
+    Object.keys(fldsPathInResp).forEach((key: TFldsPathInRespMapKeys) => {
+      const val = getFirstNotEmptyVal(resp, key, fldsPathInResp[key]);
 
       if (val !== undefined) {
         result[key] = val;
