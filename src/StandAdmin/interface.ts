@@ -574,6 +574,7 @@ export interface IUseStandUpsertFormResult<R> {
   isUpdate: boolean;
 
   activeRecord: R | TEmpty;
+  activeRecordId: TRecordId;
   context: IStandContextProps<R>;
   config: ICommonObj;
   form: FormInstance;
