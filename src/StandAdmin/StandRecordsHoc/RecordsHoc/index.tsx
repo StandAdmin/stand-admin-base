@@ -102,6 +102,7 @@ export default function<
   const defaultRestHocParams: IRecordsHocFullParams<R> = {
     updateSearchParamsEvenError: false,
     passSearchWhenParamsEqual: false,
+    passSearchUpdateIfStoreStale: false,
     syncParamsToUrl: 'auto',
     urlParamsNs: false,
     searchRecordsOnMount: true,
@@ -200,6 +201,7 @@ export default function<
         const {
           searchRecordsOnParamsChange,
           isSearchParamsEqual,
+          passSearchUpdateIfStoreStale,
           // searchLoading,
         } = this.props;
 
@@ -217,7 +219,10 @@ export default function<
               this.latestSearchParams || {},
             );
 
-          if (searchParamsChanged) {
+          if (
+            searchParamsChanged &&
+            !(passSearchUpdateIfStoreStale && this.isStoreDataStale())
+          ) {
             this.debouncedSearchRecords();
           }
         }

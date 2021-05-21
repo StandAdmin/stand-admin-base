@@ -265,6 +265,7 @@ export interface IRecordsHocFullParams<R = any>
   receiveHocParamsAsProps?: boolean | string[];
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
+  passSearchUpdateIfStoreStale?: boolean;
   takeOverMount?: boolean;
   searchRecordsOnParamsChange?: boolean;
   searchRecordsOnRefresh?: boolean;

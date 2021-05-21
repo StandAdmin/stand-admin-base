@@ -83,6 +83,7 @@ export default function<
     clearCheckedAfterClose: false,
     resetSearchParamsOnModalShow: false,
     resetCheckedOnModalShow: false,
+    passSearchUpdateIfStoreStale: true,
     ...restHocParams,
   };
 
