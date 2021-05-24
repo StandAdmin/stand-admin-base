@@ -235,7 +235,7 @@ export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
   /**
    * StandContext will be passed in props, default true
    */
-  receiveContextAsProps?: boolean | string[];
+  receiveContextAsProps?: boolean | (keyof IStandContextProps)[];
 
   /**
    * The className for the outer container wrapper
@@ -262,7 +262,7 @@ export interface IRecordsHocFullParams<R = any>
   /**
    * HocParams will be passed in props, default true
    */
-  receiveHocParamsAsProps?: boolean | string[];
+  receiveHocParamsAsProps?: boolean | (keyof IRecordsHocFullParams)[];
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
   passSearchUpdateIfStoreStale?: boolean;
