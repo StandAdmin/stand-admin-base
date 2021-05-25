@@ -210,7 +210,9 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     };
   }, [isModalVisible, recordFormVisibleTag, activeRecord, form, getInitValues]);
 
-  const isUpdate = !!getRecordId(activeRecord);
+  const activeRecordId = getRecordId(activeRecord);
+
+  const isUpdate = activeRecordId !== undefined && activeRecordId !== null;
 
   const defaultSubmitValues = usePersistFn(values => {
     if (isUpdate) {
@@ -314,6 +316,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
      */
     isUpdate,
     activeRecord,
+    activeRecordId,
     context,
     config,
     form,

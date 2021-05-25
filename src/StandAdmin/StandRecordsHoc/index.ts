@@ -21,16 +21,20 @@ export {
   StandConnectHoc,
 };
 
+const defaultHocParamsInDefineFn: IRecordsHocCommonParams = {
+  receiveContextAsProps: false,
+};
+
 export function defineCommonHocParams(params: IRecordsHocCommonParams) {
-  return params;
+  return { ...defaultHocParamsInDefineFn, ...params };
 }
 
 export function defineFullHocParams<R = any>(params: IRecordsHocFullParams<R>) {
-  return params;
+  return { ...defaultHocParamsInDefineFn, ...params };
 }
 
 export function defineListCtrlHocParams<R = any>(
   params: IListCtrlHocParams<R>,
 ) {
-  return params;
+  return { ...defaultHocParamsInDefineFn, ...params };
 }

@@ -99,9 +99,10 @@ export default function<
     StoreNs,
   } = recordModel || {};
 
-  const defaultRestHocParams: IRecordsHocFullParams<R> = {
+  const defaultHocParams: IRecordsHocFullParams<R> = {
     updateSearchParamsEvenError: false,
     passSearchWhenParamsEqual: false,
+    passSearchUpdateIfStoreStale: false,
     syncParamsToUrl: 'auto',
     urlParamsNs: false,
     searchRecordsOnMount: true,
@@ -127,7 +128,6 @@ export default function<
     ],
     listRowSelectionSupport: false,
     formNamePrefix: 'Form',
-    ...restHocParams,
   };
 
   const getRecordFld = (record: R, fld: string) => {
@@ -159,7 +159,8 @@ export default function<
       )}`;
 
       static defaultProps = {
-        ...defaultRestHocParams,
+        ...defaultHocParams,
+        ...restHocParams,
       };
 
       mountId: number = -1;
@@ -200,6 +201,7 @@ export default function<
         const {
           searchRecordsOnParamsChange,
           isSearchParamsEqual,
+          passSearchUpdateIfStoreStale,
           // searchLoading,
         } = this.props;
 
@@ -217,7 +219,10 @@ export default function<
               this.latestSearchParams || {},
             );
 
-          if (searchParamsChanged) {
+          if (
+            searchParamsChanged &&
+            !(passSearchUpdateIfStoreStale && this.isStoreDataStale())
+          ) {
             this.debouncedSearchRecords();
           }
         }
@@ -1087,7 +1092,7 @@ export default function<
 
         const contextVal = this.getStandContext();
 
-        const hocParamsKeys = Object.keys(defaultRestHocParams);
+        const hocParamsKeys = Object.keys(defaultHocParams);
 
         const finalProps: P = {
           // inject props

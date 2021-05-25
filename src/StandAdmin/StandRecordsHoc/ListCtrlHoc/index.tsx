@@ -9,7 +9,7 @@ import {
   IRecordsHocFullParams,
   TListCtrlHocComponent,
   IListCtrlHocProps,
-  ModalTriggerOpts,
+  IModalTriggerOpts,
   ICommonObj,
   TIdSelectCtrlHocComponent,
 } from '../../interface';
@@ -22,48 +22,61 @@ interface IListCtrlState {
   modalVisible: boolean | undefined;
 }
 
-function defaultModalTriggerRender<R>({
-  props,
-  showModal,
-  context,
-}: ModalTriggerOpts<R>) {
-  const {
-    recordNsTitle,
-    toggleChecked,
-    checkedList,
-    getRecordId,
-    getRecordName,
-  } = context;
+function defaultModalTriggerButtonRender<R>(opts: IModalTriggerOpts<R>) {
+  const { props, showModal, context } = opts;
+
+  const { recordNsTitle, checkedList } = context;
+
+  const { modalTriggerDisabled, modalTriggerTitle } = props;
+
+  return (
+    <Button
+      icon={<PlusCircleOutlined />}
+      disabled={modalTriggerDisabled}
+      onClick={showModal}
+    >
+      {modalTriggerTitle || `选择${recordNsTitle}`} (已选 {checkedList.length})
+    </Button>
+  );
+}
+
+function defaultModalTriggerCheckedListRender<R>(opts: IModalTriggerOpts<R>) {
+  const { context } = opts;
+
+  const { toggleChecked, checkedList, getRecordId, getRecordName } = context;
+
+  return (
+    <div className={styles.tagList}>
+      {checkedList.map(record => (
+        <Tag
+          key={getRecordId(record)}
+          closable
+          onClose={() => {
+            toggleChecked(record, false);
+          }}
+        >
+          {getRecordId(record)}
+          {record ? `: ${getRecordName(record)}` : ''}
+        </Tag>
+      ))}
+    </div>
+  );
+}
+
+function defaultModalTriggerRender<R>(opts: IModalTriggerOpts<R>) {
+  const { props } = opts;
+
+  const { modalTriggerClassName } = props;
 
   const {
-    modalTriggerDisabled,
-    modalTriggerTitle,
-    modalTriggerClassName,
+    modalTriggerButtonRender = defaultModalTriggerButtonRender,
+    modalTriggerCheckedListRender = defaultModalTriggerCheckedListRender,
   } = props;
 
   return (
     <div className={modalTriggerClassName}>
-      <Button
-        onClick={showModal}
-        icon={<PlusCircleOutlined />}
-        disabled={modalTriggerDisabled}
-      >
-        选择{modalTriggerTitle || recordNsTitle} (已选 {checkedList.length})
-      </Button>
-      <div className={styles.tagList}>
-        {checkedList.map(record => (
-          <Tag
-            key={getRecordId(record)}
-            closable
-            onClose={() => {
-              toggleChecked(record, false);
-            }}
-          >
-            {getRecordId(record)}
-            {record ? `: ${getRecordName(record)}` : ''}
-          </Tag>
-        ))}
-      </div>
+      {modalTriggerButtonRender(opts)}
+      {modalTriggerCheckedListRender(opts)}
     </div>
   );
 }
@@ -74,7 +87,7 @@ export default function<
 >(hocParams: IListCtrlHocParams<R>) {
   const { ...restHocParams } = hocParams;
 
-  const defaultRestHocParams: IListCtrlHocParams<R> = {
+  const defaultHocParams: IListCtrlHocParams<R> = {
     isModalMode: true,
     isStandListCtrl: true,
     listRowSelectionSupport: true,
@@ -83,11 +96,12 @@ export default function<
     clearCheckedAfterClose: false,
     resetSearchParamsOnModalShow: false,
     resetCheckedOnModalShow: false,
-    ...restHocParams,
+    passSearchUpdateIfStoreStale: true,
+    syncParamsToUrl: false,
   };
 
-  if (!('syncParamsToUrl' in defaultRestHocParams)) {
-    defaultRestHocParams.syncParamsToUrl = !defaultRestHocParams.isModalMode;
+  if (!('syncParamsToUrl' in restHocParams)) {
+    defaultHocParams.syncParamsToUrl = !restHocParams.isModalMode;
   }
 
   type OuterCompProps = Omit<P, keyof IListCtrlHocInjectProps<R>>;
@@ -103,7 +117,8 @@ export default function<
 
     class Comp extends React.Component<InnerCompProps, IListCtrlState> {
       static defaultProps = {
-        ...defaultRestHocParams,
+        ...defaultHocParams,
+        ...restHocParams,
       };
 
       static contextType = StandContext;
@@ -156,12 +171,6 @@ export default function<
         specProps?: InnerCompProps,
         specState?: IListCtrlState,
       ) => {
-        const { modalProps = {} } = specProps || this.props;
-
-        if (modalProps.visible !== undefined) {
-          return modalProps.visible;
-        }
-
         const { modalVisible } = specState || this.state;
 
         return modalVisible;
@@ -202,6 +211,10 @@ export default function<
         if (onModalVisibleChange) {
           onModalVisibleChange(v);
         }
+      };
+
+      toggleModalVisible = (v: boolean) => {
+        return this.toggleVisible(v);
       };
 
       handleOK = () => {
@@ -362,7 +375,8 @@ export default function<
     }
 
     const standHocParams: IListCtrlHocParams<R> = {
-      ...defaultRestHocParams,
+      ...defaultHocParams,
+      ...restHocParams,
       takeOverMount: true,
     };
 
