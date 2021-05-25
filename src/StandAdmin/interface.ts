@@ -388,38 +388,46 @@ export interface IListCtrlHocParams<R> extends IRecordsHocFullParams<R> {
   isStandListCtrl?: boolean;
   defaultModalVisible?: boolean;
   modalVisible?: boolean;
-  clearCheckedAfterClose?: boolean;
   resetSearchParamsOnModalShow?: boolean;
   resetCheckedOnModalShow?: boolean;
+  clearCheckedAfterClose?: boolean;
 }
 
-export interface ModalTriggerOpts<R> {
+export interface IModalTriggerOpts<R> {
   props: IListCtrlHocProps<R>;
   showModal: () => void;
   hideModal: () => void;
-  toggleVisible: (v: boolean) => void;
+
+  /** @deprecated use toggleModalVisible instead */
+  toggleVisible: (visible: boolean) => void;
+
+  toggleModalVisible: (visible: boolean) => void;
   context: IStandContextProps<R>;
 }
+
+export type TModalTriggerRender<R> = (
+  opts: IModalTriggerOpts<R>,
+) => React.ReactNode | React.ReactNode;
 
 export interface IListCtrlHocInjectProps<R = any>
   extends IRecordsHocInjectProps<R> {
   isModalMode: boolean;
-  toggleModalVisible?: (v: boolean) => void;
+  toggleModalVisible?: (visible: boolean) => void;
 }
 export interface IListCtrlHocProps<R>
   extends IListCtrlHocParams<R>,
     IRecordsHocProps<R> {
   modalProps?: ModalProps;
-  modalTrigger?: (
-    opts: ModalTriggerOpts<R>,
-  ) => React.ReactNode | React.ReactNode;
+  modalTrigger?: TModalTriggerRender<R>;
+  modalTriggerButtonRender?: TModalTriggerRender<R>;
+  modalTriggerCheckedListRender?: TModalTriggerRender<R>;
   modalTriggerDisabled?: boolean;
   modalTriggerTitle?: string;
   modalWrapperClassName?: string;
   modalTriggerClassName?: string;
   onModalShow?: TFnVoid;
   onModalHide?: TFnVoid;
-  onModalVisibleChange?: (v: boolean) => void;
+  onModalVisibleChange?: (visible: boolean) => void;
   onModalOk?: (params: { checkedList: R[] }) => void;
 }
 
