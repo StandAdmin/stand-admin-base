@@ -4,7 +4,7 @@ import { message, Tooltip } from 'antd';
 import { ITargetFormInfo, IHistoryRecord } from './interface';
 import { IFormHistroyTriggerProps } from '../StandAdmin/interface';
 import { getDynamicComp, RecordFormWrapper } from './main';
-import { useStandContext } from '../StandAdmin/StandRecordsHoc/hooks/useStandContext';
+import { useStandContext } from '../StandAdmin/Admin/hooks/useStandContext';
 import { isEmpty } from 'lodash';
 
 import styles from './styles';

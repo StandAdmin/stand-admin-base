@@ -2,13 +2,13 @@ export * from './config';
 
 export * from './standModelHelper';
 
-export * from './StandRecordsHoc';
+export * from './Admin';
 
-export * from './StandRecordsHoc/hooks/useStandSearchForm';
-export * from './StandRecordsHoc/hooks/useStandUpsertForm';
-export * from './StandRecordsHoc/hooks/useStandTableList';
+export * from './Admin/hooks/useStandSearchForm';
+export * from './Admin/hooks/useStandUpsertForm';
+export * from './Admin/hooks/useStandTableList';
 
-export * from './StandRecordsHoc/hooks/useStandContext';
+export * from './Admin/hooks/useStandContext';
 
 export {
   IResponseOfSearchRecords,
@@ -19,18 +19,18 @@ export {
   IStoreActionParams,
   IServiceParams,
   IStoreRef,
-  IRecordsHocCommonParams,
-  IRecordsHocFullParams,
-  IRecordsHocInjectProps,
-  IRecordsHocProps,
-  IListCtrlHocParams,
-  IListCtrlHocInjectProps,
-  IListCtrlHocProps,
+  IContextHocCommonParams,
+  IContextHocFullParams,
+  IContextHocInjectProps,
+  IContextHocProps,
+  ISelectCtrlHocParams,
+  ISelectCtrlHocInjectProps,
+  ISelectCtrlHocProps,
   IIdSelectCtrlHocProps,
   IRecordInfoHocInjectProps,
   IStandContextProps,
-  TRecordsHocComponent,
-  TListCtrlHocComponent,
+  TContextHocComponent,
+  TSelectCtrlHocComponent,
   IUseStandSearchFormResult,
   IUseStandUpsertFormResult,
   IStandTableRenderParams,

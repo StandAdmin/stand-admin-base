@@ -8,7 +8,7 @@ import { Dispatch, Model } from 'dva';
 import { Connect } from 'react-redux';
 import { UndefinedOptional } from './undefinedOptional';
 
-import standStyles from './StandRecordsHoc/styles';
+import standStyles from './Admin/styles';
 
 export type TKey = string | number;
 
@@ -179,7 +179,7 @@ export interface IHistory {
   location: any;
 }
 
-export interface IRecordsHocModelParams {
+export interface IContextHocModelParams {
   /**
    * Normally returned by buildStandConfigModelPkg
    */
@@ -191,7 +191,7 @@ export interface IRecordsHocModelParams {
   recordModel?: IModelPkg;
 }
 
-export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
+export interface IContextHocCommonParams extends IContextHocModelParams {
   /**
    * Whether sync search params to url
    */
@@ -257,12 +257,12 @@ export interface IRecordsHocCommonParams extends IRecordsHocModelParams {
   resetStoreStateWhenUnmount?: boolean;
   resetStoreStateWhenMount?: boolean;
 }
-export interface IRecordsHocFullParams<R = any>
-  extends IRecordsHocCommonParams {
+export interface IContextHocFullParams<R = any>
+  extends IContextHocCommonParams {
   /**
    * HocParams will be passed in props, default true
    */
-  receiveHocParamsAsProps?: boolean | (keyof IRecordsHocFullParams)[];
+  receiveHocParamsAsProps?: boolean | (keyof IContextHocFullParams)[];
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
   passSearchUpdateIfStoreStale?: boolean;
@@ -302,12 +302,12 @@ export interface IStandConnectInjectProps<R> {
   dispatch: Dispatch<any>;
 }
 
-export interface IRecordsHocInjectProps<R = any> {
+export interface IContextHocInjectProps<R = any> {
   isStandAdminHoc: boolean;
   getStandContext: () => IStandContextProps<R>;
 }
 
-export interface IRecordsContextMethods<R> {
+export interface IContextMethods<R> {
   getRecordMapByIdList: (
     idList: TRecordId[],
   ) => Promise<
@@ -369,21 +369,21 @@ export interface IRecordsContextMethods<R> {
   getRecordModelPkg: () => IModelPkg;
   getConfigModelPkg: () => IModelPkg;
 
-  getDefaultSearchParams: (specProps?: IRecordsHocProps<R>) => ICommonObj;
-  getSpecSearchParams: (specProps?: IRecordsHocProps<R>) => ICommonObj;
+  getDefaultSearchParams: (specProps?: IContextHocProps<R>) => ICommonObj;
+  getSpecSearchParams: (specProps?: IContextHocProps<R>) => ICommonObj;
   callStoreAction: (params: IStoreActionParams) => Promise<IResponse>;
   callService: (params: IServiceParams) => Promise<IResponse>;
   renderEmpty: () => React.ReactNode;
   getLatestSearchParams: () => TSearchParams;
 }
 
-export interface IRecordsHocProps<R>
-  extends IRecordsHocFullParams<R>,
+export interface IContextHocProps<R>
+  extends IContextHocFullParams<R>,
     IBatchCheckHocProps<R> {
   location?: { search: string };
 }
 
-export interface IListCtrlHocParams<R> extends IRecordsHocFullParams<R> {
+export interface ISelectCtrlHocParams<R> extends IContextHocFullParams<R> {
   isModalMode?: boolean;
   isStandListCtrl?: boolean;
   defaultModalVisible?: boolean;
@@ -394,7 +394,7 @@ export interface IListCtrlHocParams<R> extends IRecordsHocFullParams<R> {
 }
 
 export interface IModalTriggerOpts<R> {
-  props: IListCtrlHocProps<R>;
+  props: ISelectCtrlHocProps<R>;
   showModal: () => void;
   hideModal: () => void;
 
@@ -409,14 +409,14 @@ export type TModalTriggerRender<R> = (
   opts: IModalTriggerOpts<R>,
 ) => React.ReactNode | React.ReactNode;
 
-export interface IListCtrlHocInjectProps<R = any>
-  extends IRecordsHocInjectProps<R> {
+export interface ISelectCtrlHocInjectProps<R = any>
+  extends IContextHocInjectProps<R> {
   isModalMode: boolean;
   toggleModalVisible?: (visible: boolean) => void;
 }
-export interface IListCtrlHocProps<R>
-  extends IListCtrlHocParams<R>,
-    IRecordsHocProps<R> {
+export interface ISelectCtrlHocProps<R>
+  extends ISelectCtrlHocParams<R>,
+    IContextHocProps<R> {
   modalProps?: ModalProps;
   modalTrigger?: TModalTriggerRender<R>;
   modalTriggerButtonRender?: TModalTriggerRender<R>;
@@ -432,7 +432,7 @@ export interface IListCtrlHocProps<R>
 }
 
 export interface IIdSelectCtrlHocProps<R = any>
-  extends Omit<IListCtrlHocProps<R>, 'onChange'> {
+  extends Omit<ISelectCtrlHocProps<R>, 'onChange'> {
   checkedIdList?: TRecordId[];
   defaultCheckedIdList?: TRecordId[];
   onChangeWithData?: (list: R[]) => void;
@@ -440,7 +440,7 @@ export interface IIdSelectCtrlHocProps<R = any>
 }
 
 export interface IRecordInfoHocInjectProps<R = any>
-  extends IRecordsHocInjectProps<R> {
+  extends IContextHocInjectProps<R> {
   recordInfoLoading: boolean;
   recordInfo: R;
 }
@@ -474,7 +474,7 @@ export interface IActionCounterHocInjectProps {
 export interface IStandContextProps<R = any>
   extends IActionCounterHocInjectProps,
     IBatchCheckHocInjectProps<R>,
-    IRecordsContextMethods<R> {
+    IContextMethods<R> {
   StoreNs: string;
   storeRef: IStoreRef<R>;
 
@@ -494,16 +494,16 @@ export interface IStandContextProps<R = any>
   mountId: TKey;
 }
 
-export type TRecordsHocComponent<R = any, P = any> = React.ComponentType<
-  UndefinedOptional<P> & IRecordsHocProps<R>
+export type TContextHocComponent<R = any, P = any> = React.ComponentType<
+  UndefinedOptional<P> & IContextHocProps<R>
 >;
 
 export type TIdSelectCtrlHocComponent<R = any, P = any> = React.ComponentType<
   UndefinedOptional<P> & IIdSelectCtrlHocProps<R>
 >;
 
-export type TListCtrlHocComponent<R = any, P = any> = React.ComponentType<
-  UndefinedOptional<P> & IListCtrlHocProps<R>
+export type TSelectCtrlHocComponent<R = any, P = any> = React.ComponentType<
+  UndefinedOptional<P> & ISelectCtrlHocProps<R>
 > & {
   IdSelectCtrl: TIdSelectCtrlHocComponent<R, P>;
 };

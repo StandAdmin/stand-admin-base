@@ -3,7 +3,7 @@ import { useUnmount, usePersistFn } from '@/StandAdmin/utils/hooks';
 import {
   ICommonObj,
   TRecordId,
-  IListCtrlHocInjectProps,
+  ISelectCtrlHocInjectProps,
   IIdSelectCtrlHocProps,
   IStandContextProps,
 } from '../../interface';
@@ -14,12 +14,12 @@ const TagProp = '_cus_tag_';
 
 export default function<
   R extends ICommonObj = any,
-  P extends IListCtrlHocInjectProps<R> = any
+  P extends ISelectCtrlHocInjectProps<R> = any
 >() {
   const globalRecordCache: ICommonObj = {};
 
   return (WrappedComponent: React.ComponentType<P>) => {
-    type InnerCompProps = Omit<P, keyof IListCtrlHocInjectProps<R>> &
+    type InnerCompProps = Omit<P, keyof ISelectCtrlHocInjectProps<R>> &
       IIdSelectCtrlHocProps<R>;
 
     const Comp = (props: InnerCompProps) => {

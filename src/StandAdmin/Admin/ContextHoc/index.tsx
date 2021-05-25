@@ -20,10 +20,10 @@ import {
   getDynamicModelPkg,
 } from '../../standModelHelper';
 import {
-  IRecordsHocInjectProps,
-  IRecordsHocProps,
-  IRecordsHocFullParams,
-  IRecordsContextMethods,
+  IContextHocInjectProps,
+  IContextHocProps,
+  IContextHocFullParams,
+  IContextMethods,
   IStandConnectInjectProps,
   //IActionCounterHocProps,
   // TAsyncFnAny,
@@ -32,7 +32,7 @@ import {
   IResponseOfAction,
   TSearchParamsOrId,
   TRecordFormVisibleTag,
-  TRecordsHocComponent,
+  TContextHocComponent,
   ICommonObj,
   TRecordId,
   IStandContextProps,
@@ -59,7 +59,7 @@ const defaultSearchParamsEqualFn = (a: ICommonObj, b: ICommonObj) => {
   return isEqual(omitBy(a, isUndefined), omitBy(b, isUndefined));
 };
 
-const defaultSuccessHandlerFn: IRecordsHocFullParams['successHandler'] = params => {
+const defaultSuccessHandlerFn: IContextHocFullParams['successHandler'] = params => {
   const { successMsg, actionTitle } = params;
   message.success(successMsg || `${actionTitle}成功！`);
 };
@@ -78,8 +78,8 @@ const pickProps = (props: any, keys: boolean | string[]) => {
 
 export default function<
   R extends ICommonObj = any,
-  P extends IRecordsHocInjectProps<R> = any
->(hocParams: IRecordsHocFullParams<R>) {
+  P extends IContextHocInjectProps<R> = any
+>(hocParams: IContextHocFullParams<R>) {
   const {
     makeRecordModelPkgDynamic,
     recordModel: origRecordModel = EmptyRecordModel,
@@ -99,7 +99,7 @@ export default function<
     StoreNs,
   } = recordModel || {};
 
-  const defaultHocParams: IRecordsHocFullParams<R> = {
+  const defaultHocParams: IContextHocFullParams<R> = {
     updateSearchParamsEvenError: false,
     passSearchWhenParamsEqual: false,
     passSearchUpdateIfStoreStale: false,
@@ -142,12 +142,12 @@ export default function<
 
   const getRecordName = (record: R) => getRecordFld(record, nameFieldName);
 
-  type OuterCompProps = Omit<P, keyof IRecordsHocInjectProps<R>>;
+  type OuterCompProps = Omit<P, keyof IContextHocInjectProps<R>>;
 
   return (
     WrappedComponent: React.ComponentType<P>,
-  ): TRecordsHocComponent<R, OuterCompProps> => {
-    type InnerCompProps = IRecordsHocProps<R> &
+  ): TContextHocComponent<R, OuterCompProps> => {
+    type InnerCompProps = IContextHocProps<R> &
       OuterCompProps &
       IStandConnectInjectProps<R> &
       IActionCounterHocInjectProps &
@@ -915,7 +915,7 @@ export default function<
         );
       };
 
-      getInsMethods = (): IRecordsContextMethods<R> => {
+      getInsMethods = (): IContextMethods<R> => {
         const {
           clearActiveRecord,
           hideRecordFormOnly,

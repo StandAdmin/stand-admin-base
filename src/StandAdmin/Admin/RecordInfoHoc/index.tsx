@@ -3,8 +3,8 @@ import React from 'react';
 import { EmptyRecordModel } from '../../standModelHelper';
 import {
   IRecordInfoHocInjectProps,
-  IRecordsHocFullParams,
-  TRecordsHocComponent,
+  IContextHocFullParams,
+  TContextHocComponent,
   IResponseOfGetRecord,
   ICommonObj,
 } from '../../interface';
@@ -13,7 +13,7 @@ import { set, omit } from 'lodash';
 
 import { useStandContext } from '../hooks/useStandContext';
 
-import StandRecordsHoc from '../RecordsHoc';
+import StandContextHoc from '../ContextHoc';
 import {
   buildStandRecordModelPkg,
   getAutoStoreNs,
@@ -22,12 +22,12 @@ import {
 export default function<
   R extends ICommonObj = any,
   P extends IRecordInfoHocInjectProps<R> = any
->(hocParams: IRecordsHocFullParams<R>) {
+>(hocParams: IContextHocFullParams<R>) {
   const { recordModel = EmptyRecordModel } = hocParams;
 
   return (
     WrappedComponent: React.ComponentType<P>,
-  ): TRecordsHocComponent<R, P> => {
+  ): TContextHocComponent<R, P> => {
     const Comp = (props: P) => {
       const {
         searchLoading,
@@ -45,7 +45,7 @@ export default function<
       );
     };
 
-    return StandRecordsHoc<R>({
+    return StandContextHoc<R>({
       ...hocParams,
       recordModel: buildStandRecordModelPkg({
         ...recordModel.modelOpts,

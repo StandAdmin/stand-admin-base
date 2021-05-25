@@ -10,7 +10,7 @@ import { encodeFormVals } from '../../StandAdmin/utils/formEncoder';
 import {
   useStandUpsertForm,
   getOptsForStandUpsertForm,
-} from '../../StandAdmin/StandRecordsHoc/hooks/useStandUpsertForm';
+} from '../../StandAdmin/Admin/hooks/useStandUpsertForm';
 
 const FormItem = Form.Item;
 

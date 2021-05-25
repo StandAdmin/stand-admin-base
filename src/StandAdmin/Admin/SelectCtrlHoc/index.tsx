@@ -2,13 +2,13 @@ import React, { Fragment } from 'react';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { Button, Modal, Tag } from 'antd';
 import classNames from 'classnames';
-import StandRecordsHoc from '../RecordsHoc';
+import StandContextHoc from '../ContextHoc';
 import {
-  IListCtrlHocInjectProps,
-  IListCtrlHocParams,
-  IRecordsHocFullParams,
-  TListCtrlHocComponent,
-  IListCtrlHocProps,
+  ISelectCtrlHocInjectProps,
+  ISelectCtrlHocParams,
+  IContextHocFullParams,
+  TSelectCtrlHocComponent,
+  ISelectCtrlHocProps,
   IModalTriggerOpts,
   ICommonObj,
   TIdSelectCtrlHocComponent,
@@ -18,7 +18,7 @@ import { StandContext } from '../../const';
 
 import styles from '../styles';
 
-interface IListCtrlState {
+interface ISelectCtrlState {
   modalVisible: boolean | undefined;
 }
 
@@ -83,11 +83,11 @@ function defaultModalTriggerRender<R>(opts: IModalTriggerOpts<R>) {
 
 export default function<
   R extends ICommonObj = any,
-  P extends IListCtrlHocInjectProps<R> = any
->(hocParams: IListCtrlHocParams<R>) {
+  P extends ISelectCtrlHocInjectProps<R> = any
+>(hocParams: ISelectCtrlHocParams<R>) {
   const { ...restHocParams } = hocParams;
 
-  const defaultHocParams: IListCtrlHocParams<R> = {
+  const defaultHocParams: ISelectCtrlHocParams<R> = {
     isModalMode: true,
     isStandListCtrl: true,
     listRowSelectionSupport: true,
@@ -104,18 +104,18 @@ export default function<
     defaultHocParams.syncParamsToUrl = !restHocParams.isModalMode;
   }
 
-  type OuterCompProps = Omit<P, keyof IListCtrlHocInjectProps<R>>;
+  type OuterCompProps = Omit<P, keyof ISelectCtrlHocInjectProps<R>>;
 
   return (
     WrappedComponent: React.ComponentType<P>,
-  ): TListCtrlHocComponent<R, OuterCompProps> => {
+  ): TSelectCtrlHocComponent<R, OuterCompProps> => {
     type InnerCompProps = OuterCompProps &
-      Omit<IListCtrlHocProps<R>, keyof IRecordsHocFullParams<R>> & {
+      Omit<ISelectCtrlHocProps<R>, keyof IContextHocFullParams<R>> & {
         searchRecordsOnMount?: boolean;
         listRowSelectionSupport?: boolean;
       };
 
-    class Comp extends React.Component<InnerCompProps, IListCtrlState> {
+    class Comp extends React.Component<InnerCompProps, ISelectCtrlState> {
       static defaultProps = {
         ...defaultHocParams,
         ...restHocParams,
@@ -126,7 +126,7 @@ export default function<
 
       static getDerivedStateFromProps(
         props: InnerCompProps,
-        state: IListCtrlState,
+        state: ISelectCtrlState,
       ) {
         if ('modalVisible' in props) {
           return {
@@ -155,7 +155,10 @@ export default function<
         }
       }
 
-      componentDidUpdate(prevProps: InnerCompProps, prevState: IListCtrlState) {
+      componentDidUpdate(
+        prevProps: InnerCompProps,
+        prevState: ISelectCtrlState,
+      ) {
         const prevModalVisible = this.isModalVisible(prevProps, prevState);
         const currModalVisible = this.isModalVisible();
 
@@ -169,7 +172,7 @@ export default function<
 
       isModalVisible = (
         specProps?: InnerCompProps,
-        specState?: IListCtrlState,
+        specState?: ISelectCtrlState,
       ) => {
         const { modalVisible } = specState || this.state;
 
@@ -374,35 +377,35 @@ export default function<
       }
     }
 
-    const standHocParams: IListCtrlHocParams<R> = {
+    const standHocParams: ISelectCtrlHocParams<R> = {
       ...defaultHocParams,
       ...restHocParams,
       takeOverMount: true,
     };
 
-    const FinalComp = StandRecordsHoc<R, P>({
+    const FinalComp = StandContextHoc<R, P>({
       makeRecordModelPkgDynamic: standHocParams.isModalMode
         ? 'ListCtrl'
         : undefined,
       ...standHocParams,
-    })(Comp as any) as TListCtrlHocComponent<R, OuterCompProps>;
+    })(Comp as any) as TSelectCtrlHocComponent<R, OuterCompProps>;
 
-    const IdSelectHocParams: IListCtrlHocParams<R> = {
+    const IdSelectHocParams: ISelectCtrlHocParams<R> = {
       makeRecordModelPkgDynamic: 'IdSelectCtrl',
       ...standHocParams,
     };
 
-    FinalComp.IdSelectCtrl = (StandRecordsHoc<R, P>({
+    FinalComp.IdSelectCtrl = (StandContextHoc<R, P>({
       ...IdSelectHocParams,
       makeRecordModelPkgDynamic: 'IdSelectCtrlOuterWrapper',
       searchRecordsOnParamsChange: false,
       receiveHocParamsAsProps: false,
       receiveContextAsProps: false,
     })(
-      // First StandRecordsHoc hoc, just provide the context IdSelectCtrlHoc needs
-      IdSelectCtrlHoc<R, IListCtrlHocInjectProps<R>>()(
+      // First StandContextHoc hoc, just provide the context IdSelectCtrlHoc needs
+      IdSelectCtrlHoc<R, ISelectCtrlHocInjectProps<R>>()(
         // Second level, the real core ListHocComp
-        StandRecordsHoc<R, P>(IdSelectHocParams)(Comp as any) as any,
+        StandContextHoc<R, P>(IdSelectHocParams)(Comp as any) as any,
       ),
     ) as any) as TIdSelectCtrlHocComponent<R, OuterCompProps>;
 

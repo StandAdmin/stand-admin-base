@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-  StandListCtrlHoc,
-  StandRecordsHoc,
+  StandSelectCtrlHoc,
+  StandContextHoc,
   defineCommonHocParams,
-} from '../StandAdmin/StandRecordsHoc';
-import { useStandContext } from '../StandAdmin/StandRecordsHoc/hooks/useStandContext';
+} from '../StandAdmin/Admin';
+import { useStandContext } from '../StandAdmin/Admin/hooks/useStandContext';
 import {
   buildStandRecordModelPkg,
   buildStandConfigModelPkg,
@@ -18,8 +18,8 @@ import { IFormHistroyTriggerProps, IHistoryRecord } from './interface';
 
 import {
   ICommonObj,
-  IListCtrlHocInjectProps,
-  IRecordsHocCommonParams,
+  ISelectCtrlHocInjectProps,
+  IContextHocCommonParams,
   IStandContextProps,
 } from '../StandAdmin/interface';
 
@@ -52,7 +52,7 @@ export const recordModel = buildStandRecordModelPkg({
 });
 
 function MainComp(
-  props: IFormHistroyTriggerProps & IListCtrlHocInjectProps<IHistoryRecord>,
+  props: IFormHistroyTriggerProps & ISelectCtrlHocInjectProps<IHistoryRecord>,
 ) {
   // const { config } = useStandContext();
   return (
@@ -108,11 +108,11 @@ export const getDynamicComp = (
   }: {
     isListCtrl?: boolean;
     Comp?: React.ComponentType<any>;
-    extraHocParams?: IRecordsHocCommonParams;
+    extraHocParams?: IContextHocCommonParams;
   } = {},
 ) => {
   if (!DynamicCompCache[namespace]) {
-    const hocWrapper = isListCtrl ? StandListCtrlHoc : StandRecordsHoc;
+    const hocWrapper = isListCtrl ? StandSelectCtrlHoc : StandContextHoc;
 
     DynamicCompCache[namespace] = (hocWrapper as any)({
       ...hocParams,

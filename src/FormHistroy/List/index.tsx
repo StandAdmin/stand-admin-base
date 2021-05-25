@@ -3,19 +3,19 @@ import { Popconfirm } from 'antd';
 import {
   useStandTableList,
   getOptsForStandTableList,
-} from '../../StandAdmin/StandRecordsHoc/hooks/useStandTableList';
+} from '../../StandAdmin/Admin/hooks/useStandTableList';
 import {
   IFormHistroyTriggerProps,
   IHistoryRecord,
   ITargetFormInfo,
 } from '../interface';
 
-import { IListCtrlHocInjectProps } from '../../StandAdmin/interface';
+import { ISelectCtrlHocInjectProps } from '../../StandAdmin/interface';
 
 import { decodeFormVals } from '../../StandAdmin/utils/formEncoder';
 
 export default (
-  props: IFormHistroyTriggerProps & IListCtrlHocInjectProps<IHistoryRecord>,
+  props: IFormHistroyTriggerProps & ISelectCtrlHocInjectProps<IHistoryRecord>,
 ) => {
   const {
     targetFormInfo,

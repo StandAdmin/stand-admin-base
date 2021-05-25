@@ -1,7 +1,7 @@
 import { ConfigLoadingFld, ConfigLoadingMethod } from '../const';
 import { getConfig } from '../config';
 import { memoize, omit } from 'lodash';
-import { IRecordsHocModelParams, IStandConnectInjectProps } from '../interface';
+import { IContextHocModelParams, IStandConnectInjectProps } from '../interface';
 
 const filterState = memoize(state => {
   return omit(state, [ConfigLoadingFld]);
@@ -11,7 +11,7 @@ export const StandConnectHoc = <
   R = any,
   P extends IStandConnectInjectProps<R> = any
 >(
-  hocParams: Partial<IRecordsHocModelParams>,
+  hocParams: Partial<IContextHocModelParams>,
 ) => {
   const { getConnect } = getConfig();
 
