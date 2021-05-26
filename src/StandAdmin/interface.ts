@@ -14,7 +14,7 @@ export type TKey = string | number;
 
 export type TFnAny = (...args: any[]) => any;
 
-export type TAsyncFnAny = (...args: any[]) => Promise<any>;
+export type TAsyncFnAny<R = any> = (...args: any[]) => Promise<R>;
 
 export type TFnVoid = () => void;
 
@@ -147,7 +147,7 @@ export interface IServiceParams
     'action' | 'actionTitle' | 'payload' | 'StoreNs'
   > {
   serviceTitle: string;
-  serviceFunction: TAsyncFnAny;
+  serviceFunction: TAsyncFnAny<IResponse>;
   serviceParams: any[];
 }
 
@@ -372,7 +372,7 @@ export interface IContextMethods<R> {
     shouldRefresh: boolean,
   ) => Promise<any>;
 
-  renderPagination: (params?: PaginationProps) => void;
+  renderPagination: (params?: PaginationProps) => React.ReactNode;
 
   handleTableChange: TableProps<R>['onChange'];
   getRecordId: (record: R) => TRecordId;
@@ -466,15 +466,20 @@ export interface IBatchCheckHocProps<R> {
 export interface IBatchCheckHocInjectProps<R> {
   checkedList: R[];
   isAllChecked: (records: R[]) => boolean;
-  isRecordChecked: (record: R) => boolean;
+  isChecked: (record: R) => boolean;
   setChecked: (records: R[]) => void;
   checkAll: (records: R[]) => void;
   uncheckAll: (records: R[]) => void;
   checkReverse: (records: R[]) => void;
   clearChecked: TFnVoid;
   toggleChecked: (record: R | R[], checked: boolean) => void;
-  batchToggleChecked: (records: R[], checked: boolean) => void;
   getCheckedList: () => R[];
+
+  /** @deprecated use isChecked instead */
+  isRecordChecked: (record: R) => boolean;
+
+  /** @deprecated use toggleChecked instead */
+  batchToggleChecked: (records: R[], checked: boolean) => void;
 }
 
 export interface IActionCounterHocInjectProps {

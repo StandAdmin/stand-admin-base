@@ -82,10 +82,9 @@ export default function<R = any, P extends IBatchCheckHocInjectProps<R> = any>(
         };
       };
 
-      isAllChecked = (records: R[]) =>
-        !records.some(r => !this.isRecordChecked(r));
+      isAllChecked = (records: R[]) => !records.some(r => !this.isChecked(r));
 
-      isRecordChecked = (record: R) => {
+      isChecked = (record: R) => {
         const { checkedList } = this.state;
 
         return checkedList.some(item => this.recordMatch(item, record));
@@ -133,7 +132,7 @@ export default function<R = any, P extends IBatchCheckHocInjectProps<R> = any>(
 
       checkReverse = (records: R[]) => {
         this.setState(state => {
-          const unCheckedList = records.filter(r => !this.isRecordChecked(r));
+          const unCheckedList = records.filter(r => !this.isChecked(r));
           const newList = pullAll(state.checkedList, records).concat(
             unCheckedList,
           );
@@ -168,7 +167,7 @@ export default function<R = any, P extends IBatchCheckHocInjectProps<R> = any>(
 
         const {
           isAllChecked,
-          isRecordChecked,
+          isChecked,
           setChecked,
           checkAll,
           uncheckAll,
@@ -183,7 +182,8 @@ export default function<R = any, P extends IBatchCheckHocInjectProps<R> = any>(
           checkedList,
           setChecked,
           isAllChecked,
-          isRecordChecked,
+          isChecked,
+          isRecordChecked: isChecked,
           checkAll,
           uncheckAll,
           checkReverse,

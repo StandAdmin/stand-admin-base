@@ -997,6 +997,7 @@ export default function<
           checkedList,
           isAllChecked,
           isRecordChecked,
+          isChecked,
           setChecked,
           checkAll,
           uncheckAll,
@@ -1008,6 +1009,7 @@ export default function<
         } = this.props;
 
         return {
+          isChecked,
           checkedList,
           isAllChecked,
           isRecordChecked,
