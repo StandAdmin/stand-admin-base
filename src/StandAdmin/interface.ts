@@ -337,7 +337,10 @@ export interface IContextMethods<R> {
   searchRecords: (
     specParams?: ICommonObj,
   ) => Promise<IResponseOfSearchRecords<R>>;
-  debouncedSearchRecords: (specParams?: ICommonObj) => void;
+
+  debouncedSearchRecords: IContextMethods<R>['searchRecords'];
+  reloadSearch: IContextMethods<R>['searchRecords'];
+
   blinkRecordById: (id: TRecordId) => void;
 
   getRecord: (specParams?: TSearchParams) => Promise<R>;
@@ -374,7 +377,7 @@ export interface IContextMethods<R> {
   handleTableChange: TableProps<R>['onChange'];
   getRecordId: (record: R) => TRecordId;
   getRecordName: (record: R) => any;
-  reloadSearch: TFnVoid;
+
   getRecordModelPkg: () => IModelPkg;
   getConfigModelPkg: () => IModelPkg;
 

@@ -165,7 +165,9 @@ export default function<
 
       mountId: number = -1;
 
-      debouncedSearchRecords: (specParams?: ICommonObj) => Promise<any>;
+      debouncedSearchRecords: (
+        specParams?: ICommonObj,
+      ) => Promise<IResponseOfSearchRecords<R>>;
 
       latestSearchParams: ICommonObj;
 
@@ -174,7 +176,7 @@ export default function<
       constructor(props: any) {
         super(props);
 
-        this.debouncedSearchRecords = debounce(this.searchRecords, 10) as any;
+        this.debouncedSearchRecords = debounce(this.searchRecords, 10);
 
         this.mountId = getNewMountId();
       }
@@ -453,7 +455,7 @@ export default function<
 
       reloadSearch = () => {
         const { storeRef } = this.props;
-        this.searchRecords(storeRef.searchParams);
+        return this.searchRecords(storeRef.searchParams);
       };
 
       goSearch = async (params: ICommonObj = {}) => {
