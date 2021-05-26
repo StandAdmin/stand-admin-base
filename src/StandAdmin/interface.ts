@@ -141,7 +141,11 @@ export interface IStoreActionParams {
   successMsg?: false | string;
 }
 
-export interface IServiceParams extends Omit<IStoreActionParams, 'action'> {
+export interface IServiceParams
+  extends Omit<
+    IStoreActionParams,
+    'action' | 'actionTitle' | 'payload' | 'StoreNs'
+  > {
   serviceTitle: string;
   serviceFunction: TAsyncFnAny;
   serviceParams: any[];
@@ -326,7 +330,9 @@ export interface IContextMethods<R> {
     params: TSearchParamsOrId,
     recordFormVisibleTag?: TRecordFormVisibleTag,
   ) => void;
-  goSearch: (params?: TSearchParams) => void;
+  goSearch: (
+    params?: TSearchParams,
+  ) => Promise<IResponseOfSearchRecords<R> | string>;
   getSearchParams: (specProps?: ICommonObj) => object;
   searchRecords: (
     specParams?: ICommonObj,
@@ -349,7 +355,10 @@ export interface IContextMethods<R> {
   ) => Promise<IResponseOfAction<R>>;
 
   clearActiveRecord: TFnVoid;
+
+  /** @deprecated use hideRecordForm instead */
   hideRecordFormOnly: TFnVoid;
+
   hideRecordForm: TFnVoid;
 
   /** @deprecated use callStoreAction instead */

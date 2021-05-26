@@ -483,11 +483,10 @@ export default function<
 
           if (isQueryParamsEqual(oldQueryParams, newQueryParams)) {
             if (passSearchWhenParamsEqual) {
-              return;
+              return Promise.resolve('passSearchWhenParamsEqual');
             }
 
-            this.searchRecords(params);
-            return;
+            return this.searchRecords(params);
           }
 
           const searchQuery = [toUrlQuery(newQueryParams, urlQueryOpts)];
@@ -515,12 +514,10 @@ export default function<
             search: `?${searchQuery.join('&')}`,
           });
 
-          this.searchRecords(newQueryParams);
-
-          return;
+          return this.searchRecords(newQueryParams);
         }
 
-        this.searchRecords(params);
+        return this.searchRecords(params);
       };
 
       showEmptyRecordForm = () => {
