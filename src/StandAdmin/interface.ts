@@ -237,9 +237,14 @@ export interface IContextHocCommonParams extends IContextHocModelParams {
   placeholderIfConfigLoading?: boolean | React.ReactNode;
 
   /**
-   * StandContext will be passed in props, default true
+   * StandContext will be passed in props
    */
   receiveContextAsProps?: boolean | (keyof IStandContextProps)[];
+
+  /**
+   * HocParams will be passed in props
+   */
+  receiveHocParamsAsProps?: boolean | (keyof IContextHocFullParams)[];
 
   /**
    * The className for the outer container wrapper
@@ -263,10 +268,6 @@ export interface IContextHocCommonParams extends IContextHocModelParams {
 }
 export interface IContextHocFullParams<R = any>
   extends IContextHocCommonParams {
-  /**
-   * HocParams will be passed in props, default true
-   */
-  receiveHocParamsAsProps?: boolean | (keyof IContextHocFullParams)[];
   updateSearchParamsEvenError?: boolean;
   passSearchWhenParamsEqual?: boolean;
   passSearchUpdateIfStoreStale?: boolean;
@@ -558,8 +559,8 @@ export interface IUseStandSearchFormResult<R> {
   };
   config: ICommonObj;
   context: IStandContextProps<R>;
-  form: FormInstance;
-  onFinish: (values: ICommonObj) => void;
+  form: IUseStandSearchFormResult<R>['formProps']['form'];
+  onFinish: IUseStandSearchFormResult<R>['formProps']['onFinish'];
   submitForm: TFnVoid;
   resetForm: TFnVoid;
   FormItem: typeof FormItem;
@@ -625,5 +626,5 @@ export interface IUseStandTableListResult<R> {
   tableListStyles: typeof standStyles;
   tableListProps: TableProps<R>;
   searchLoading: boolean;
-  standRender: (params: IStandTableRenderParams<R>) => React.ReactElement;
+  standRender: (params: IStandTableRenderParams<R>) => React.ReactNode;
 }

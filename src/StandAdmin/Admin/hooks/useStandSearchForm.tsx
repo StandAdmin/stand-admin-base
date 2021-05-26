@@ -21,11 +21,12 @@ import {
 } from '../../interface';
 
 export interface IStandSearchFormOpts {
+  formIdTag?: string;
   defaultSearchParams?: TSearchParams;
   searchParamsToValues?: (params: TSearchParams) => TCommonObjOrEmpty;
   searchParamsFromValues?: (
     values: ICommonObj,
-    searchParams?: TSearchParams,
+    searchParams: TSearchParams,
   ) => TCommonObjOrEmpty;
   disabledSearchParams?: string[];
 }
@@ -74,6 +75,7 @@ export function useStandSearchForm<R extends ICommonObj = any>(
     searchParamsToValues = identity,
     searchParamsFromValues = identity,
     disabledSearchParams,
+    formIdTag = 'Search',
   } = stOpts;
 
   const context = useStandContext<R>();
@@ -168,7 +170,7 @@ export function useStandSearchForm<R extends ICommonObj = any>(
     },
   );
 
-  const formId = `${formNamePrefix}_${StoreNs}_Search`;
+  const formId = `${formNamePrefix}_${StoreNs}_${formIdTag}`;
 
   const renderFormHistroyTrigger = usePersistFn(
     (renderOpts: TRenderFormHistroyTriggerOpts) => {

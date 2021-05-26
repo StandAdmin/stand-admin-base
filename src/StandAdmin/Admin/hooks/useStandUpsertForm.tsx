@@ -19,6 +19,7 @@ import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 import FormHistroyTrigger from '../../../FormHistroy/trigger';
 
 export interface IStandUpsertFormOpts<R> {
+  formIdTag?: string;
   // form?: any;
   /**
    * 默认的表单数据
@@ -130,6 +131,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     submitValues,
     onSuccess,
     isModalVisible: origIsModalVisible = isTrue,
+    formIdTag = 'Upsert',
   } = stOpts;
 
   const context: IStandContextProps<R> = useStandContext<R>();
@@ -261,7 +263,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
 
   const activeRecordName = getRecordName(activeRecord);
 
-  const formId = `${formNamePrefix}_${StoreNs}_Upsert${
+  const formId = `${formNamePrefix}_${StoreNs}_${formIdTag}${
     typeof recordFormVisibleTag !== 'boolean' ? '_' + recordFormVisibleTag : ''
   }`;
 

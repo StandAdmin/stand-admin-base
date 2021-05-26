@@ -122,8 +122,6 @@ export default function<
     receiveHocParamsAsProps: [
       'defaultSearchParams',
       'specSearchParams',
-      'sorterSearchParams',
-      'filterSearchParams',
       'listRowSelectionSupport',
     ],
     listRowSelectionSupport: false,
