@@ -153,7 +153,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     defaultValues,
     recordToValues = identity,
     recordFromValues = identity,
-    submitValues,
+    submitValues = defaultSubmitValues,
     onSuccess,
     isModalVisible: origIsModalVisible = isTrue,
     formIdTag = 'Upsert',
@@ -243,10 +243,14 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
   const resetForm = usePersistFn(() => form.resetFields());
 
   const onFinish = usePersistFn(values =>
-    (submitValues || defaultSubmitValues)(
-      recordFromValues(values, activeRecord),
-      { config, context, activeRecord, isUpdate, addRecord, updateRecord },
-    ).then(resp => {
+    submitValues(recordFromValues(values, activeRecord), {
+      config,
+      context,
+      activeRecord,
+      isUpdate,
+      addRecord,
+      updateRecord,
+    }).then(resp => {
       if (resp && resp.success) {
         if (!isUpdate) {
           resetForm();
