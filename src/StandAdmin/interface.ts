@@ -626,5 +626,5 @@ export interface IUseStandTableListResult<R> {
   tableListStyles: typeof standStyles;
   tableListProps: TableProps<R>;
   searchLoading: boolean;
-  standRender: (params: IStandTableRenderParams<R>) => React.ReactNode;
+  standRender: (params: IStandTableRenderParams<R>) => JSX.Element;
 }

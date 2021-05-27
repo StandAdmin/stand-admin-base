@@ -2,8 +2,9 @@ import React from 'react';
 import {
   StandSelectCtrlHoc,
   StandContextHoc,
-  defineCommonHocParams,
+  defineContextHocParams,
 } from '../StandAdmin/Admin';
+
 import { useStandContext } from '../StandAdmin/Admin/hooks/useStandContext';
 import {
   buildStandRecordModelPkg,
@@ -84,7 +85,7 @@ export function RecordFormWrapper(
   );
 }
 
-const hocParams = defineCommonHocParams({
+const hocParams = defineContextHocParams({
   recordModel,
   configModel,
 

@@ -18,6 +18,31 @@ import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 
 import FormHistroyTrigger from '../../../FormHistroy/trigger';
 
+function defaultSubmitValues<R extends ICommonObj = any>(
+  values: TCommonObjOrEmpty,
+  options: {
+    config: TCommonObjOrEmpty;
+    context: IStandContextProps;
+    activeRecord: R;
+    isUpdate: boolean;
+    addRecord: IStandContextProps<R>['addRecord'];
+    updateRecord: IStandContextProps<R>['updateRecord'];
+  },
+) {
+  const { isUpdate, addRecord, updateRecord, activeRecord, context } = options;
+
+  const { idFieldName, getRecordId } = context;
+
+  if (isUpdate) {
+    return updateRecord({
+      [idFieldName]: getRecordId(activeRecord),
+      ...values,
+    } as R);
+  }
+
+  return addRecord(values as any);
+}
+
 export interface IStandUpsertFormOpts<R> {
   formIdTag?: string;
   // form?: any;
@@ -41,13 +66,13 @@ export interface IStandUpsertFormOpts<R> {
    */
   recordFromValues?: (
     values: any,
-    activeRecord?: TCommonObjOrEmpty,
+    activeRecord: TCommonObjOrEmpty,
   ) => TCommonObjOrEmpty;
 
   /**
    * 默认调用 addRecord/updateRecord
    */
-  submitValues?: (values: TCommonObjOrEmpty) => Promise<any>;
+  submitValues?: typeof defaultSubmitValues;
 
   /**
    * submitValues 成功后的回调
@@ -138,7 +163,6 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
 
   const {
     StoreNsTitle,
-    idFieldName,
     getRecordId,
     getRecordName,
     nameFieldName,
@@ -216,22 +240,12 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
 
   const isUpdate = activeRecordId !== undefined && activeRecordId !== null;
 
-  const defaultSubmitValues = usePersistFn(values => {
-    if (isUpdate) {
-      return updateRecord({
-        [idFieldName]: activeRecord && activeRecord[idFieldName],
-        ...values,
-      });
-    }
-
-    return addRecord(values);
-  });
-
   const resetForm = usePersistFn(() => form.resetFields());
 
   const onFinish = usePersistFn(values =>
     (submitValues || defaultSubmitValues)(
       recordFromValues(values, activeRecord),
+      { config, context, activeRecord, isUpdate, addRecord, updateRecord },
     ).then(resp => {
       if (resp && resp.success) {
         if (!isUpdate) {
@@ -252,7 +266,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
   );
 
   const handleCancel = usePersistFn(() => {
-    context.hideRecordFormOnly();
+    context.hideRecordForm();
   });
 
   const clearActiveRecord = usePersistFn(() => {
