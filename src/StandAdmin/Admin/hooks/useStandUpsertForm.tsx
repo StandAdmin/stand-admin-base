@@ -11,8 +11,10 @@ import {
   IStandContextProps,
   TSearchParams,
   TFnParamsFilter,
+  TRecordFormVisibleTag,
   TRenderFormHistroyTriggerOpts,
   IFormHistroyTriggerProps,
+  IResponse,
 } from '../../interface';
 import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
 
@@ -77,12 +79,12 @@ export interface IStandUpsertFormOpts<R> {
   /**
    * submitValues 成功后的回调
    */
-  onSuccess?: (resp: ICommonObj) => void;
+  onSuccess?: (resp: IResponse) => void;
 
   /**
    * 判断 Upsert Modal的显隐, recordFormVisibleTag 来源于 showRecordForm调用传递的参数
    */
-  isModalVisible?: (recordFormVisibleTag: boolean | string | number) => boolean;
+  isModalVisible?: (recordFormVisibleTag: TRecordFormVisibleTag) => boolean;
 }
 
 export interface IPropsForStandUpsertForm {
@@ -94,6 +96,14 @@ export interface IPropsForStandUpsertForm {
 
 export interface IExtraOpts {
   defaultValues?: IStandUpsertFormOpts<any>['defaultValues'];
+}
+
+function stringifyRecordFormVisibleTag(tag: TRecordFormVisibleTag): string {
+  if (typeof tag === 'object') {
+    return encodeFormVals(tag);
+  }
+
+  return String(tag);
 }
 
 export function getOptsForStandUpsertForm(
@@ -136,7 +146,7 @@ export function getOptsForStandUpsertForm(
   };
 }
 
-const isTrue = (v: any) => !!v;
+const isWeakTrue = (v: any) => !!v;
 
 export function useStandUpsertForm<R extends ICommonObj = any>(
   opts: IStandUpsertFormOpts<R> | IPropsForStandUpsertForm,
@@ -155,7 +165,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     recordFromValues = identity,
     submitValues = defaultSubmitValues,
     onSuccess,
-    isModalVisible: origIsModalVisible = isTrue,
+    isModalVisible: origIsModalVisible = isWeakTrue,
     formIdTag = 'Upsert',
   } = stOpts;
 
@@ -282,7 +292,9 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
   const activeRecordName = getRecordName(activeRecord);
 
   const formId = `${formNamePrefix}_${StoreNs}_${formIdTag}${
-    typeof recordFormVisibleTag !== 'boolean' ? '_' + recordFormVisibleTag : ''
+    typeof recordFormVisibleTag !== 'boolean'
+      ? '_' + stringifyRecordFormVisibleTag(recordFormVisibleTag)
+      : ''
   }`;
 
   const renderFormHistroyTrigger = usePersistFn(

@@ -28,7 +28,7 @@ export type TEmpty = undefined | null;
 
 export type TCommonObjOrEmpty = ICommonObj | TEmpty;
 
-export type TRecordFormVisibleTag = boolean | TKey;
+export type TRecordFormVisibleTag = boolean | TKey | ICommonObj;
 
 export type TSearchParams = ICommonObj;
 
@@ -376,7 +376,7 @@ export interface IContextMethods<R> {
   renderPagination: (params?: PaginationProps) => React.ReactNode;
 
   handleTableChange: TableProps<R>['onChange'];
-  getRecordId: (record: R) => TRecordId;
+  getRecordId: (record: R) => any;
   getRecordName: (record: R) => any;
 
   getRecordModelPkg: () => IModelPkg;
@@ -607,8 +607,10 @@ export interface IUseStandUpsertFormResult<R> {
   onFinish: (values: ICommonObj) => void;
   submitForm: TFnVoid;
   resetForm: TFnVoid;
-  handleCancel: TFnVoid;
   clearActiveRecord: TFnVoid;
+
+  /** @deprecated use modalProps.onCancel instead */
+  handleCancel: TFnVoid;
 }
 
 export interface IStandTableRenderParams<R> extends TableProps<R> {

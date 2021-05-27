@@ -8,7 +8,7 @@ export default {
   /**
    * map({key:value}) 转 option({value:key,label:value})
    */
-  mapToOptions(obj: ICommonObj, opts: { valueFilter: (val: any) => any }) {
+  mapToOptions(obj: ICommonObj, opts?: { valueFilter: (val: any) => any }) {
     const { valueFilter = identity } = opts || {};
 
     return Object.keys(obj).map(key => ({
@@ -19,8 +19,10 @@ export default {
   /**
    * array([item])转option({value:item,label:item})
    */
-  arrayToOptions(arr: any[]) {
-    return arr.map(value => ({ value, label: value }));
+  arrayToOptions(arr: any[], opts?: { valueFilter: (val: any) => any }) {
+    const { valueFilter = identity } = opts || {};
+
+    return arr.map(value => ({ value: valueFilter(value), label: value }));
   },
 
   stringifyQueryParams: toUrlQuery,

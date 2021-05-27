@@ -132,23 +132,6 @@ export function handleCommonRespError(
   });
 }
 
-export function getDynamicModelPkg(modelPkg: IModelPkg, nsPre: string) {
-  const { modelOpts, StoreNs } = modelPkg;
-
-  if (!modelOpts) {
-    throw new Error('modelOpts is missing');
-  }
-
-  const newStoreNs = `${nsPre || `dynamic${getAutoId()}`}-${StoreNs}`;
-
-  return {
-    ...modelPkg,
-    StoreNs: newStoreNs,
-    default: getStandModel({ ...modelPkg.modelOpts, StoreNs: newStoreNs }),
-    isDynamic: true,
-  };
-}
-
 export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
   const {
     idFieldName = 'id',
@@ -732,6 +715,35 @@ export function buildStandRecordModelPkg<R = any>(
     modelOpts: opts,
     default: getStandModel<R>({ ...opts, StoreNs }),
   };
+}
+
+export function cloneModelPkg<R>(
+  modelPkg: IModelPkg,
+  nsTag: string = '_Clone',
+  opts?: Omit<IStandModelOptions<R>, 'StoreNs'>,
+) {
+  const { modelOpts, StoreNs } = modelPkg;
+
+  if (!modelOpts) {
+    throw new Error('modelOpts is missing');
+  }
+
+  const newStoreNs = `${nsTag}_A${`${getAutoId()}`}-${StoreNs}`;
+
+  const newModelOpts: IStandModelOptions<R> = {
+    ...modelPkg.modelOpts,
+    ...opts,
+    StoreNs: newStoreNs,
+  };
+
+  return buildStandRecordModelPkg(newModelOpts);
+}
+
+export function getDynamicModelPkg(
+  modelPkg: IModelPkg,
+  nsTag: string = '_Dynamic',
+) {
+  return cloneModelPkg(modelPkg, nsTag, { isDynamic: true });
 }
 
 export function buildStandConfigModelPkg(
