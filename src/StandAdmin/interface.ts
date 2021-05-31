@@ -259,7 +259,7 @@ export interface IContextHocCommonParams extends IContextHocModelParams {
   listRowSelectionSupport?: boolean;
 
   /**
-   * If true, a new recordModel with new namespace will be created
+   * A new recordModel with new namespace will be created if not empty
    */
   makeRecordModelPkgDynamic?: string;
 
