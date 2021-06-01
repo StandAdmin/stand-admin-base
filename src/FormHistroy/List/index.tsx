@@ -12,7 +12,7 @@ import {
 
 import { ISelectCtrlHocInjectProps } from '../../StandAdmin/interface';
 
-import { decodeFormVals } from '../../StandAdmin/utils/formEncoder';
+import { decodeFormValues } from '../../StandAdmin/utils/formEncoder';
 
 export default (
   props: IFormHistroyTriggerProps & ISelectCtrlHocInjectProps<IHistoryRecord>,
@@ -38,7 +38,7 @@ export default (
   const { deleteRecord, idFieldName, getRecordId, getRecordName } = context;
 
   const recoverRecord = (record: IHistoryRecord) => {
-    const { decode = decodeFormVals } = formValuesEncoder || {};
+    const { decode = decodeFormValues } = formValuesEncoder || {};
 
     const formValues = decode(record.formVals);
 

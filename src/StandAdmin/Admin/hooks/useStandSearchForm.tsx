@@ -6,7 +6,7 @@ import { FormInstance, FormItemProps } from 'antd/es/form';
 // import classNames from 'classnames';
 import { identity, isEqual } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
-import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
+import { encodeFormValues, decodeFormValues } from '../../utils/formEncoder';
 import { useStandContext } from './useStandContext';
 import FormHistroyTrigger from '../../../FormHistroy/trigger';
 
@@ -176,7 +176,10 @@ export function useStandSearchForm<R extends ICommonObj = any>(
     (renderOpts: TRenderFormHistroyTriggerOpts) => {
       const formHistroyTriggerProps: IFormHistroyTriggerProps = {
         targetFormInfo: { formId, form, title: `${StoreNsTitle}查询` },
-        formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
+        formValuesEncoder: {
+          encode: encodeFormValues,
+          decode: decodeFormValues,
+        },
         historyRecordInfo: { nameFieldName },
         actionHooks: { afterRestore: submitForm },
       };

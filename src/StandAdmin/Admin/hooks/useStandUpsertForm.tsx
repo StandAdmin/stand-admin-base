@@ -16,7 +16,7 @@ import {
   IFormHistroyTriggerProps,
   IResponse,
 } from '../../interface';
-import { encodeFormVals, decodeFormVals } from '../../utils/formEncoder';
+import { encodeFormValues, decodeFormValues } from '../../utils/formEncoder';
 
 import FormHistroyTrigger from '../../../FormHistroy/trigger';
 
@@ -100,7 +100,7 @@ export interface IExtraOpts {
 
 function stringifyRecordFormVisibleTag(tag: TRecordFormVisibleTag): string {
   if (typeof tag === 'object') {
-    return encodeFormVals(tag);
+    return encodeFormValues(tag);
   }
 
   return String(tag);
@@ -301,7 +301,10 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     (renderOpts: TRenderFormHistroyTriggerOpts) => {
       const formHistroyTriggerProps: IFormHistroyTriggerProps = {
         targetFormInfo: { formId, form, title: `${StoreNsTitle}` },
-        formValuesEncoder: { encode: encodeFormVals, decode: decodeFormVals },
+        formValuesEncoder: {
+          encode: encodeFormValues,
+          decode: decodeFormValues,
+        },
         historyRecordInfo: { nameFieldName },
       };
 

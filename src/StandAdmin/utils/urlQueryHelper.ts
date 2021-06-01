@@ -4,7 +4,7 @@ import { StateParamPrefix } from '../const';
 
 import { paramToUrl, paramFromUrl } from './urlParams';
 
-import { encodeFormVals, decodeFormVals } from './formEncoder';
+import { encodeFormValues, decodeFormValues } from './formEncoder';
 
 import { ICommonObj } from '../interface';
 
@@ -21,7 +21,7 @@ export function toUrlQuery(
 ) {
   const result: ICommonObj = {};
 
-  const params = encodeFormVals(origParams);
+  const params = encodeFormValues(origParams);
 
   if (ns) {
     result[ns] = JSON.stringify(params);
@@ -64,5 +64,5 @@ export function fromUrlQuery(
     });
   }
 
-  return decodeFormVals(result);
+  return decodeFormValues(result);
 }

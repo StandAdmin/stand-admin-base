@@ -17,7 +17,8 @@ const converterList = [
     },
   },
 ];
-export function encodeFormVals(vals: any) {
+
+export function encodeFormValues(vals: any) {
   return cloneDeepWith(vals, (value: any) => {
     const matchItem = converterList.find(({ encode: { test } }) => test(value));
 
@@ -29,7 +30,7 @@ export function encodeFormVals(vals: any) {
   });
 }
 
-export function decodeFormVals(vals: any) {
+export function decodeFormValues(vals: any) {
   return cloneDeepWith(vals, (value: any) => {
     const matchItem = converterList.find(({ decode: { test } }) => test(value));
 

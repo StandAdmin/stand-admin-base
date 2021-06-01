@@ -6,7 +6,7 @@ import {
   IFormHistroyTriggerProps,
   IHistoryRecord,
 } from '../interface';
-import { encodeFormVals } from '../../StandAdmin/utils/formEncoder';
+import { encodeFormValues } from '../../StandAdmin/utils/formEncoder';
 import {
   useStandUpsertForm,
   getOptsForStandUpsertForm,
@@ -75,7 +75,7 @@ export default (props: IFormHistroyTriggerProps) => {
   const { nameFieldName } = historyRecordInfo;
 
   const getFormVals = () => {
-    const { encode = encodeFormVals } = formValuesEncoder || {};
+    const { encode = encodeFormValues } = formValuesEncoder || {};
     return encode(targetForm.getFieldsValue());
   };
 

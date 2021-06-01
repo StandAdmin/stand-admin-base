@@ -4,6 +4,8 @@ import { ICommonObj } from '../interface';
 
 import { toUrlQuery, fromUrlQuery } from './urlQueryHelper';
 
+import { encodeFormValues, decodeFormValues } from './formEncoder';
+
 export default {
   /**
    * map({key:value}) 转 option({value:key,label:value})
@@ -27,4 +29,6 @@ export default {
 
   stringifyQueryParams: toUrlQuery,
   parseQueryString: fromUrlQuery,
+  encodeFormValues,
+  decodeFormValues,
 };
