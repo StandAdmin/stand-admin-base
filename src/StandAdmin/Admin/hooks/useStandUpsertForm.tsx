@@ -15,6 +15,7 @@ import {
   TRenderFormHistroyTriggerOpts,
   IFormHistroyTriggerProps,
   IResponse,
+  IStoreRef,
 } from '../../interface';
 import { encodeFormValues, decodeFormValues } from '../../utils/formEncoder';
 
@@ -29,6 +30,7 @@ function defaultSubmitValues<R extends ICommonObj = any>(
     isUpdate: boolean;
     addRecord: IStandContextProps<R>['addRecord'];
     updateRecord: IStandContextProps<R>['updateRecord'];
+    recordFormVisibleTag: IStoreRef<R>['recordFormVisibleTag'];
   },
 ) {
   const { isUpdate, addRecord, updateRecord, activeRecord, context } = options;
@@ -260,6 +262,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
       isUpdate,
       addRecord,
       updateRecord,
+      recordFormVisibleTag,
     }).then(resp => {
       if (resp && resp.success) {
         if (!isUpdate) {

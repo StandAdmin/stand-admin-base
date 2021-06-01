@@ -286,7 +286,7 @@ export interface IContextHocFullParams<R = any>
   finalSearchParamsFilter?: (params?: TSearchParams) => TSearchParams;
   formNamePrefix?: string;
   onRecordFormVisibleTagChange?: (
-    recordFormVisibleTag: TRecordFormVisibleTag,
+    recordFormVisibleTag: IStoreRef<R>['recordFormVisibleTag'],
   ) => void;
   onRefresh?: TFnVoid;
   callStoreActionPayloadFilter?: (action: string, payload: any) => void;
@@ -325,11 +325,11 @@ export interface IContextMethods<R> {
   showEmptyRecordForm: TFnVoid;
   showRecordForm: (
     activeRecord?: R | TEmpty,
-    recordFormVisibleTag?: TRecordFormVisibleTag,
+    recordFormVisibleTag?: IStoreRef<R>['recordFormVisibleTag'],
   ) => void;
   loadAndShowRecordForm: (
     params: TSearchParamsOrId,
-    recordFormVisibleTag?: TRecordFormVisibleTag,
+    recordFormVisibleTag?: IStoreRef<R>['recordFormVisibleTag'],
   ) => void;
   goSearch: (
     params?: TSearchParams,
@@ -588,7 +588,7 @@ export interface IUseStandUpsertFormResult<R> {
   /**
    * Normally passed by showRecordForm, and used as match condition in isModalVisible
    */
-  recordFormVisibleTag: TRecordFormVisibleTag;
+  recordFormVisibleTag: IStoreRef<R>['recordFormVisibleTag'];
 
   getInitValues: (record?: R) => ICommonObj;
   getInitValuesByRecord: (record: R) => ICommonObj;
