@@ -832,7 +832,10 @@ export default function<
         filters?: any,
         sorter?: any,
       ) => {
-        const { searchParams = {} } = this.props.storeRef;
+        const {
+          searchParams = {},
+          pagination: { current: origCurrent, pageSize: origPageSize },
+        } = this.props.storeRef;
 
         const sorterParams = sorter
           ? this.getSorterSearchParams(this.props, sorter)
@@ -846,8 +849,8 @@ export default function<
           ...searchParams,
           ...sorterParams,
           ...filterParams,
-          pageNum: current,
-          pageSize,
+          pageNum: current || origCurrent,
+          pageSize: pageSize || origPageSize,
         };
 
         const withUpdates = !this.props.isSearchParamsEqual(
