@@ -141,6 +141,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
       pageSize: 'data.pageSize',
       total: 'data.total',
       list: 'data.list',
+      extraPayload: 'data.extraPayload',
       errorMsg: defaultErrorMsgFields,
       permissionApplyUrl: defaultPermissionApplyUrlFields,
     },
@@ -203,6 +204,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
       activeRecord: null,
       removingRecord: null,
       records: [],
+      extraPayload: null,
       searchParams: {},
       searchLoading: false,
       pagination: { total: 0, current: 1, pageSize: 10 },
@@ -332,6 +334,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
             const {
               list = [],
               total: origTotal,
+              extraPayload,
               pageSize = reqParams.pageSize,
               pageNum = reqParams.pageNum || 1,
             } = getCommonFlds(response);
@@ -341,6 +344,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
             Object.assign(newPayload, {
               searchParams: params,
               records: list,
+              extraPayload,
               pagination: { current: pageNum, pageSize, total },
             });
           }
@@ -609,6 +613,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
           activeRecord: null,
           removingRecord: null,
           records: [],
+          extraPayload: null,
           searchParams: {},
           pagination: { total: 0, current: 1, pageSize: 10 },
         };
