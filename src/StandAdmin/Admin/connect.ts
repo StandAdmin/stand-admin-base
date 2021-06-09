@@ -1,4 +1,4 @@
-import { ConfigLoadingFld, ConfigLoadingMethod } from '../const';
+import { ConfigLoadingFld, ConfigLoadMethod } from '../const';
 import { getConfig } from '../config';
 import { memoize, omit } from 'lodash';
 import { IContextHocModelParams, IStandConnectInjectProps } from '../interface';
@@ -48,7 +48,7 @@ export const StandConnectHoc = <
             !!configStoreRefState[ConfigLoadingFld] ||
             (loading &&
               loading.effects &&
-              loading.effects[`${ConfigStoreNs}/${ConfigLoadingMethod}`]),
+              loading.effects[`${ConfigStoreNs}/${ConfigLoadMethod}`]),
         };
       },
     )(WrappedComponent as any);

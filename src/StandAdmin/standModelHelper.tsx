@@ -2,7 +2,12 @@ import React from 'react';
 import { notification, Modal } from 'antd';
 import { merge, get } from 'lodash';
 // import Localforage from 'localforage';
-import { ConfigLoadingFld, ModelNsPre, ConfigLoadingMethod } from './const';
+import {
+  ConfigLoadingFld,
+  ConfigUpdateMethod,
+  ModelNsPre,
+  ConfigLoadMethod,
+} from './const';
 
 import { getAutoIdGenerator, markAndMatch } from './utils/util';
 
@@ -19,6 +24,7 @@ import {
   IResponseOfGetRecord,
   TFldsPathInRespMapValue,
   TFldsPathInRespMapKeys,
+  TStandConfigGetConfigItem,
 } from './interface';
 import { logWarn } from './utils/logUtils';
 
@@ -651,11 +657,32 @@ export function getStandConfigModel(opts: IStandConfigModelOptions): Model {
     namespace: StoreNs,
     state: { [ConfigLoadingFld]: true },
     effects: {
-      *[ConfigLoadingMethod](_: any, { all, call, put }: any) {
-        put({
-          type: 'saveState',
-          payload: { [ConfigLoadingFld]: true },
+      *[ConfigLoadMethod](_: any, { all, call, put }: any) {
+        const configObj: ICommonObj = yield put.resolve({
+          type: ConfigUpdateMethod,
+          getConfig,
+          updateConfigLoading: true,
         });
+
+        return configObj;
+      },
+
+      *[ConfigUpdateMethod](
+        {
+          getConfig,
+          updateConfigLoading = true,
+        }: {
+          getConfig: TStandConfigGetConfigItem;
+          updateConfigLoading: boolean;
+        },
+        { all, call, put }: any,
+      ) {
+        if (updateConfigLoading) {
+          yield put({
+            type: 'saveState',
+            payload: { [ConfigLoadingFld]: true },
+          });
+        }
 
         const results: ICommonObj[] = yield all(
           (Array.isArray(getConfig) ? getConfig : [getConfig]).map(item =>
@@ -663,16 +690,22 @@ export function getStandConfigModel(opts: IStandConfigModelOptions): Model {
           ),
         );
 
+        const configObj: ICommonObj = results.reduce((map, item) => {
+          Object.assign(map, item);
+          return map;
+        }, {});
+
+        const payload = {
+          ...configObj,
+          ...(updateConfigLoading ? { [ConfigLoadingFld]: false } : undefined),
+        };
+
         yield put({
           type: 'saveState',
-          payload: results.reduce(
-            (map, item) => {
-              Object.assign(map, item);
-              return map;
-            },
-            { [ConfigLoadingFld]: false },
-          ),
+          payload,
         });
+
+        return configObj;
       },
     },
     reducers: {
@@ -686,7 +719,7 @@ export function getStandConfigModel(opts: IStandConfigModelOptions): Model {
     subscriptions: {
       setup({ dispatch }: any) {
         dispatch({
-          type: ConfigLoadingMethod,
+          type: ConfigLoadMethod,
         });
       },
     },

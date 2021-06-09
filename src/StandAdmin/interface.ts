@@ -118,12 +118,16 @@ export interface IModelPkg<R = any> {
 
 export type TStandConfigGetConfigFn = () => Promise<ICommonObj>;
 
-export type TStandConfigGetConfigItem = TStandConfigGetConfigFn | ICommonObj;
+type TStandConfigGetConfigSingleItem = TStandConfigGetConfigFn | ICommonObj;
+
+export type TStandConfigGetConfigItem =
+  | TStandConfigGetConfigSingleItem
+  | TStandConfigGetConfigSingleItem[];
 
 export interface IStandConfigModelOptions {
   StoreNsTitle?: string;
   StoreNs?: string;
-  getConfig?: TStandConfigGetConfigItem | TStandConfigGetConfigItem[];
+  getConfig?: TStandConfigGetConfigItem;
 }
 
 export interface IStoreActionParams {
@@ -227,9 +231,14 @@ export interface IContextHocCommonParams extends IContextHocModelParams {
   filterSearchParams?: TSearchParams | TFnParamsFilter;
 
   /**
-   * Do searchRecords in didMount, default true
+   *  Trigger searchRecord in didMount, default true
    */
   searchRecordsOnMount?: boolean;
+
+  /**
+   *  Trigger searchRecord if params change, default true
+   */
+  searchRecordsOnParamsChange?: boolean;
 
   /**
    * If configModel is loading, render this placeholder
@@ -272,7 +281,6 @@ export interface IContextHocFullParams<R = any>
   passSearchWhenParamsEqual?: boolean;
   passSearchUpdateIfStoreStale?: boolean;
   takeOverMount?: boolean;
-  searchRecordsOnParamsChange?: boolean;
   searchRecordsOnRefresh?: boolean;
   isSearchParamsEqual?: (paramsA: ICommonObj, paramsB: ICommonObj) => boolean;
   successHandler?: (params: {
@@ -388,6 +396,11 @@ export interface IContextMethods<R> {
   callService: (params: IServiceParams) => Promise<IResponse>;
   renderEmpty: () => React.ReactNode;
   getLatestSearchParams: () => TSearchParams;
+
+  updateConfig: (
+    getConfig: TStandConfigGetConfigItem,
+    updateConfigLoading?: boolean,
+  ) => Promise<ICommonObj>;
 }
 
 export interface IContextHocProps<R>

@@ -399,6 +399,7 @@ export default function<
       ...IdSelectHocParams,
       makeRecordModelPkgDynamic: 'IdSelectCtrlOuterWrapper',
       searchRecordsOnParamsChange: false,
+      searchRecordsOnMount: false,
       receiveHocParamsAsProps: false,
       receiveContextAsProps: false,
     })(

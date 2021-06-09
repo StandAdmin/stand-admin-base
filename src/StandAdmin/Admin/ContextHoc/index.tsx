@@ -13,7 +13,7 @@ import { getConfig } from '../../config';
 import { logInfo } from '../../utils/logUtils';
 import ActionCounterHoc from '../../ActionCounterHoc';
 import BatchCheckHoc from '../../BatchCheckHoc';
-import { StandContext } from '../../const';
+import { StandContext, ConfigUpdateMethod } from '../../const';
 import {
   EmptyConfigModel,
   EmptyRecordModel,
@@ -40,6 +40,7 @@ import {
   TSearchParams,
   IActionCounterHocInjectProps,
   IBatchCheckHocInjectProps,
+  TStandConfigGetConfigItem,
   //IStandConnectHocProps,
 } from '../../interface';
 import {
@@ -915,6 +916,19 @@ export default function<
         );
       };
 
+      updateConfig = (
+        getConfig: TStandConfigGetConfigItem,
+        updateConfigLoading: boolean = false,
+      ): Promise<ICommonObj> => {
+        const { dispatch } = this.props;
+
+        return dispatch({
+          type: `${this.getConfigModelPkg().StoreNs}/${ConfigUpdateMethod}`,
+          getConfig,
+          updateConfigLoading,
+        }) as any;
+      };
+
       getInsMethods = (): IContextMethods<R> => {
         const {
           clearActiveRecord,
@@ -946,6 +960,7 @@ export default function<
           getRecordModelPkg,
           getConfigModelPkg,
           blinkRecordById,
+          updateConfig,
         } = this;
 
         return {
@@ -980,6 +995,7 @@ export default function<
           getRecordModelPkg,
           getConfigModelPkg,
           blinkRecordById,
+          updateConfig,
         };
       };
 
