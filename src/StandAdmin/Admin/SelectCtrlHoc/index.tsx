@@ -122,7 +122,8 @@ export default function<
       };
 
       static contextType = StandContext;
-      context!: React.ContextType<typeof StandContext>;
+
+      declare context: React.ContextType<typeof StandContext>;
 
       static getDerivedStateFromProps(
         props: InnerCompProps,
