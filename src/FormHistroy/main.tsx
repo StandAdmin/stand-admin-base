@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   StandSelectCtrlHoc,
-  StandContextHoc,
+  // StandContextHoc,
   defineContextHocParams,
 } from '../StandAdmin/Admin';
 
@@ -18,7 +18,7 @@ import RecordForm from './RecordForm';
 import { IFormHistroyTriggerProps, IHistoryRecord } from './interface';
 
 import {
-  ICommonObj,
+  TSelectCtrlHocComponent,
   ISelectCtrlHocInjectProps,
   IContextHocCommonParams,
   IStandContextProps,
@@ -97,25 +97,23 @@ const hocParams = defineContextHocParams({
   // defaultSearchParams: {},
 });
 
-const DynamicCompCache: ICommonObj = {};
+const DynamicCompCache: { [key: string]: TSelectCtrlHocComponent } = {};
 
 // 动态主组件，支持不同的数据空间
 export const getDynamicComp = (
   namespace: string,
   {
     Comp = MainComp,
-    isListCtrl = true,
     extraHocParams,
   }: {
-    isListCtrl?: boolean;
     Comp?: React.ComponentType<any>;
     extraHocParams?: IContextHocCommonParams;
   } = {},
 ) => {
   if (!DynamicCompCache[namespace]) {
-    const hocWrapper = isListCtrl ? StandSelectCtrlHoc : StandContextHoc;
+    const hocWrapper = StandSelectCtrlHoc;
 
-    DynamicCompCache[namespace] = (hocWrapper as any)({
+    DynamicCompCache[namespace] = hocWrapper({
       ...hocParams,
       makeRecordModelPkgDynamic: namespace,
       ...extraHocParams,

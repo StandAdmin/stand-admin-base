@@ -546,6 +546,9 @@ export interface ITargetFormInfo {
 }
 
 export interface IFormHistroyTriggerProps {
+  wrapperClassName?: string;
+  historySaveTrigger?: (opts: { showSaveForm: () => void }) => React.ReactNode;
+  historyListTrigger?: (opts: { showListModal: () => void }) => React.ReactNode;
   targetFormInfo: ITargetFormInfo;
   historyRecordInfo: { nameFieldName: string };
   formValuesEncoder?: {
