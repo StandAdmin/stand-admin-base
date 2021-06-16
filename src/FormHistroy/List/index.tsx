@@ -1,5 +1,6 @@
 import React from 'react';
 import { Popconfirm } from 'antd';
+import { identity } from 'lodash';
 import {
   useStandTableList,
   getOptsForStandTableList,
@@ -20,6 +21,7 @@ export default (
   const {
     targetFormInfo,
     formValuesEncoder,
+    formValuesFilter,
     toggleModalVisible,
     actionHooks,
   } = props;
@@ -40,7 +42,9 @@ export default (
   const recoverRecord = (record: IHistoryRecord) => {
     const { decode = decodeFormValues } = formValuesEncoder || {};
 
-    const formValues = decode(record.formVals);
+    const { beforeRestore = identity } = formValuesFilter || {};
+
+    const formValues = beforeRestore(decode(record.formVals));
 
     targetForm.setFieldsValue(formValues);
 

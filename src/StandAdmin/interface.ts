@@ -552,6 +552,10 @@ export interface IFormHistroyTriggerProps {
     encode?: (vals: any) => any;
     decode?: (vals: any) => any;
   };
+  formValuesFilter?: {
+    beforeSave: (vals: any) => any;
+    beforeRestore: (vals: any) => any;
+  };
   actionHooks?: { afterRestore: (vals: any) => any };
 }
 

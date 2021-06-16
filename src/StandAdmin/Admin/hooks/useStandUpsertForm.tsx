@@ -304,11 +304,11 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     (renderOpts: TRenderFormHistroyTriggerOpts) => {
       const formHistroyTriggerProps: IFormHistroyTriggerProps = {
         targetFormInfo: { formId, form, title: `${StoreNsTitle}` },
+        historyRecordInfo: { nameFieldName },
         formValuesEncoder: {
           encode: encodeFormValues,
           decode: decodeFormValues,
         },
-        historyRecordInfo: { nameFieldName },
       };
 
       return (

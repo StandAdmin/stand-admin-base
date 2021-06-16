@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Modal, Button, Input } from 'antd';
-import { cloneDeepWith } from 'lodash';
+import { cloneDeepWith, identity } from 'lodash';
 import {
   ITargetFormInfo,
   IFormHistroyTriggerProps,
@@ -68,19 +68,23 @@ const findValidName = (targetVals: any) => {
 };
 
 export default (props: IFormHistroyTriggerProps) => {
-  const { targetFormInfo, historyRecordInfo, formValuesEncoder } = props;
+  const {
+    targetFormInfo,
+    historyRecordInfo,
+    formValuesEncoder,
+    formValuesFilter,
+  } = props;
 
   const { formId, form: targetForm } = targetFormInfo as ITargetFormInfo;
 
   const { nameFieldName } = historyRecordInfo;
 
-  const getFormVals = () => {
-    const { encode = encodeFormValues } = formValuesEncoder || {};
-    return encode(targetForm.getFieldsValue());
+  const getTargetFormVals = () => {
+    return targetForm.getFieldsValue();
   };
 
   const getDefaultName = () => {
-    const targetFormVals = getFormVals();
+    const targetFormVals = getTargetFormVals();
 
     let name = targetFormVals[nameFieldName];
 
@@ -107,10 +111,14 @@ export default (props: IFormHistroyTriggerProps) => {
       recordFromValues: values => {
         const { name } = values;
 
+        const { encode = encodeFormValues } = formValuesEncoder || {};
+
+        const { beforeSave = identity } = formValuesFilter || {};
+
         return {
           name,
           formId,
-          formVals: getFormVals(),
+          formVals: encode(beforeSave(getTargetFormVals())),
         };
       },
     },
