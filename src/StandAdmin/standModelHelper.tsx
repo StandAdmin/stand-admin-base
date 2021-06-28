@@ -142,19 +142,8 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
   const {
     idFieldName = 'id',
     nameFieldName = 'name',
-    fldsPathInResp = {
-      pageNum: 'data.pageNum',
-      pageSize: 'data.pageSize',
-      total: 'data.total',
-      list: 'data.list',
-      extraPayload: 'data.extraPayload',
-      errorMsg: defaultErrorMsgFields,
-      permissionApplyUrl: defaultPermissionApplyUrlFields,
-    },
-    searchParamsMap = {
-      pageNum: 'pageNum',
-      pageSize: 'pageSize',
-    },
+    fldsPathInResp: origFldsPathInResp,
+    searchParamsMap: origSearchParamsMap,
     StoreNs = getAutoStoreNs('Record'),
     StoreNsTitle = '记录',
     searchRecords = emptySearchRecords,
@@ -168,6 +157,23 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
   if (!StoreNs) {
     throw new Error(`StoreNs should no be empty!`);
   }
+
+  const fldsPathInResp = {
+    pageNum: 'data.pageNum',
+    pageSize: 'data.pageSize',
+    total: 'data.total',
+    list: 'data.list',
+    extraPayload: 'data.extraPayload',
+    errorMsg: defaultErrorMsgFields,
+    permissionApplyUrl: defaultPermissionApplyUrlFields,
+    ...(origFldsPathInResp || undefined),
+  };
+
+  const searchParamsMap = {
+    pageNum: 'pageNum',
+    pageSize: 'pageSize',
+    ...(origSearchParamsMap || undefined),
+  };
 
   // const LSKey_SearchParams = `${StoreNs}_searchParams`;
 
