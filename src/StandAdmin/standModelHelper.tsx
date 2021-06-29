@@ -11,8 +11,6 @@ import {
 
 import { getAutoIdGenerator, markAndMatch } from './utils/util';
 
-import { Model } from 'dva';
-
 import {
   IResponse,
   TAsyncFnAny,
@@ -25,6 +23,7 @@ import {
   TFldsPathInRespMapValue,
   TFldsPathInRespMapKeys,
   TStandConfigGetConfigItem,
+  DvaModel,
 } from './interface';
 import { logWarn } from './utils/logUtils';
 
@@ -138,7 +137,7 @@ export function handleCommonRespError(
   });
 }
 
-export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
+export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
   const {
     idFieldName = 'id',
     nameFieldName = 'name',
@@ -210,7 +209,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
 
   const markTag = markAndMatch();
 
-  const interModel: Model = ({
+  const interModel: DvaModel = ({
     namespace: StoreNs,
     state: {
       mountId: null,
@@ -646,7 +645,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
     //     console.log(StoreNsTitle);
     //   },
     // },
-  } as unknown) as Model;
+  } as unknown) as DvaModel;
 
   return merge(
     interModel,
@@ -656,7 +655,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
   );
 }
 
-export function getStandConfigModel(opts: IStandConfigModelOptions): Model {
+export function getStandConfigModel(opts: IStandConfigModelOptions): DvaModel {
   const { getConfig = [], StoreNs = getAutoStoreNs('Config') } = opts;
 
   if (!StoreNs) {
@@ -733,7 +732,7 @@ export function getStandConfigModel(opts: IStandConfigModelOptions): Model {
         });
       },
     },
-  } as unknown) as Model;
+  } as unknown) as DvaModel;
 }
 
 export function getAutoStoreNs(key: string) {

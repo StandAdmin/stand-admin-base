@@ -1,4 +1,8 @@
 import React from 'react';
+
+import { Dispatch, Model } from 'dva';
+import { Connect } from 'react-redux';
+
 import {
   TableProps,
   ModalProps,
@@ -6,11 +10,12 @@ import {
   FormInstance,
   PaginationProps,
 } from '@/UI/interface';
-import { Dispatch, Model } from 'dva';
-import { Connect } from 'react-redux';
+
 import { UndefinedOptional } from './undefinedOptional';
 
 import standStyles from './Admin/styles';
+
+export type DvaModel = Model;
 
 export type TKey = string | number;
 
@@ -117,7 +122,7 @@ export interface IModelPkg<R = any> {
   StoreNs?: string;
   isDynamic?: boolean;
   modelOpts?: IStandModelOptions<R>;
-  default: Model;
+  default: DvaModel;
 }
 
 export type TStandConfigGetConfigFn = () => Promise<ICommonObj>;
