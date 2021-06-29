@@ -11,3 +11,19 @@ import 'antd/es/tooltip/style';
 import 'antd/es/popconfirm/style';
 import 'antd/es/table/style';
 import 'antd/es/input/style';
+
+export {
+  Modal,
+  notification,
+  Spin,
+  message,
+  Empty,
+  Pagination,
+  Button,
+  Tag,
+  Table,
+  Popconfirm,
+  Form,
+  Input,
+  Tooltip,
+} from 'antd';

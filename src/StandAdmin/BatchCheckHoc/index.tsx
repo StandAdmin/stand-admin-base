@@ -1,7 +1,6 @@
 import React from 'react';
 import { pullAll, uniqWith } from 'lodash';
 import { IBatchCheckHocProps, IBatchCheckHocInjectProps } from '../interface';
-// import { Icon } from 'antd';
 import { getDisplayName } from '../utils/util';
 
 interface IBatchCheckState<R> {

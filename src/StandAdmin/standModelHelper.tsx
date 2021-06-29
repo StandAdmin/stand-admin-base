@@ -1,5 +1,5 @@
 import React from 'react';
-import { notification, Modal } from 'antd';
+import { notification, Modal } from '@/UI/lib';
 import { merge, get } from 'lodash';
 // import Localforage from 'localforage';
 import {
@@ -66,7 +66,7 @@ function convertParamsName(
 function getFirstNotEmptyVal(
   obj: ICommonObj,
   key: TFldsPathInRespMapKeys,
-  pathList: TFldsPathInRespMapValue | TFldsPathInRespMapValue[],
+  pathList: TFldsPathInRespMapValue,
 ) {
   if (!pathList) {
     throw new Error('pathList is Empty!');
@@ -75,7 +75,7 @@ function getFirstNotEmptyVal(
   const list = Array.isArray(pathList) ? pathList : [pathList];
 
   for (let i = 0, len = list.length; i < len; i += 1) {
-    const fldPath: TFldsPathInRespMapValue = list[i];
+    const fldPath = list[i];
 
     const val =
       typeof fldPath === 'string' ? get(obj, fldPath) : fldPath(obj, key);
@@ -100,8 +100,8 @@ export function handleCommonRespError(
     permissionApplyUrlFields = defaultPermissionApplyUrlFields,
   }: {
     errorTitle?: string;
-    errorMsgFields?: string[];
-    permissionApplyUrlFields?: string[];
+    errorMsgFields?: TFldsPathInRespMapValue;
+    permissionApplyUrlFields?: TFldsPathInRespMapValue;
   } = {},
 ) {
   if (!response || response.success) {
@@ -201,7 +201,11 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): Model {
     response: IResponse;
     errorTitle: string;
   }) => {
-    handleCommonRespError(StoreNsTitle, response, { errorTitle });
+    handleCommonRespError(StoreNsTitle, response, {
+      errorTitle,
+      errorMsgFields: fldsPathInResp.errorMsg,
+      permissionApplyUrlFields: fldsPathInResp.permissionApplyUrl,
+    });
   };
 
   const markTag = markAndMatch();

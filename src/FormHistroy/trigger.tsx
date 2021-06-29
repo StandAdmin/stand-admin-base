@@ -1,6 +1,6 @@
 import React from 'react';
 import { HistoryOutlined, SaveOutlined } from '@ant-design/icons';
-import { message, Tooltip } from 'antd';
+import { message, Tooltip } from '@/UI/lib';
 import classNames from 'classnames';
 import { ITargetFormInfo, IHistoryRecord } from './interface';
 import { IFormHistroyTriggerProps } from '../StandAdmin/interface';

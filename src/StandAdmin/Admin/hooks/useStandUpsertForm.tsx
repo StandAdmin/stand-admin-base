@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import { Form } from 'antd';
-import { FormInstance } from 'antd/es/form';
+import { Form } from '@/UI/lib';
+import { FormInstance } from '@/UI/interface';
 import { identity, isEqual } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { useStandContext } from './useStandContext';
@@ -19,7 +19,7 @@ import {
 } from '../../interface';
 import { encodeFormValues, decodeFormValues } from '../../utils/formEncoder';
 
-import FormHistroyTrigger from '../../../FormHistroy/trigger';
+import FormHistroyTrigger from '@/FormHistroy/trigger';
 
 function defaultSubmitValues<R extends ICommonObj = any>(
   values: TCommonObjOrEmpty,

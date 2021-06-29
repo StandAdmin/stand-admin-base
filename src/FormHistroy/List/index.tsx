@@ -1,19 +1,19 @@
 import React from 'react';
-import { Popconfirm } from 'antd';
+import { Popconfirm } from '@/UI/lib';
 import { identity } from 'lodash';
 import {
   useStandTableList,
   getOptsForStandTableList,
-} from '../../StandAdmin/Admin/hooks/useStandTableList';
+} from '@/StandAdmin/Admin/hooks/useStandTableList';
 import {
   IFormHistroyTriggerProps,
   IHistoryRecord,
   ITargetFormInfo,
 } from '../interface';
 
-import { ISelectCtrlHocInjectProps } from '../../StandAdmin/interface';
+import { ISelectCtrlHocInjectProps } from '@/StandAdmin/interface';
 
-import { decodeFormValues } from '../../StandAdmin/utils/formEncoder';
+import { decodeFormValues } from '@/StandAdmin/utils/formEncoder';
 
 export default (
   props: IFormHistroyTriggerProps & ISelectCtrlHocInjectProps<IHistoryRecord>,

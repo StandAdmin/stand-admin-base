@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Button, Modal, Tag } from 'antd';
+import { Button, Modal, Tag } from '@/UI/lib';
 import classNames from 'classnames';
 import StandContextHoc from '../ContextHoc';
 import {

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from 'antd';
+import { Button } from '@/UI/lib';
 import { SaveOutlined } from '@ant-design/icons';
-import { useStandContext } from '../../StandAdmin/Admin/hooks/useStandContext';
+import { useStandContext } from '@/StandAdmin/Admin/hooks/useStandContext';
 
 import styles from '../styles';
 

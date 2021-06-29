@@ -1,16 +1,16 @@
 import React from 'react';
-import { Form, Modal, Button, Input } from 'antd';
+import { Form, Modal, Button, Input } from '@/UI/lib';
 import { cloneDeepWith, identity } from 'lodash';
 import {
   ITargetFormInfo,
   IFormHistroyTriggerProps,
   IHistoryRecord,
 } from '../interface';
-import { encodeFormValues } from '../../StandAdmin/utils/formEncoder';
+import { encodeFormValues } from '@/StandAdmin/utils/formEncoder';
 import {
   useStandUpsertForm,
   getOptsForStandUpsertForm,
-} from '../../StandAdmin/Admin/hooks/useStandUpsertForm';
+} from '@/StandAdmin/Admin/hooks/useStandUpsertForm';
 
 const FormItem = Form.Item;
 

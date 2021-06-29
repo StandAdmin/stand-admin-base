@@ -1,9 +1,11 @@
 import React from 'react';
-import { TableProps } from 'antd/es/table';
-import { ModalProps } from 'antd/es/modal';
-import FormItem from 'antd/es/form/FormItem';
-import { FormInstance } from 'antd/es/form';
-import { PaginationProps } from 'antd/es/pagination';
+import {
+  TableProps,
+  ModalProps,
+  FormItem,
+  FormInstance,
+  PaginationProps,
+} from '@/UI/interface';
 import { Dispatch, Model } from 'dva';
 import { Connect } from 'react-redux';
 import { UndefinedOptional } from './undefinedOptional';
@@ -78,17 +80,19 @@ export type TFldsPathInRespMapKeys =
   | 'errorMsg'
   | 'permissionApplyUrl';
 
-export type TFldsPathInRespMapValue =
+export type TFldsPathInRespMapValueItem =
   | string
   | ((resp: ICommonObj, field: string) => any);
+
+export type TFldsPathInRespMapValue =
+  | TFldsPathInRespMapValueItem
+  | TFldsPathInRespMapValueItem[];
 
 export interface IStandModelOptions<R> {
   idFieldName?: string;
   nameFieldName?: string;
   fldsPathInResp?: {
-    [key in TFldsPathInRespMapKeys]?:
-      | TFldsPathInRespMapValue[]
-      | TFldsPathInRespMapValue;
+    [key in TFldsPathInRespMapKeys]?: TFldsPathInRespMapValue;
   };
   searchParamsMap?: {
     [key in TSearchParamsMapKeys]?: string;
@@ -394,7 +398,10 @@ export interface IContextMethods<R> {
   getSpecSearchParams: (specProps?: IContextHocProps<R>) => ICommonObj;
   callStoreAction: (params: IStoreActionParams) => Promise<IResponse>;
   callService: (params: IServiceParams) => Promise<IResponse>;
+
+  /** @deprecated */
   renderEmpty: () => React.ReactNode;
+
   getLatestSearchParams: () => TSearchParams;
 
   updateConfig: (

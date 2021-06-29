@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo } from 'react';
 
-import { Form } from 'antd';
-import { FormInstance, FormItemProps } from 'antd/es/form';
+import { Form } from '@/UI/lib';
+import { FormInstance, FormItemProps } from '@/UI/interface';
 // import moment from 'moment';
 // import classNames from 'classnames';
 import { identity, isEqual } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { encodeFormValues, decodeFormValues } from '../../utils/formEncoder';
 import { useStandContext } from './useStandContext';
-import FormHistroyTrigger from '../../../FormHistroy/trigger';
+import FormHistroyTrigger from '@/FormHistroy/trigger';
 
 import {
   ICommonObj,
