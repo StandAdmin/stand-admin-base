@@ -100,7 +100,7 @@ export default function<
     syncParamsToUrl: false,
   };
 
-  if (!('syncParamsToUrl' in restHocParams)) {
+  if ('isModalMode' in restHocParams && !('syncParamsToUrl' in restHocParams)) {
     defaultHocParams.syncParamsToUrl = !restHocParams.isModalMode;
   }
 
