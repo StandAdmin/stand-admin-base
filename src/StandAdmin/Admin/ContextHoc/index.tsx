@@ -1,7 +1,7 @@
 import React from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Empty, Pagination, message, Modal, Spin } from '@/UI/lib';
-import { PaginationProps } from '@/UI/interface';
+import { PaginationProps } from '../../../UI/interface';
 import classNames from 'classnames';
 import { isEqual, debounce, pick, pickBy, omit, omitBy } from 'lodash';
 import {

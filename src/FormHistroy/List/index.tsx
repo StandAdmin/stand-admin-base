@@ -11,7 +11,7 @@ import {
   ITargetFormInfo,
 } from '../interface';
 
-import { ISelectCtrlHocInjectProps } from '@/StandAdmin/interface';
+import { ISelectCtrlHocInjectProps } from '../../StandAdmin/interface';
 
 import { decodeFormValues } from '@/StandAdmin/utils/formEncoder';
 

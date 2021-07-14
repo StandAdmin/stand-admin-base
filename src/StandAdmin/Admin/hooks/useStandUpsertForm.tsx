@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { Form } from '@/UI/lib';
-import { FormInstance } from '@/UI/interface';
+import { FormInstance } from '../../../UI/interface';
 import { identity, isEqual } from 'lodash';
 import { usePersistFn } from '@/StandAdmin/utils/hooks';
 import { useStandContext } from './useStandContext';

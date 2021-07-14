@@ -1,7 +1,11 @@
 import React, { Fragment, useMemo } from 'react';
 import { Table } from '@/UI/lib';
 import classNames from 'classnames';
-import { PaginationProps, TableProps, ColumnsType } from '@/UI/interface';
+import {
+  PaginationProps,
+  TableProps,
+  ColumnsType,
+} from '../../../UI/interface';
 import { useStandContext } from './useStandContext';
 import {
   IStandTableRenderParams,

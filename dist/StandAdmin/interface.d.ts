@@ -1,8 +1,6 @@
 import React from 'react';
-
 import { Dispatch, Model } from 'dva';
 import { Connect } from 'react-redux';
-
 import {
   TableProps,
   ModalProps,
@@ -10,45 +8,28 @@ import {
   FormInstance,
   PaginationProps,
 } from '../UI/interface';
-
 import { UndefinedOptional } from './undefinedOptional';
-
 import standStyles from './Admin/styles';
-
-export type DvaModel = Model;
-
-export type TKey = string | number;
-
-export type TFnAny = (...args: any[]) => any;
-
-export type TAsyncFnAny<R = any> = (...args: any[]) => Promise<R>;
-
-export type TFnVoid = () => void;
-
-export type TRecordId = string | number;
-
+export declare type DvaModel = Model;
+export declare type TKey = string | number;
+export declare type TFnAny = (...args: any[]) => any;
+export declare type TAsyncFnAny<R = any> = (...args: any[]) => Promise<R>;
+export declare type TFnVoid = () => void;
+export declare type TRecordId = string | number;
 export interface ICommonObj {
   [key: string]: any;
 }
-
-export type TEmpty = undefined | null;
-
-export type TCommonObjOrEmpty = ICommonObj | TEmpty;
-
-export type TRecordFormVisibleTag = boolean | TKey | ICommonObj;
-
-export type TSearchParams = ICommonObj;
-
-export type TSearchParamsOrId = TSearchParams | TRecordId;
-
-export type TFnParamsFilter = (...args: any[]) => TCommonObjOrEmpty;
-
+export declare type TEmpty = undefined | null;
+export declare type TCommonObjOrEmpty = ICommonObj | TEmpty;
+export declare type TRecordFormVisibleTag = boolean | TKey | ICommonObj;
+export declare type TSearchParams = ICommonObj;
+export declare type TSearchParamsOrId = TSearchParams | TRecordId;
+export declare type TFnParamsFilter = (...args: any[]) => TCommonObjOrEmpty;
 export interface IGlobalConfig {
   getDvaApp: () => IDvaApp;
   getHistory: () => IHistory;
   getConnect: () => Connect;
 }
-
 export interface IResponse {
   success: boolean;
   message?: string;
@@ -56,7 +37,6 @@ export interface IResponse {
   data?: any;
   [key: string]: any;
 }
-
 export interface IResponseOfSearchRecords<R> extends IResponse {
   data?: {
     list?: R[];
@@ -66,33 +46,26 @@ export interface IResponseOfSearchRecords<R> extends IResponse {
     [key: string]: any;
   };
 }
-
 export interface IResponseOfGetRecord<R> extends IResponse {
   data: R;
 }
-
 export interface IResponseOfAction<R> extends IResponse {
   data?: R;
 }
-
-export type TSearchParamsMapKeys = 'pageNum' | 'pageSize';
-
-export type TFldsPathInRespMapKeys =
+export declare type TSearchParamsMapKeys = 'pageNum' | 'pageSize';
+export declare type TFldsPathInRespMapKeys =
   | 'pageNum'
   | 'pageSize'
   | 'total'
   | 'list'
   | 'errorMsg'
   | 'permissionApplyUrl';
-
-export type TFldsPathInRespMapValueItem =
+export declare type TFldsPathInRespMapValueItem =
   | string
   | ((resp: ICommonObj, field: string) => any);
-
-export type TFldsPathInRespMapValue =
+export declare type TFldsPathInRespMapValue =
   | TFldsPathInRespMapValueItem
   | TFldsPathInRespMapValueItem[];
-
 export interface IStandModelOptions<R> {
   idFieldName?: string;
   nameFieldName?: string;
@@ -114,7 +87,6 @@ export interface IStandModelOptions<R> {
   deleteRecord?: (params: TSearchParams) => Promise<IResponseOfAction<R>>;
   extensions?: any;
 }
-
 export interface IModelPkg<R = any> {
   idFieldName?: string;
   nameFieldName?: string;
@@ -124,21 +96,18 @@ export interface IModelPkg<R = any> {
   modelOpts?: IStandModelOptions<R>;
   default: DvaModel;
 }
-
-export type TStandConfigGetConfigFn = () => Promise<ICommonObj>;
-
-type TStandConfigGetConfigSingleItem = TStandConfigGetConfigFn | ICommonObj;
-
-export type TStandConfigGetConfigItem =
+export declare type TStandConfigGetConfigFn = () => Promise<ICommonObj>;
+declare type TStandConfigGetConfigSingleItem =
+  | TStandConfigGetConfigFn
+  | ICommonObj;
+export declare type TStandConfigGetConfigItem =
   | TStandConfigGetConfigSingleItem
   | TStandConfigGetConfigSingleItem[];
-
 export interface IStandConfigModelOptions {
   StoreNsTitle?: string;
   StoreNs?: string;
   getConfig?: TStandConfigGetConfigItem;
 }
-
 export interface IStoreActionParams {
   action: string;
   actionForCount?: string;
@@ -153,7 +122,6 @@ export interface IStoreActionParams {
   blinkRecord?: boolean;
   successMsg?: false | string;
 }
-
 export interface IServiceParams
   extends Omit<
     IStoreActionParams,
@@ -163,51 +131,42 @@ export interface IServiceParams
   serviceFunction: TAsyncFnAny<IResponse>;
   serviceParams: any[];
 }
-
 export interface IPagination {
   total: number;
   current: number;
   pageSize: number;
 }
-
 export interface IStoreRef<R> {
   mountId: TKey | null;
   idFieldName: string;
   nameFieldName: string;
-
   records: R[];
   searchParams: TSearchParams;
   pagination: IPagination;
   recordFormVisibleTag: TRecordFormVisibleTag;
-
   blinkRecord: R | TEmpty;
   activeRecord: R | TEmpty;
   removingRecord: R | TEmpty;
 }
-
 export interface IDvaApp {
   model: (model: any) => void;
   unmodel: (namespace: string) => void;
   _models: any[];
 }
-
 export interface IHistory {
   push: TFnAny;
   location: any;
 }
-
 export interface IContextHocModelParams {
   /**
    * Normally returned by buildStandConfigModelPkg
    */
   configModel?: IModelPkg;
-
   /**
    * Normally returned by buildStandRecordModelPkg
    */
   recordModel?: IModelPkg;
 }
-
 export interface IContextHocCommonParams extends IContextHocModelParams {
   /**
    * Whether sync search params to url
@@ -229,7 +188,6 @@ export interface IContextHocCommonParams extends IContextHocModelParams {
    * Special search params, which can not be overide
    */
   specSearchParams?: TSearchParams | TFnParamsFilter;
-
   /**
    * Sorter params, normally from Table.onChange
    */
@@ -238,49 +196,39 @@ export interface IContextHocCommonParams extends IContextHocModelParams {
    * Filter params, normally from Table.onChange
    */
   filterSearchParams?: TSearchParams | TFnParamsFilter;
-
   /**
    *  Trigger searchRecord in didMount, default true
    */
   searchRecordsOnMount?: boolean;
-
   /**
    *  Trigger searchRecord if params change, default true
    */
   searchRecordsOnParamsChange?: boolean;
-
   /**
    * If configModel is loading, render this placeholder
    */
   placeholderIfConfigLoading?: boolean | React.ReactNode;
-
   /**
    * StandContext will be passed in props
    */
   receiveContextAsProps?: boolean | (keyof IStandContextProps)[];
-
   /**
    * HocParams will be passed in props
    */
   receiveHocParamsAsProps?: boolean | (keyof IContextHocFullParams)[];
-
   /**
    * The className for the outer container wrapper
    */
   wrapperClassName?: string;
-
   wrapperStyle?: React.CSSProperties;
-
   /**
    * Row Select support for the standRender of useStandTableList
    */
   listRowSelectionSupport?: boolean;
-
   /**
    * A new recordModel with new namespace will be created if not empty
    */
   makeRecordModelPkgDynamic?: string;
-
   resetStoreStateWhenUnmount?: boolean;
   resetStoreStateWhenMount?: boolean;
 }
@@ -315,7 +263,6 @@ export interface IContextHocFullParams<R = any>
     }
   >;
 }
-
 export interface IStandConnectInjectProps<R> {
   storeRef: IStoreRef<R>;
   configStoreRef: ICommonObj;
@@ -323,12 +270,10 @@ export interface IStandConnectInjectProps<R> {
   configLoading: boolean;
   dispatch: Dispatch<any>;
 }
-
 export interface IContextHocInjectProps<R = any> {
   isStandAdminHoc: boolean;
   getStandContext: () => IStandContextProps<R>;
 }
-
 export interface IContextMethods<R> {
   getRecordMapByIdList: (
     idList: TRecordId[],
@@ -337,7 +282,6 @@ export interface IContextMethods<R> {
       [key in TRecordId]: R;
     }
   >;
-
   getUrlParams: (specProps?: TSearchParams) => ICommonObj;
   showEmptyRecordForm: TFnVoid;
   showRecordForm: (
@@ -355,12 +299,9 @@ export interface IContextMethods<R> {
   searchRecords: (
     specParams?: ICommonObj,
   ) => Promise<IResponseOfSearchRecords<R>>;
-
   debouncedSearchRecords: IContextMethods<R>['searchRecords'];
   reloadSearch: IContextMethods<R>['searchRecords'];
-
   blinkRecordById: (id: TRecordId) => void;
-
   getRecord: (specParams?: TSearchParams) => Promise<R>;
   updateRecord: (
     record: R,
@@ -374,14 +315,10 @@ export interface IContextMethods<R> {
     params: ICommonObj,
     callback?: (resp: IResponseOfAction<R>) => void,
   ) => Promise<IResponseOfAction<R>>;
-
   clearActiveRecord: TFnVoid;
-
   /** @deprecated use hideRecordForm instead */
   hideRecordFormOnly: TFnVoid;
-
   hideRecordForm: TFnVoid;
-
   /** @deprecated use callStoreAction instead */
   callAction: (
     action: string,
@@ -389,38 +326,31 @@ export interface IContextMethods<R> {
     payload: any,
     shouldRefresh: boolean,
   ) => Promise<any>;
-
   renderPagination: (params?: PaginationProps) => React.ReactNode;
-
   handleTableChange: TableProps<R>['onChange'];
   getRecordId: (record: R) => any;
   getRecordName: (record: R) => any;
-
   getRecordModelPkg: () => IModelPkg;
   getConfigModelPkg: () => IModelPkg;
-
   getDefaultSearchParams: (specProps?: IContextHocProps<R>) => ICommonObj;
   getSpecSearchParams: (specProps?: IContextHocProps<R>) => ICommonObj;
   callStoreAction: (params: IStoreActionParams) => Promise<IResponse>;
   callService: (params: IServiceParams) => Promise<IResponse>;
-
   /** @deprecated */
   renderEmpty: () => React.ReactNode;
-
   getLatestSearchParams: () => TSearchParams;
-
   updateConfig: (
     getConfig: TStandConfigGetConfigItem,
     updateConfigLoading?: boolean,
   ) => Promise<ICommonObj>;
 }
-
 export interface IContextHocProps<R>
   extends IContextHocFullParams<R>,
     IBatchCheckHocProps<R> {
-  location?: { search: string };
+  location?: {
+    search: string;
+  };
 }
-
 export interface ISelectCtrlHocParams<R> extends IContextHocFullParams<R> {
   isModalMode?: boolean;
   isStandListCtrl?: boolean;
@@ -430,23 +360,18 @@ export interface ISelectCtrlHocParams<R> extends IContextHocFullParams<R> {
   resetCheckedOnModalShow?: boolean;
   clearCheckedAfterClose?: boolean;
 }
-
 export interface IModalTriggerOpts<R> {
   props: ISelectCtrlHocProps<R>;
   showModal: () => void;
   hideModal: () => void;
-
   /** @deprecated use toggleModalVisible instead */
   toggleVisible: (visible: boolean) => void;
-
   toggleModalVisible: (visible: boolean) => void;
   context: IStandContextProps<R>;
 }
-
-export type TModalTriggerRender<R> = (
+export declare type TModalTriggerRender<R> = (
   opts: IModalTriggerOpts<R>,
 ) => React.ReactNode | React.ReactNode;
-
 export interface ISelectCtrlHocInjectProps<R = any>
   extends IContextHocInjectProps<R> {
   isModalMode: boolean;
@@ -468,7 +393,6 @@ export interface ISelectCtrlHocProps<R>
   onModalVisibleChange?: (visible: boolean) => void;
   onModalOk?: (params: { checkedList: R[] }) => void;
 }
-
 export interface IIdSelectCtrlHocProps<R = any>
   extends Omit<ISelectCtrlHocProps<R>, 'onChange'> {
   checkedIdList?: TRecordId[];
@@ -476,13 +400,11 @@ export interface IIdSelectCtrlHocProps<R = any>
   onChangeWithData?: (list: R[]) => void;
   onChange?: (list: TRecordId[]) => void;
 }
-
 export interface IRecordInfoHocInjectProps<R = any>
   extends IContextHocInjectProps<R> {
   recordInfoLoading: boolean;
   recordInfo: R;
 }
-
 export interface IBatchCheckHocProps<R> {
   defaultCheckedList?: R[];
   maxCheckedLength?: number;
@@ -500,30 +422,24 @@ export interface IBatchCheckHocInjectProps<R> {
   clearChecked: TFnVoid;
   toggleChecked: (record: R | R[], checked: boolean) => void;
   getCheckedList: () => R[];
-
   /** @deprecated use isChecked instead */
   isRecordChecked: (record: R) => boolean;
-
   /** @deprecated use toggleChecked instead */
   batchToggleChecked: (records: R[], checked: boolean) => void;
 }
-
 export interface IActionCounterHocInjectProps {
   increaseActionCount: (action?: string, num?: number) => void;
   decreaseActionCount: (action?: string, num?: number) => void;
   getActionCount: (action?: string | string[]) => number;
 }
-
 export interface IStandContextProps<R = any>
   extends IActionCounterHocInjectProps,
     IBatchCheckHocInjectProps<R>,
     IContextMethods<R> {
   StoreNs: string;
   storeRef: IStoreRef<R>;
-
   /** @deprecated use config instead */
   configStoreRef: ICommonObj;
-
   config: ICommonObj;
   searchLoading: boolean;
   configLoading: boolean;
@@ -536,33 +452,33 @@ export interface IStandContextProps<R = any>
   isStoreDataStale: boolean;
   mountId: TKey;
 }
-
-export type TContextHocComponent<R = any, P = any> = React.ComponentType<
-  UndefinedOptional<P> & IContextHocProps<R>
->;
-
-export type TIdSelectCtrlHocComponent<R = any, P = any> = React.ComponentType<
-  UndefinedOptional<P> & IIdSelectCtrlHocProps<R>
->;
-
-export type TSelectCtrlHocComponent<R = any, P = any> = React.ComponentType<
-  UndefinedOptional<P> & ISelectCtrlHocProps<R>
-> & {
+export declare type TContextHocComponent<
+  R = any,
+  P = any
+> = React.ComponentType<UndefinedOptional<P> & IContextHocProps<R>>;
+export declare type TIdSelectCtrlHocComponent<
+  R = any,
+  P = any
+> = React.ComponentType<UndefinedOptional<P> & IIdSelectCtrlHocProps<R>>;
+export declare type TSelectCtrlHocComponent<
+  R = any,
+  P = any
+> = React.ComponentType<UndefinedOptional<P> & ISelectCtrlHocProps<R>> & {
   IdSelectCtrl: TIdSelectCtrlHocComponent<R, P>;
 };
-
 export interface ITargetFormInfo {
   formId: string;
   form: FormInstance;
   title: string;
 }
-
 export interface IFormHistroyTriggerProps {
   wrapperClassName?: string;
   historySaveTrigger?: (opts: { showSaveForm: () => void }) => React.ReactNode;
   historyListTrigger?: (opts: { showListModal: () => void }) => React.ReactNode;
   targetFormInfo: ITargetFormInfo;
-  historyRecordInfo: { nameFieldName: string };
+  historyRecordInfo: {
+    nameFieldName: string;
+  };
   formValuesEncoder?: {
     encode?: (vals: any) => any;
     decode?: (vals: any) => any;
@@ -571,13 +487,13 @@ export interface IFormHistroyTriggerProps {
     beforeSave: (vals: any) => any;
     beforeRestore: (vals: any) => any;
   };
-  actionHooks?: { afterRestore: (vals: any) => any };
+  actionHooks?: {
+    afterRestore: (vals: any) => any;
+  };
 }
-
-export type TRenderFormHistroyTriggerOpts =
+export declare type TRenderFormHistroyTriggerOpts =
   | Partial<IFormHistroyTriggerProps>
   | ((props: IFormHistroyTriggerProps) => Partial<IFormHistroyTriggerProps>);
-
 export interface IUseStandSearchFormResult<R> {
   formId: string;
   renderFormHistroyTrigger: (
@@ -597,7 +513,6 @@ export interface IUseStandSearchFormResult<R> {
   resetForm: TFnVoid;
   FormItem: typeof FormItem;
 }
-
 export interface IUseStandUpsertFormResult<R> {
   formId: string;
   renderFormHistroyTrigger: (
@@ -616,21 +531,17 @@ export interface IUseStandUpsertFormResult<R> {
     onCancel: TFnVoid;
     afterClose: TFnVoid;
   };
-
   /**
    * Normally passed by showRecordForm, and used as match condition in isModalVisible
    */
   recordFormVisibleTag: IStoreRef<R>['recordFormVisibleTag'];
-
   getInitValues: (record?: R) => ICommonObj;
   getInitValuesByRecord: (record: R) => ICommonObj;
-
   /**
    *  Update or Create
    *  isUpdate =  activeRecord && activeRecord[idFieldName]
    */
   isUpdate: boolean;
-
   activeRecord: R | TEmpty;
   activeRecordId: TRecordId;
   context: IStandContextProps<R>;
@@ -640,17 +551,19 @@ export interface IUseStandUpsertFormResult<R> {
   submitForm: TFnVoid;
   resetForm: TFnVoid;
   clearActiveRecord: TFnVoid;
-
   /** @deprecated use modalProps.onCancel instead */
   handleCancel: TFnVoid;
 }
-
 export interface IStandTableRenderParams<R> extends TableProps<R> {
   hasPagination?: PaginationProps | boolean;
   noFiltersForDisabledSearchParams?: boolean;
-  autoScrollX?: boolean | { defaultWidth?: number; extraWidth?: number };
+  autoScrollX?:
+    | boolean
+    | {
+        defaultWidth?: number;
+        extraWidth?: number;
+      };
 }
-
 export interface IUseStandTableListResult<R> {
   context: IStandContextProps<R>;
   config: ICommonObj;
@@ -662,3 +575,4 @@ export interface IUseStandTableListResult<R> {
   searchLoading: boolean;
   standRender: (params: IStandTableRenderParams<R>) => JSX.Element;
 }
+export {};

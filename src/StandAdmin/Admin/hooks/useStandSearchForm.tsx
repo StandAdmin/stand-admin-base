@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 
 import { Form } from '@/UI/lib';
-import { FormInstance, FormItemProps } from '@/UI/interface';
+import { FormInstance, FormItemProps } from '../../../UI/interface';
 // import moment from 'moment';
 // import classNames from 'classnames';
 import { identity, isEqual } from 'lodash';

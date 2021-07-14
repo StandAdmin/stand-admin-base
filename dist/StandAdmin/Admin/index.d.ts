@@ -8,9 +8,7 @@ import {
   ISelectCtrlHocParams,
 } from '../interface';
 import { StandConfigLoadingHoc, StandConnectHoc } from './connect';
-
 import styles from './styles';
-
 export {
   StandContextHoc,
   StandContext,
@@ -20,40 +18,22 @@ export {
   StandConfigLoadingHoc,
   StandConnectHoc,
 };
-
-const defaultHocParamsInDefineFn: IContextHocCommonParams = {
-  receiveContextAsProps: false,
-};
-
-export function defineContextHocParams(
+export declare function defineContextHocParams(
   params: IContextHocCommonParams,
-): IContextHocCommonParams {
-  return { ...defaultHocParamsInDefineFn, ...params };
-}
-
-export function defineFullContextHocParams<R = any>(
+): IContextHocCommonParams;
+export declare function defineFullContextHocParams<R = any>(
   params: IContextHocFullParams<R>,
-): IContextHocFullParams<R> {
-  return { ...defaultHocParamsInDefineFn, ...params };
-}
-
-export function defineSelectCtrlHocParams<R = any>(
+): IContextHocFullParams<R>;
+export declare function defineSelectCtrlHocParams<R = any>(
   params: ISelectCtrlHocParams<R>,
-): ISelectCtrlHocParams<R> {
-  return { ...defaultHocParamsInDefineFn, ...params };
-}
-
+): ISelectCtrlHocParams<R>;
 /** @deprecated use StandContextHoc instead */
-export const StandRecordsHoc = StandContextHoc;
-
+export declare const StandRecordsHoc: typeof StandContextHoc;
 /** @deprecated use StandSelectCtrlHoc instead */
-export const StandListCtrlHoc = StandSelectCtrlHoc;
-
+export declare const StandListCtrlHoc: typeof StandSelectCtrlHoc;
 /** @deprecated use defineSelectCtrlHocParams instead */
-export const defineListCtrlHocParams = defineSelectCtrlHocParams;
-
+export declare const defineListCtrlHocParams: typeof defineSelectCtrlHocParams;
 /** @deprecated use defineFullContextHocParams instead */
-export const defineFullHocParams = defineFullContextHocParams;
-
+export declare const defineFullHocParams: typeof defineFullContextHocParams;
 /** @deprecated use defineContextHocParams instead */
-export const defineCommonHocParams = defineContextHocParams;
+export declare const defineCommonHocParams: typeof defineContextHocParams;
