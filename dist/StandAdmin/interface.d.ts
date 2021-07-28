@@ -52,6 +52,9 @@ export interface IResponseOfGetRecord<R> extends IResponse {
 export interface IResponseOfAction<R> extends IResponse {
   data?: R;
 }
+export declare type TResponseOfActionHandler<R> = (
+  resp: IResponseOfAction<R>,
+) => void;
 export declare type TSearchParamsMapKeys = 'pageNum' | 'pageSize';
 export declare type TFldsPathInRespMapKeys =
   | 'pageNum'
@@ -305,15 +308,15 @@ export interface IContextMethods<R> {
   getRecord: (specParams?: TSearchParams) => Promise<R>;
   updateRecord: (
     record: R,
-    callback?: (resp: IResponseOfAction<R>) => void,
+    callback?: TResponseOfActionHandler<R>,
   ) => Promise<IResponseOfAction<R>>;
   addRecord: (
     record: R,
-    callback?: (resp: IResponseOfAction<R>) => void,
+    callback?: TResponseOfActionHandler<R>,
   ) => Promise<IResponseOfAction<R>>;
   deleteRecord: (
     params: ICommonObj,
-    callback?: (resp: IResponseOfAction<R>) => void,
+    callback?: TResponseOfActionHandler<R>,
   ) => Promise<IResponseOfAction<R>>;
   clearActiveRecord: TFnVoid;
   /** @deprecated use hideRecordForm instead */

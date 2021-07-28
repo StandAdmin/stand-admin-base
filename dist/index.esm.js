@@ -3444,49 +3444,79 @@ function StandContextHoc(hocParams) {
           );
         };
 
-        _this.addRecord = function(record, callback) {
-          return _this.callStoreAction({
-            action: 'addRecord',
-            actionForCount: 'upsertRecord',
-            actionTitle: '\u521B\u5EFA'.concat(StoreNsTitle),
-            payload: {
-              record: record,
-              callback: callback,
-            },
-          });
-        };
+        _this.addRecord = function(record, opts) {
+          var _ref7 = typeof opts === 'function' ? [opts] : [, opts],
+            _ref8 = _slicedToArray(_ref7, 2),
+            callback = _ref8[0],
+            actionArgs = _ref8[1];
 
-        _this.updateRecord = function(record, callback) {
-          return _this.callStoreAction({
-            action: 'updateRecord',
-            actionForCount: 'upsertRecord',
-            actionTitle: '\u7F16\u8F91'.concat(StoreNsTitle, ' [').concat(
-              [getRecordId(record), getRecordName(record)]
-                .filter(function(item) {
-                  return !!item;
-                })
-                .join(': '),
-              '] ',
+          return _this.callStoreAction(
+            _objectSpread2(
+              {
+                action: 'addRecord',
+                actionForCount: 'upsertRecord',
+                actionTitle: '\u521B\u5EFA'.concat(StoreNsTitle),
+                payload: {
+                  record: record,
+                  callback: callback,
+                },
+              },
+              actionArgs,
             ),
-            payload: {
-              record: record,
-              callback: callback,
-            },
-          });
+          );
         };
 
-        _this.deleteRecord = function(params, callback) {
+        _this.updateRecord = function(record, opts) {
+          var _ref9 = typeof opts === 'function' ? [opts] : [, opts],
+            _ref10 = _slicedToArray(_ref9, 2),
+            callback = _ref10[0],
+            actionArgs = _ref10[1];
+
+          return _this.callStoreAction(
+            _objectSpread2(
+              {
+                action: 'updateRecord',
+                actionForCount: 'upsertRecord',
+                actionTitle: '\u7F16\u8F91'.concat(StoreNsTitle, ' [').concat(
+                  [getRecordId(record), getRecordName(record)]
+                    .filter(function(item) {
+                      return !!item;
+                    })
+                    .join(': '),
+                  '] ',
+                ),
+                payload: {
+                  record: record,
+                  callback: callback,
+                },
+              },
+              actionArgs,
+            ),
+          );
+        };
+
+        _this.deleteRecord = function(params, opts) {
+          var _ref11 = typeof opts === 'function' ? [opts] : [, opts],
+            _ref12 = _slicedToArray(_ref11, 2),
+            callback = _ref12[0],
+            actionArgs = _ref12[1];
+
           var recordId = getRecordId(params);
-          return _this.callStoreAction({
-            action: 'deleteRecord',
-            actionTitle: '\u5220\u9664'
-              .concat(StoreNsTitle)
-              .concat(recordId ? ' ['.concat(recordId, '] ') : ''),
-            payload: {
-              params: params,
-              callback: callback,
-            },
-          });
+          return _this.callStoreAction(
+            _objectSpread2(
+              {
+                action: 'deleteRecord',
+                actionTitle: '\u5220\u9664'
+                  .concat(StoreNsTitle)
+                  .concat(recordId ? ' ['.concat(recordId, '] ') : ''),
+                payload: {
+                  params: params,
+                  callback: callback,
+                },
+              },
+              actionArgs,
+            ),
+          );
         };
 
         _this.onShowSizeChange = function(current, pageSize) {
@@ -3515,9 +3545,9 @@ function StandContextHoc(hocParams) {
           });
         };
 
-        _this.handleTableChange = function(_ref7, filters, sorter) {
-          var current = _ref7.current,
-            pageSize = _ref7.pageSize;
+        _this.handleTableChange = function(_ref13, filters, sorter) {
+          var current = _ref13.current,
+            pageSize = _ref13.pageSize;
           var _this$props$storeRef2 = _this.props.storeRef,
             _this$props$storeRef3 = _this$props$storeRef2.searchParams,
             searchParams =
@@ -3578,12 +3608,12 @@ function StandContextHoc(hocParams) {
         };
 
         _this.renderPagination = function() {
-          var _ref8 =
+          var _ref14 =
               arguments.length > 0 && arguments[0] !== undefined
                 ? arguments[0]
                 : {},
-            className = _ref8.className,
-            restProps = _objectWithoutProperties(_ref8, ['className']);
+            className = _ref14.className,
+            restProps = _objectWithoutProperties(_ref14, ['className']);
 
           var storeRef = _this.props.storeRef;
           var pagination = storeRef.pagination;
