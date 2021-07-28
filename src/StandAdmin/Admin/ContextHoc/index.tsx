@@ -41,6 +41,7 @@ import {
   IActionCounterHocInjectProps,
   IBatchCheckHocInjectProps,
   TStandConfigGetConfigItem,
+  TResponseOfActionHandler,
   //IStandConnectHocProps,
 } from '../../interface';
 import {
@@ -769,20 +770,27 @@ export default function<
 
       addRecord = (
         record: R,
-        callback: (resp: IResponseOfAction<R>) => void,
+        opts: IStoreActionParams | TResponseOfActionHandler<R>,
       ) => {
+        const [callback, actionArgs] =
+          typeof opts === 'function' ? [opts] : [, opts];
+
         return this.callStoreAction({
           action: 'addRecord',
           actionForCount: 'upsertRecord',
           actionTitle: `创建${StoreNsTitle}`,
           payload: { record, callback },
+          ...actionArgs,
         });
       };
 
       updateRecord = (
         record: R,
-        callback: (resp: IResponseOfAction<R>) => void,
+        opts: IStoreActionParams | TResponseOfActionHandler<R>,
       ) => {
+        const [callback, actionArgs] =
+          typeof opts === 'function' ? [opts] : [, opts];
+
         return this.callStoreAction({
           action: 'updateRecord',
           actionForCount: 'upsertRecord',
@@ -796,13 +804,17 @@ export default function<
             record,
             callback,
           },
+          ...actionArgs,
         });
       };
 
       deleteRecord = (
         params: TSearchParams,
-        callback: (resp: IResponseOfAction<R>) => void,
+        opts: IStoreActionParams | TResponseOfActionHandler<R>,
       ) => {
+        const [callback, actionArgs] =
+          typeof opts === 'function' ? [opts] : [, opts];
+
         const recordId = getRecordId(params as any);
 
         return this.callStoreAction({
@@ -811,6 +823,7 @@ export default function<
             recordId ? ` [${recordId}] ` : ''
           }`,
           payload: { params, callback },
+          ...actionArgs,
         });
       };
 

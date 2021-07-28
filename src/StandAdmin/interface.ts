@@ -75,6 +75,8 @@ export interface IResponseOfAction<R> extends IResponse {
   data?: R;
 }
 
+export type TResponseOfActionHandler<R> = (resp: IResponseOfAction<R>) => void;
+
 export type TSearchParamsMapKeys = 'pageNum' | 'pageSize';
 
 export type TFldsPathInRespMapKeys =
@@ -364,15 +366,15 @@ export interface IContextMethods<R> {
   getRecord: (specParams?: TSearchParams) => Promise<R>;
   updateRecord: (
     record: R,
-    callback?: (resp: IResponseOfAction<R>) => void,
+    callback?: TResponseOfActionHandler<R>,
   ) => Promise<IResponseOfAction<R>>;
   addRecord: (
     record: R,
-    callback?: (resp: IResponseOfAction<R>) => void,
+    callback?: TResponseOfActionHandler<R>,
   ) => Promise<IResponseOfAction<R>>;
   deleteRecord: (
     params: ICommonObj,
-    callback?: (resp: IResponseOfAction<R>) => void,
+    callback?: TResponseOfActionHandler<R>,
   ) => Promise<IResponseOfAction<R>>;
 
   clearActiveRecord: TFnVoid;
