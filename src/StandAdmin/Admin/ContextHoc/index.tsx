@@ -47,6 +47,7 @@ import {
 import {
   getAutoIdGenerator,
   getDisplayName,
+  jsxJoin,
   // whyDidYouUpdate,
 } from '../../utils/util';
 import { StandConnectHoc } from '../connect';
@@ -63,7 +64,7 @@ const defaultSearchParamsEqualFn = (a: ICommonObj, b: ICommonObj) => {
 
 const defaultSuccessHandlerFn: IContextHocFullParams['successHandler'] = params => {
   const { successMsg, actionTitle } = params;
-  message.success(successMsg || `${actionTitle}成功！`);
+  message.success(successMsg || <>{actionTitle}成功！</>);
 };
 
 const pickProps = (props: any, keys: boolean | string[]) => {
@@ -138,9 +139,11 @@ export default function<
     return undefined;
   };
 
-  const getRecordId = (record: R) => getRecordFld(record, idFieldName);
+  const getRecordId = (record: R): TRecordId =>
+    getRecordFld(record, idFieldName);
 
-  const getRecordName = (record: R) => getRecordFld(record, nameFieldName);
+  const getRecordName = (record: R): React.ReactNode =>
+    getRecordFld(record, nameFieldName);
 
   type OuterCompProps = Omit<P, keyof IContextHocInjectProps<R>>;
 
@@ -794,12 +797,12 @@ export default function<
         return this.callStoreAction({
           action: 'updateRecord',
           actionForCount: 'upsertRecord',
-          actionTitle: `编辑${StoreNsTitle} [${[
-            getRecordId(record),
-            getRecordName(record),
-          ]
-            .filter(item => !!item)
-            .join(': ')}] `,
+          actionTitle: (
+            <>
+              编辑{StoreNsTitle} [
+              {jsxJoin([getRecordId(record), getRecordName(record)], ': ')}]
+            </>
+          ),
           payload: {
             record,
             callback,
@@ -1175,7 +1178,7 @@ export default function<
             const aId = getRecordId(a);
             const bId = getRecordId(b);
 
-            if (aId) {
+            if (aId || aId === 0) {
               return aId === bId;
             }
 

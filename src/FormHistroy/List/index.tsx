@@ -107,7 +107,7 @@ export default (
               <Popconfirm
                 // tipTitle="删除"
                 placement="topRight"
-                title={`确认要删除 [${getRecordName(record)}] ？`}
+                title={<>确认要删除 [{getRecordName(record)}] ？</>}
                 onConfirm={() => {
                   deleteRecord({ [idFieldName]: getRecordId(record) });
                 }}

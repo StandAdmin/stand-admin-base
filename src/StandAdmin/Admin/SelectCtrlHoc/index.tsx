@@ -15,6 +15,7 @@ import {
 } from '../../interface';
 import IdSelectCtrlHoc from './IdSelectCtrlHoc';
 import { StandContext } from '../../const';
+import { jsxJoin } from '../../utils/util';
 
 import styles from '../styles';
 
@@ -55,8 +56,7 @@ function defaultModalTriggerCheckedListRender<R>(opts: IModalTriggerOpts<R>) {
             toggleChecked(record, false);
           }}
         >
-          {getRecordId(record)}
-          {record ? `: ${getRecordName(record)}` : ''}
+          {jsxJoin([getRecordId(record), getRecordName(record)], ': ')}
         </Tag>
       ))}
     </div>

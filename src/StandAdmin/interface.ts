@@ -6,6 +6,7 @@ import { Connect } from 'react-redux';
 import {
   TableProps,
   ModalProps,
+  FormProps,
   FormItem,
   FormInstance,
   PaginationProps,
@@ -144,7 +145,7 @@ export interface IStandConfigModelOptions {
 export interface IStoreActionParams {
   action: string;
   actionForCount?: string;
-  actionTitle?: string;
+  actionTitle?: React.ReactNode;
   payload?: any;
   shouldRefresh?: boolean;
   StoreNs?: string;
@@ -298,7 +299,7 @@ export interface IContextHocFullParams<R = any>
     StoreNs: string;
     successMsg: string;
     action: string;
-    actionTitle: string;
+    actionTitle: React.ReactNode;
     payload: any;
     shouldRefresh: boolean;
   }) => void;
@@ -395,8 +396,8 @@ export interface IContextMethods<R> {
   renderPagination: (params?: PaginationProps) => React.ReactNode;
 
   handleTableChange: TableProps<R>['onChange'];
-  getRecordId: (record: R) => any;
-  getRecordName: (record: R) => any;
+  getRecordId: (record: R) => TRecordId;
+  getRecordName: (record: R) => React.ReactNode;
 
   getRecordModelPkg: () => IModelPkg;
   getConfigModelPkg: () => IModelPkg;
@@ -585,12 +586,7 @@ export interface IUseStandSearchFormResult<R> {
   renderFormHistroyTrigger: (
     opts?: TRenderFormHistroyTriggerOpts,
   ) => React.ReactNode;
-  formProps: {
-    name: string;
-    form: FormInstance;
-    initialValues: ICommonObj;
-    onFinish: (values: ICommonObj) => void;
-  };
+  formProps: Pick<FormProps, 'name' | 'form' | 'initialValues' | 'onFinish'>;
   config: ICommonObj;
   context: IStandContextProps<R>;
   form: IUseStandSearchFormResult<R>['formProps']['form'];
@@ -605,19 +601,11 @@ export interface IUseStandUpsertFormResult<R> {
   renderFormHistroyTrigger: (
     opts?: TRenderFormHistroyTriggerOpts,
   ) => React.ReactNode;
-  formProps: {
-    name: string;
-    form: FormInstance;
-    initialValues: ICommonObj;
-    onFinish: (values: ICommonObj) => void;
-  };
-  modalProps: {
-    title: string;
-    visible: boolean;
-    onOk: TFnVoid;
-    onCancel: TFnVoid;
-    afterClose: TFnVoid;
-  };
+  formProps: Pick<FormProps, 'name' | 'form' | 'initialValues' | 'onFinish'>;
+  modalProps: Pick<
+    ModalProps,
+    'title' | 'visible' | 'onOk' | 'onCancel' | 'afterClose'
+  >;
 
   /**
    * Normally passed by showRecordForm, and used as match condition in isModalVisible

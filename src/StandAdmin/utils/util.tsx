@@ -1,3 +1,5 @@
+import React, { Fragment } from 'react';
+
 export function getAutoIdGenerator(base = 0) {
   let baseId = base;
 
@@ -50,4 +52,21 @@ export function whyDidYouUpdate(
   if (Object.keys(changedProps).length) {
     console.log('[why-did-you-update]', componentName, changedProps);
   }
+}
+
+export function jsxJoin(nodes: React.ReactNode[], separator: any) {
+  const filtered = nodes.filter(Boolean);
+
+  return filtered.length === 0
+    ? null
+    : filtered.reduce<React.ReactNode[]>((acc, curr, i) => {
+        return acc.length
+          ? [
+              ...acc,
+              // Wrap the separator in a fragment to avoid `missing key` issues
+              <Fragment key={i}>{separator}</Fragment>,
+              curr,
+            ]
+          : [curr];
+      }, []);
 }

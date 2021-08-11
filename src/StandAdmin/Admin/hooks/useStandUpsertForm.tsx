@@ -18,6 +18,7 @@ import {
   IStoreRef,
 } from '../../interface';
 import { encodeFormValues, decodeFormValues } from '../../utils/formEncoder';
+import { jsxJoin } from '../../utils/util';
 
 import FormHistroyTrigger from '@/FormHistroy/trigger';
 
@@ -332,11 +333,14 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
       onFinish,
     },
     modalProps: {
-      title: !isUpdate
-        ? `创建${StoreNsTitle}`
-        : `修改${StoreNsTitle}${
-            activeRecordName ? ` - ${activeRecordName}` : ''
-          }`,
+      title: !isUpdate ? (
+        <>创建{StoreNsTitle}</>
+      ) : (
+        <>
+          修改{StoreNsTitle} [
+          {jsxJoin([activeRecordId, activeRecordName], ': ')}]
+        </>
+      ),
       visible: isModalVisible(recordFormVisibleTag),
       onOk: submitForm,
       onCancel: handleCancel,
