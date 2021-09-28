@@ -64,8 +64,8 @@
   .@{cls-prefix}-blinkRecord,
   .@{cls-prefix}-removingRecord,
   .@{cls-prefix}-activeRecord {
-    .ant-table-cell-fix-left,
-    .ant-table-cell-fix-right {
+    .@{ant-prefix}-table-cell-fix-left,
+    .@{ant-prefix}-table-cell-fix-right {
       background-color: @table-row-hover-bg;
     }
   }
@@ -90,19 +90,19 @@
 }
 
 .@{cls-prefix}-modalWrapper {
-  // .ant-modal-footer {
+  // .@{ant-prefix}-modal-footer {
   //   // padding: 10px 0;
   // }
-  .ant-modal {
+  .@{ant-prefix}-modal {
     top: 40px;
     min-width: 300px;
   }
 
-  .ant-modal-header {
+  .@{ant-prefix}-modal-header {
     padding: 12px 16px;
   }
 
-  .ant-modal-body {
+  .@{ant-prefix}-modal-body {
     min-height: 300px;
     max-height: calc(100vh - 170px);
     padding: 8px 16px;
@@ -125,11 +125,11 @@
       justify-content: flex-end;
     }
 
-    .ant-btn-link {
+    .@{ant-prefix}-btn-link {
       padding: 0;
     }
 
-    .ant-btn {
+    .@{ant-prefix}-btn {
       display: inline-block;
     }
   }
@@ -138,15 +138,15 @@
 .@{cls-prefix}-readonly {
   pointer-events: none;
 
-  .ant-picker,
-  .ant-select-selector,
-  .ant-input-affix-wrapper {
+  .@{ant-prefix}-picker,
+  .@{ant-prefix}-select-selector,
+  .@{ant-prefix}-input-affix-wrapper {
     border: 1px dashed #efefef !important;
   }
 
-  .ant-input-suffix,
-  .ant-select-arrow,
-  .ant-select-selection-item-remove {
+  .@{ant-prefix}-input-suffix,
+  .@{ant-prefix}-select-arrow,
+  .@{ant-prefix}-select-selection-item-remove {
     visibility: hidden !important;
   }
 }

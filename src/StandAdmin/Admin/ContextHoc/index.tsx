@@ -48,6 +48,7 @@ import {
   getAutoIdGenerator,
   getDisplayName,
   jsxJoin,
+  waitCondition,
   // whyDidYouUpdate,
 } from '../../utils/util';
 import { StandConnectHoc } from '../connect';
@@ -259,12 +260,18 @@ export default function<
         });
       };
 
-      getDvaApp = () => {
+      getDvaApp = (options?: { justTry: boolean }) => {
+        const { justTry = false } = options || {};
+
         const { getDvaApp } = getConfig();
 
         const app = getDvaApp();
 
         if (!app) {
+          if (justTry) {
+            return false;
+          }
+
           throw new Error('DvaApp still empty now!!');
         }
 
@@ -272,7 +279,11 @@ export default function<
       };
 
       isModelNsExists = (namespace: string) => {
-        const app = this.getDvaApp();
+        const app = this.getDvaApp({ justTry: true });
+
+        if (!app) {
+          return false;
+        }
 
         // eslint-disable-next-line no-underscore-dangle
         const existModels = app._models;
@@ -294,8 +305,18 @@ export default function<
         );
       };
 
-      tryRegisterModels = () => {
-        const app = this.getDvaApp();
+      tryRegisterModels = async () => {
+        await waitCondition({
+          test: () => !!this.getDvaApp({ justTry: true }),
+          interval: 10,
+          timeout: 10 * 1000,
+        });
+
+        const app = this.getDvaApp({ justTry: false });
+
+        if (!app) {
+          throw new Error('get DvaApp Failed');
+        }
 
         this.getRelModelPkgs().forEach(modelPkg => {
           if (this.isModelNsExists(modelPkg.StoreNs)) {
@@ -314,7 +335,11 @@ export default function<
       };
 
       tryUnregisterModels = () => {
-        const app = this.getDvaApp();
+        const app = this.getDvaApp({ justTry: true });
+
+        if (!app) {
+          return;
+        }
 
         this.getRelModelPkgs().forEach(modelPkg => {
           if (this.autoRegisteredStoreNsMap[modelPkg.StoreNs]) {

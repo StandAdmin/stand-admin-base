@@ -9,6 +9,32 @@ export function getAutoIdGenerator(base = 0) {
   };
 }
 
+export function waitCondition(options: {
+  test: () => boolean;
+  interval?: number;
+  timeout?: number;
+}) {
+  const { test, interval = 10, timeout = -1 } = options;
+
+  let timeLast = 10;
+
+  return new Promise<Boolean>(function(resolve, reject) {
+    (function waitPoll() {
+      if (test()) {
+        return resolve(true);
+      }
+
+      if (timeLast > 0 && timeLast > timeout) {
+        console.warn('waitCondition timeout', test);
+        reject(new Error('timeout'));
+      }
+
+      setTimeout(waitPoll, interval);
+      timeLast += interval;
+    })();
+  });
+}
+
 export function markAndMatch() {
   const markMap: { [key: string]: number } = {};
 
