@@ -179,6 +179,7 @@ export interface IStoreRef<R> {
   nameFieldName: string;
 
   records: R[];
+  extraPayload: any;
   searchParams: TSearchParams;
   pagination: IPagination;
   recordFormVisibleTag: TRecordFormVisibleTag;
