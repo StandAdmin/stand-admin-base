@@ -602,12 +602,17 @@ export default function<
       loadAndShowRecordForm = (
         paramsOrId: TSearchParamsOrId,
         recordFormVisibleTag = true,
+        opts?: { showLoadingModal: boolean },
       ) => {
-        const modal = Modal.info({
-          content: <Spin />,
-          maskClosable: false,
-          okButtonProps: { style: { display: 'none' } },
-        });
+        const { showLoadingModal } = { showLoadingModal: true, ...opts };
+
+        const modal = showLoadingModal
+          ? Modal.info({
+              content: <Spin />,
+              maskClosable: false,
+              okButtonProps: { style: { display: 'none' } },
+            })
+          : null;
 
         return this.getRecord(paramsOrId)
           .then(activeRecord => {
@@ -619,7 +624,9 @@ export default function<
             return Promise.reject(activeRecord);
           })
           .finally(() => {
-            modal.destroy();
+            if (modal) {
+              modal.destroy();
+            }
           });
       };
 

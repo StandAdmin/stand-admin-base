@@ -351,6 +351,7 @@ export interface IContextMethods<R> {
   loadAndShowRecordForm: (
     params: TSearchParamsOrId,
     recordFormVisibleTag?: IStoreRef<R>['recordFormVisibleTag'],
+    opts?: { showLoadingModal: boolean },
   ) => void;
   goSearch: (
     params?: TSearchParams,
