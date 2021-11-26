@@ -82,7 +82,7 @@ export interface IStandUpsertFormOpts<R> {
   /**
    * submitValues 成功后的回调
    */
-  onSuccess?: (resp: IResponse) => void;
+  onSuccess?: (resp: IResponse, values: any) => void;
 
   /**
    * 判断 Upsert Modal的显隐, recordFormVisibleTag 来源于 showRecordForm调用传递的参数
@@ -271,7 +271,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
         }
 
         if (onSuccess) {
-          onSuccess(resp);
+          onSuccess(resp, values);
         }
       }
     }),
