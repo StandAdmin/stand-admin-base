@@ -99,6 +99,7 @@ export function useStandSearchForm<R extends ICommonObj = any>(
     searchParamsToValues({
       ...getDefaultSearchParams(),
       ...defaultSearchParams,
+      ...context.getSearchParams(),
       ...storeRef.searchParams,
       ...getSpecSearchParams(),
     }),
