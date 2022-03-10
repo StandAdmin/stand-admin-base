@@ -51,7 +51,7 @@ const findValidName = (targetVals: any) => {
 
   // 深度遍历
   cloneDeepWith(targetVals, function(val) {
-    if (typeof val === 'string' || typeof val === 'number') {
+    if (typeof val === 'string') {
       strVals.push(val);
     }
   });
