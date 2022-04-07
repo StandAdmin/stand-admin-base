@@ -369,15 +369,15 @@ export interface IContextMethods<R> {
   getRecord: (specParams?: TSearchParams) => Promise<R>;
   updateRecord: (
     record: R,
-    callback?: TResponseOfActionHandler<R>,
+    opts?: IStoreActionParams | TResponseOfActionHandler<R>,
   ) => Promise<IResponseOfAction<R>>;
   addRecord: (
     record: R,
-    callback?: TResponseOfActionHandler<R>,
+    opts?: IStoreActionParams | TResponseOfActionHandler<R>,
   ) => Promise<IResponseOfAction<R>>;
   deleteRecord: (
     params: ICommonObj,
-    callback?: TResponseOfActionHandler<R>,
+    opts?: IStoreActionParams | TResponseOfActionHandler<R>,
   ) => Promise<IResponseOfAction<R>>;
 
   clearActiveRecord: TFnVoid;

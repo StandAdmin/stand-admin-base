@@ -805,7 +805,7 @@ export default function<
 
       addRecord = (
         record: R,
-        opts: IStoreActionParams | TResponseOfActionHandler<R>,
+        opts?: IStoreActionParams | TResponseOfActionHandler<R>,
       ) => {
         const [callback, actionArgs] =
           typeof opts === 'function' ? [opts] : [, opts];
@@ -821,7 +821,7 @@ export default function<
 
       updateRecord = (
         record: R,
-        opts: IStoreActionParams | TResponseOfActionHandler<R>,
+        opts?: IStoreActionParams | TResponseOfActionHandler<R>,
       ) => {
         const [callback, actionArgs] =
           typeof opts === 'function' ? [opts] : [, opts];
@@ -845,7 +845,7 @@ export default function<
 
       deleteRecord = (
         params: TSearchParams,
-        opts: IStoreActionParams | TResponseOfActionHandler<R>,
+        opts?: IStoreActionParams | TResponseOfActionHandler<R>,
       ) => {
         const [callback, actionArgs] =
           typeof opts === 'function' ? [opts] : [, opts];
