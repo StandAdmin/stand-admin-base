@@ -6,27 +6,27 @@ import { paramToUrl, paramFromUrl } from './urlParams';
 
 import { encodeFormValues, decodeFormValues } from './formEncoder';
 
-import { ICommonObj } from '../interface';
+import type { TCommonObj } from '../interface';
 
-export function isQueryParamsEqual(paramsA: ICommonObj, paramsB: ICommonObj) {
+export function isQueryParamsEqual(paramsA: TCommonObj, paramsB: TCommonObj) {
   return isEqual(
     fromUrlQuery(toUrlQuery(paramsA)),
-    fromUrlQuery(toUrlQuery(paramsB)),
+    fromUrlQuery(toUrlQuery(paramsB))
   );
 }
 
 export function toUrlQuery(
-  origParams: ICommonObj,
-  { ns = false }: { ns?: string | false } = {},
+  origParams: TCommonObj,
+  { ns = false }: { ns?: string | false } = {}
 ) {
-  const result: ICommonObj = {};
+  const result: TCommonObj = {};
 
   const params = encodeFormValues(origParams);
 
   if (ns) {
     result[ns] = JSON.stringify(params);
   } else {
-    Object.keys(params).forEach(k => {
+    Object.keys(params).forEach((k) => {
       const val = params[k];
 
       if (val === null || val === undefined) {
@@ -42,7 +42,7 @@ export function toUrlQuery(
 
 export function fromUrlQuery(
   search: string,
-  { ns = false }: { ns?: string | false } = {},
+  { ns = false }: { ns?: string | false } = {}
 ) {
   const urlParams = qsParse(search);
 
@@ -55,7 +55,7 @@ export function fromUrlQuery(
       } catch (e) {}
     }
   } else {
-    Object.keys(urlParams).forEach(k => {
+    Object.keys(urlParams).forEach((k) => {
       if (k.indexOf(StateParamPrefix) === 0) {
         return;
       }

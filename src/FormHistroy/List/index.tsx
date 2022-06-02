@@ -1,22 +1,22 @@
 import React from 'react';
-import { Popconfirm } from '@/UI/lib';
+import { Popconfirm } from '../../UI/lib';
 import { identity } from 'lodash';
 import {
   useStandTableList,
   getOptsForStandTableList,
-} from '@/StandAdmin/Admin/hooks/useStandTableList';
-import {
+} from '../../StandAdmin/Admin/hooks/useStandTableList';
+import type {
   IFormHistroyTriggerProps,
   IHistoryRecord,
   ITargetFormInfo,
 } from '../interface';
 
-import { ISelectCtrlHocInjectProps } from '../../StandAdmin/interface';
+import type { ISelectCtrlHocInjectProps } from '../../StandAdmin/interface';
 
-import { decodeFormValues } from '@/StandAdmin/utils/formEncoder';
+import { decodeFormValues } from '../../StandAdmin/utils/formEncoder';
 
 export default (
-  props: IFormHistroyTriggerProps & ISelectCtrlHocInjectProps<IHistoryRecord>,
+  props: IFormHistroyTriggerProps & ISelectCtrlHocInjectProps<IHistoryRecord>
 ) => {
   const {
     targetFormInfo,
@@ -28,14 +28,10 @@ export default (
 
   const { form: targetForm } = targetFormInfo as ITargetFormInfo;
 
-  const {
-    context,
-    showRecordForm,
-    tableListStyles,
-    standRender,
-  } = useStandTableList<IHistoryRecord>({
-    ...getOptsForStandTableList(props as any),
-  });
+  const { context, showRecordForm, tableListStyles, standRender } =
+    useStandTableList<IHistoryRecord>({
+      ...getOptsForStandTableList(props as any),
+    });
 
   const { deleteRecord, idFieldName, getRecordId, getRecordName } = context;
 

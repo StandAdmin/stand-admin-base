@@ -2,7 +2,7 @@ import Localforage from 'localforage';
 import { isMatch, pick } from 'lodash';
 import moment from 'moment';
 
-import { IHistoryRecord, IHistoryRecordSearchParams } from './interface';
+import type { IHistoryRecord, IHistoryRecordSearchParams } from './interface';
 const datetimeFormat = 'YYYY-MM-DD HH:mm:ss';
 
 const localforage = Localforage.createInstance({

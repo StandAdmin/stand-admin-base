@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useUnmount, usePersistFn } from '@/StandAdmin/utils/hooks';
-import {
-  ICommonObj,
+import { useUnmount, usePersistFn } from '../../utils/hooks';
+import type {
+  TCommonObj,
   TRecordId,
   ISelectCtrlHocInjectProps,
   IIdSelectCtrlHocProps,
@@ -12,12 +12,10 @@ import { useStandContext } from '../hooks/useStandContext';
 
 const TagProp = '_cus_tag_';
 
-export default function<
-  R extends ICommonObj = any,
+export default function <
+  R extends TCommonObj = any,
   P extends ISelectCtrlHocInjectProps<R> = any
 >() {
-  const globalRecordCache: ICommonObj = {};
-
   return (WrappedComponent: React.ComponentType<P>) => {
     type InnerCompProps = Omit<P, keyof ISelectCtrlHocInjectProps<R>> &
       IIdSelectCtrlHocProps<R>;
@@ -47,7 +45,7 @@ export default function<
         );
       }, [isControlledMode, origCheckedIdList, defaultCheckedIdList]);
 
-      const [recordCache, setRecordCache] = useState(globalRecordCache);
+      const [recordCache, setRecordCache] = useState<Record<TRecordId,any>>({});
 
       let hasUnMount = false;
 
@@ -55,10 +53,8 @@ export default function<
         hasUnMount = true;
       });
 
-      const updateRecordCache = usePersistFn(newRecordMap => {
+      const updateRecordCache = usePersistFn((newRecordMap) => {
         Object.assign(recordCache, newRecordMap);
-
-        Object.assign(globalRecordCache, recordCache);
 
         if (!hasUnMount) {
           setRecordCache({ ...recordCache });
@@ -73,9 +69,9 @@ export default function<
               map[id] = tag ? { [TagProp]: tag } : undefined;
 
               return map;
-            }, {}),
+            }, {})
           );
-        },
+        }
       );
 
       const onChange = usePersistFn((itemList: R[]) => {
@@ -84,7 +80,7 @@ export default function<
             // eslint-disable-next-line no-param-reassign
             map[getRecordId(item)] = item;
             return map;
-          }, {}),
+          }, {})
         );
 
         if (onChangeWithData) {
@@ -99,7 +95,7 @@ export default function<
 
       useEffect(() => {
         const update = async () => {
-          const missingIds = checkedIdList.filter(id => !recordCache[id]);
+          const missingIds = checkedIdList.filter((id) => !recordCache[id]);
 
           if (missingIds.length) {
             tagRecordByIdList(missingIds, 'loading');
@@ -113,6 +109,7 @@ export default function<
         };
 
         update();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [checkedIdList]);
 
       const checkedList = useMemo(() => {
@@ -126,15 +123,14 @@ export default function<
           return { [idFieldName]: id, [nameFieldName]: '...' };
         };
 
-        return checkedIdList.map(id => getFullRecord(id));
-      }, [checkedIdList, recordCache]);
+        return checkedIdList.map((id) => getFullRecord(id));
+      }, [checkedIdList, idFieldName, nameFieldName, recordCache]);
 
       return (
         <WrappedComponent
           {...{
-            [isControlledMode
-              ? 'checkedList'
-              : 'defaultCheckedList']: checkedList,
+            [isControlledMode ? 'checkedList' : 'defaultCheckedList']:
+              checkedList,
             onChange,
           }}
           {...(rest as P)}

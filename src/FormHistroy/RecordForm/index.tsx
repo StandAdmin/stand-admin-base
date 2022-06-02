@@ -1,16 +1,16 @@
 import React from 'react';
-import { Form, Modal, Button, Input } from '@/UI/lib';
+import { Form, Modal, Button, Input } from '../../UI/lib';
 import { cloneDeepWith, identity } from 'lodash';
-import {
+import type {
   ITargetFormInfo,
   IFormHistroyTriggerProps,
   IHistoryRecord,
 } from '../interface';
-import { encodeFormValues } from '@/StandAdmin/utils/formEncoder';
+import { encodeFormValues } from '../../StandAdmin/utils/formEncoder';
 import {
   useStandUpsertForm,
   getOptsForStandUpsertForm,
-} from '@/StandAdmin/Admin/hooks/useStandUpsertForm';
+} from '../../StandAdmin/Admin/hooks/useStandUpsertForm';
 
 const FormItem = Form.Item;
 
@@ -26,8 +26,8 @@ const formItemLayout = {
 };
 
 function strLen(str: string) {
-  var count = 0;
-  for (var i = 0, len = str.length; i < len; i++) {
+  let count = 0;
+  for (let i = 0, len = str.length; i < len; i++) {
     count += str.charCodeAt(i) < 256 ? 1 : 2;
   }
   return count;
@@ -50,7 +50,7 @@ const findValidName = (targetVals: any) => {
   const strVals: (string | number)[] = [];
 
   // 深度遍历
-  cloneDeepWith(targetVals, function(val) {
+  cloneDeepWith(targetVals, function (val) {
     if (typeof val === 'string') {
       strVals.push(val);
     }
@@ -104,11 +104,11 @@ export default (props: IFormHistroyTriggerProps) => {
         },
       }),
       // 接口数据（通常来自于列表接口）转换为表单数据
-      recordToValues: record => ({
+      recordToValues: (record) => ({
         ...record,
       }),
       // 表单数据转为接口数据（后续会传递给 addRecord/updateRecord）
-      recordFromValues: values => {
+      recordFromValues: (values) => {
         const { name } = values;
 
         const { encode = encodeFormValues } = formValuesEncoder || {};
@@ -121,7 +121,7 @@ export default (props: IFormHistroyTriggerProps) => {
           formVals: encode(beforeSave(getTargetFormVals())),
         };
       },
-    },
+    }
   );
 
   const { getActionCount } = context;

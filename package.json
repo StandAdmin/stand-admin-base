@@ -1,6 +1,6 @@
 {
   "name": "stand-admin-base",
-  "version": "1.3.21",
+  "version": "1.3.22",
   "description": "A CRUD framework work perfectly with Antd Pro",
   "scripts": {
     "start": "dumi dev",
@@ -17,7 +17,7 @@
   "main": "dist/index.esm.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
-  "gitHooks": {
+  "gitHooks2": {
     "pre-commit": "lint-staged"
   },
   "lint-staged": {

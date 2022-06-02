@@ -18,7 +18,7 @@ export function waitCondition(options: {
 
   let timeLast = 10;
 
-  return new Promise<Boolean>(function(resolve, reject) {
+  return new Promise<boolean>(function(resolve, reject) {
     (function waitPoll() {
       if (test()) {
         return resolve(true);
@@ -36,7 +36,7 @@ export function waitCondition(options: {
 }
 
 export function markAndMatch() {
-  const markMap: { [key: string]: number } = {};
+  const markMap: Record<string, number> = {};
 
   const getAutoId = getAutoIdGenerator();
 
@@ -64,7 +64,7 @@ export function whyDidYouUpdate(
   props: any,
 ) {
   const allKeys = Object.keys({ ...prevProps, ...props });
-  const changedProps: { [key: string]: any } = {};
+  const changedProps: Record<string, any> = {};
 
   allKeys.forEach(key => {
     if (prevProps![key] !== props[key]) {

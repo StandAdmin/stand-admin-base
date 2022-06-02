@@ -1,5 +1,5 @@
 import React from 'react';
-import { notification, Modal } from '@/UI/lib';
+import { notification, Modal } from '../UI/lib';
 import { merge, get } from 'lodash';
 // import Localforage from 'localforage';
 import {
@@ -11,10 +11,10 @@ import {
 
 import { getAutoIdGenerator, markAndMatch } from './utils/util';
 
-import {
+import type {
   IResponse,
   TAsyncFnAny,
-  ICommonObj,
+  TCommonObj,
   IStandModelOptions,
   IStandConfigModelOptions,
   IModelPkg,
@@ -30,7 +30,7 @@ import { logWarn } from './utils/logUtils';
 const getAutoId = getAutoIdGenerator();
 
 function delayP(ms: number, val = true) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(resolve, ms, val);
   });
 }
@@ -46,16 +46,16 @@ const emptySearchRecords = async () => ({
 const isFunction = (f: any) => typeof f === 'function';
 
 function convertParamsName(
-  params: ICommonObj,
-  nameMap: { [key: string]: string },
+  params: TCommonObj,
+  nameMap: Record<string, string>
 ) {
   if (!params) {
     return params;
   }
 
-  const newParams: ICommonObj = {};
+  const newParams: TCommonObj = {};
 
-  Object.keys(params).forEach(key => {
+  Object.keys(params).forEach((key) => {
     newParams[nameMap[key] || key] = params[key];
   });
 
@@ -63,9 +63,9 @@ function convertParamsName(
 }
 
 function getFirstNotEmptyVal(
-  obj: ICommonObj,
+  obj: TCommonObj,
   key: TFldsPathInRespMapKeys,
-  pathList: TFldsPathInRespMapValue,
+  pathList: TFldsPathInRespMapValue
 ) {
   if (!pathList) {
     throw new Error('pathList is Empty!');
@@ -101,7 +101,7 @@ export function handleCommonRespError(
     errorTitle?: string;
     errorMsgFields?: TFldsPathInRespMapValue;
     permissionApplyUrlFields?: TFldsPathInRespMapValue;
-  } = {},
+  } = {}
 ) {
   if (!response || response.success) {
     return;
@@ -110,13 +110,13 @@ export function handleCommonRespError(
   const errorContent = getFirstNotEmptyVal(
     response,
     'errorMsg',
-    errorMsgFields,
+    errorMsgFields
   );
 
   const permissionApplyUrl = getFirstNotEmptyVal(
     response,
     'permissionApplyUrl',
-    permissionApplyUrlFields,
+    permissionApplyUrlFields
   );
 
   if (permissionApplyUrl) {
@@ -180,15 +180,17 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
     convertParamsName(params, searchParamsMap);
 
   const getCommonFlds = (resp: IResponse): any => {
-    const result: ICommonObj = {};
+    const result: TCommonObj = {};
 
-    Object.keys(fldsPathInResp).forEach((key: TFldsPathInRespMapKeys) => {
-      const val = getFirstNotEmptyVal(resp, key, fldsPathInResp[key]);
+    (Object.keys(fldsPathInResp) as TFldsPathInRespMapKeys[]).forEach(
+      (key: TFldsPathInRespMapKeys) => {
+        const val = getFirstNotEmptyVal(resp, key, fldsPathInResp[key]);
 
-      if (val !== undefined) {
-        result[key] = val;
+        if (val !== undefined) {
+          result[key] = val;
+        }
       }
-    });
+    );
 
     return result;
   };
@@ -209,7 +211,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
 
   const markTag = markAndMatch();
 
-  const interModel: DvaModel = ({
+  const interModel: DvaModel = {
     namespace: StoreNs,
     state: {
       mountId: null,
@@ -247,7 +249,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
 
         const response: IResponseOfSearchRecords<R> = yield call(
           searchRecords,
-          filterParams({ pageNum: 1, pageSize: 10, ...params }),
+          filterParams({ pageNum: 1, pageSize: 10, ...params })
         );
 
         if (!response || !response.success) {
@@ -267,7 +269,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
           params?: any;
           opts: { searchOneAsBackup?: boolean };
         },
-        { call, put }: any,
+        { call, put }: any
       ) {
         if (!getRecord) {
           const { searchOneAsBackup } = options;
@@ -286,7 +288,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
 
         const response = (yield call(
           getRecord,
-          filterParams({ ...params }),
+          filterParams({ ...params })
         )) as IResponseOfGetRecord<R>;
 
         if (!response || !response.success) {
@@ -298,7 +300,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
       },
 
       search: [
-        function*(
+        function* (
           {
             params,
             opts: options = {},
@@ -306,7 +308,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
             params?: any;
             opts: { updateSearchParamsEvenError?: boolean; mountId?: number };
           },
-          { call, put }: any,
+          { call, put }: any
         ) {
           const { updateSearchParamsEvenError, mountId } = options;
 
@@ -328,7 +330,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
 
           const response: IResponseOfSearchRecords<R> = yield call(
             searchRecords,
-            filterParams(reqParams),
+            filterParams(reqParams)
           );
 
           if (!tagMatch()) {
@@ -438,13 +440,13 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
       },
       *findRecordById({ id }: { id: any }, { select }: any) {
         const records: any[] = yield select(
-          (state: any) => state[StoreNs].records,
+          (state: any) => state[StoreNs].records
         );
         return records.find((item: any) => item[idFieldName] === id);
       },
       *blinkRecordById(
         { id, timeout = 1000 }: { id: any; timeout: number },
-        { put }: any,
+        { put }: any
       ) {
         const recordItem: R = yield put.resolve({
           type: 'findRecordById',
@@ -461,7 +463,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
       },
       *blinkRecord(
         { record, timeout = 2000 }: { record: any; timeout?: number },
-        { put, call }: any,
+        { put, call }: any
       ) {
         // const { recordFormVisibleTag } = params;
         yield put({
@@ -483,7 +485,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
           record,
           callback,
         }: { record: any; callback?: (resp: IResponse) => void },
-        { call }: any,
+        { call }: any
       ) {
         if (!addRecord) {
           throw new Error(`addRecord is empty!`);
@@ -504,7 +506,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
           record,
           callback,
         }: { record: any; callback?: (resp: IResponse) => void },
-        { call }: any,
+        { call }: any
       ) {
         if (!updateRecord) {
           throw new Error(`updateRecord is empty!`);
@@ -524,7 +526,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
           params,
           callback,
         }: { params: any; callback?: (resp: IResponse) => void },
-        { call, put }: any,
+        { call, put }: any
       ) {
         const { [idFieldName]: id } = params;
 
@@ -570,7 +572,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
           serviceParams: any;
           callback?: (resp: IResponse) => void;
         },
-        { call }: any,
+        { call }: any
       ) {
         if (!serviceFunction) {
           throw new Error(`${serviceTitle}: serviceFunction is empty!`);
@@ -578,7 +580,7 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
 
         const response: IResponse = yield call(
           serviceFunction,
-          ...serviceParams,
+          ...serviceParams
         );
 
         if (!response || !response.success) {
@@ -600,9 +602,9 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
           params: { record, recordList = [] },
         } = action;
 
-        [record, ...recordList].forEach(repItem => {
+        [record, ...recordList].forEach((repItem) => {
           const idx = records.findIndex(
-            (item: any) => item[idFieldName] === repItem[idFieldName],
+            (item: any) => item[idFieldName] === repItem[idFieldName]
           );
 
           if (idx < 0) {
@@ -645,13 +647,13 @@ export function getStandModel<R = any>(opts: IStandModelOptions<R>): DvaModel {
     //     console.log(StoreNsTitle);
     //   },
     // },
-  } as unknown) as DvaModel;
+  } as unknown as DvaModel;
 
   return merge(
     interModel,
     isFunction(extensions)
       ? extensions({ ...opts, handleRespError })
-      : extensions,
+      : extensions
   );
 }
 
@@ -662,12 +664,12 @@ export function getStandConfigModel(opts: IStandConfigModelOptions): DvaModel {
     throw new Error(`StoreNs should no be empty!`);
   }
 
-  return ({
+  return {
     namespace: StoreNs,
     state: { [ConfigLoadingFld]: true },
     effects: {
       *[ConfigLoadMethod](_: any, { all, call, put }: any) {
-        const configObj: ICommonObj = yield put.resolve({
+        const configObj: TCommonObj = yield put.resolve({
           type: ConfigUpdateMethod,
           getConfig,
           updateConfigLoading: true,
@@ -678,13 +680,14 @@ export function getStandConfigModel(opts: IStandConfigModelOptions): DvaModel {
 
       *[ConfigUpdateMethod](
         {
+          // eslint-disable-next-line @typescript-eslint/no-shadow
           getConfig,
           updateConfigLoading = true,
         }: {
           getConfig: TStandConfigGetConfigItem;
           updateConfigLoading: boolean;
         },
-        { all, call, put }: any,
+        { all, call, put }: any
       ) {
         if (updateConfigLoading) {
           yield put({
@@ -693,13 +696,13 @@ export function getStandConfigModel(opts: IStandConfigModelOptions): DvaModel {
           });
         }
 
-        const results: ICommonObj[] = yield all(
-          (Array.isArray(getConfig) ? getConfig : [getConfig]).map(item =>
-            isFunction(item) ? call(item) : Promise.resolve(item),
-          ),
+        const results: TCommonObj[] = yield all(
+          (Array.isArray(getConfig) ? getConfig : [getConfig]).map((item) =>
+            isFunction(item) ? call(item) : Promise.resolve(item)
+          )
         );
 
-        const configObj: ICommonObj = results.reduce((map, item) => {
+        const configObj: TCommonObj = results.reduce((map, item) => {
           Object.assign(map, item);
           return map;
         }, {});
@@ -732,7 +735,7 @@ export function getStandConfigModel(opts: IStandConfigModelOptions): DvaModel {
         });
       },
     },
-  } as unknown) as DvaModel;
+  } as unknown as DvaModel;
 }
 
 export function getAutoStoreNs(key: string) {
@@ -740,7 +743,7 @@ export function getAutoStoreNs(key: string) {
 }
 
 export function buildStandRecordModelPkg<R = any>(
-  opts: IStandModelOptions<R> = {},
+  opts: IStandModelOptions<R> = {}
 ): IModelPkg<R> {
   const {
     idFieldName = 'id',
@@ -767,7 +770,7 @@ export function buildStandRecordModelPkg<R = any>(
 export function cloneModelPkg<R>(
   modelPkg: IModelPkg,
   nsTag: string = '_Clone',
-  opts?: Omit<IStandModelOptions<R>, 'StoreNs'>,
+  opts?: Omit<IStandModelOptions<R>, 'StoreNs'>
 ) {
   const { modelOpts, StoreNs } = modelPkg;
 
@@ -788,13 +791,13 @@ export function cloneModelPkg<R>(
 
 export function getDynamicModelPkg(
   modelPkg: IModelPkg,
-  nsTag: string = '_Dynamic',
+  nsTag: string = '_Dynamic'
 ) {
   return cloneModelPkg(modelPkg, nsTag, { isDynamic: true });
 }
 
 export function buildStandConfigModelPkg(
-  opts: IStandConfigModelOptions,
+  opts: IStandConfigModelOptions
 ): IModelPkg {
   const { StoreNs = getAutoStoreNs('Config'), StoreNsTitle = '配置' } = opts;
 

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { IActionCounterHocInjectProps } from '../interface';
+import type { IActionCounterHocInjectProps } from '../interface';
 import { getDisplayName } from '../utils/util';
 interface IActionCounterState {
-  counterMap: { [key: string]: number };
+  counterMap: Record<string, number>;
 }
 
 export default function<P extends IActionCounterHocInjectProps = any>() {

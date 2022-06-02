@@ -1,69 +1,61 @@
-import React from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Empty, Pagination, message, Modal, Spin } from '@/UI/lib';
-import { PaginationProps } from '../../../UI/interface';
 import classNames from 'classnames';
-import { isEqual, debounce, pick, pickBy, omit, omitBy } from 'lodash';
-import {
-  toUrlQuery,
-  fromUrlQuery,
-  isQueryParamsEqual,
-} from '../../utils/urlQueryHelper';
-import { getConfig } from '../../config';
-import { logInfo } from '../../utils/logUtils';
+import { debounce, isEqual, omit, omitBy, pick, pickBy } from 'lodash';
+import React from 'react';
+import { Empty, message, Modal, Pagination, Spin } from '../../../UI/lib';
 import ActionCounterHoc from '../../ActionCounterHoc';
 import BatchCheckHoc from '../../BatchCheckHoc';
-import { StandContext, ConfigUpdateMethod } from '../../const';
+import { getConfig } from '../../config';
+import { ConfigUpdateMethod, StandContext } from '../../const';
+import type {
+  IActionCounterHocInjectProps,
+  IBatchCheckHocInjectProps,
+  TCommonObj,
+  IContextHocFullParams,
+  IContextHocInjectProps,
+  IContextHocProps,
+  IContextMethods,
+  IResponseOfAction,
+  IResponseOfSearchRecords,
+  IStandConnectInjectProps,
+  IStandContextProps,
+  //IActionCounterHocProps,
+  // TAsyncFnAny,
+  IStoreActionParams,
+  TContextHocComponent,
+  TRecordId,
+} from '../../interface';
 import {
   EmptyConfigModel,
   EmptyRecordModel,
   getDynamicModelPkg,
 } from '../../standModelHelper';
+import { logInfo } from '../../utils/logUtils';
 import {
-  IContextHocInjectProps,
-  IContextHocProps,
-  IContextHocFullParams,
-  IContextMethods,
-  IStandConnectInjectProps,
-  //IActionCounterHocProps,
-  // TAsyncFnAny,
-  IStoreActionParams,
-  IServiceParams,
-  IResponseOfAction,
-  TSearchParamsOrId,
-  TRecordFormVisibleTag,
-  TContextHocComponent,
-  ICommonObj,
-  TRecordId,
-  IStandContextProps,
-  IResponseOfSearchRecords,
-  TSearchParams,
-  IActionCounterHocInjectProps,
-  IBatchCheckHocInjectProps,
-  TStandConfigGetConfigItem,
-  TResponseOfActionHandler,
-  //IStandConnectHocProps,
-} from '../../interface';
+  fromUrlQuery,
+  isQueryParamsEqual,
+  toUrlQuery,
+} from '../../utils/urlQueryHelper';
 import {
   getAutoIdGenerator,
   getDisplayName,
   jsxJoin,
   waitCondition,
-  // whyDidYouUpdate,
 } from '../../utils/util';
 import { StandConnectHoc } from '../connect';
-
 import styles from '../styles';
 
 const getNewMountId = getAutoIdGenerator();
 
 const isUndefined = (v: any) => v === undefined;
 
-const defaultSearchParamsEqualFn = (a: ICommonObj, b: ICommonObj) => {
+const defaultSearchParamsEqualFn = (a: TCommonObj, b: TCommonObj) => {
   return isEqual(omitBy(a, isUndefined), omitBy(b, isUndefined));
 };
 
-const defaultSuccessHandlerFn: IContextHocFullParams['successHandler'] = params => {
+const defaultSuccessHandlerFn: IContextHocFullParams['successHandler'] = (
+  params
+) => {
   const { successMsg, actionTitle } = params;
   message.success(successMsg || <>{actionTitle}成功！</>);
 };
@@ -80,8 +72,8 @@ const pickProps = (props: any, keys: boolean | string[]) => {
   return pick(props, keys);
 };
 
-export default function<
-  R extends ICommonObj = any,
+export default function <
+  R extends TCommonObj = any,
   P extends IContextHocInjectProps<R> = any
 >(hocParams: IContextHocFullParams<R>) {
   const {
@@ -149,7 +141,7 @@ export default function<
   type OuterCompProps = Omit<P, keyof IContextHocInjectProps<R>>;
 
   return (
-    WrappedComponent: React.ComponentType<P>,
+    WrappedComponent: React.ComponentType<P>
   ): TContextHocComponent<R, OuterCompProps> => {
     type InnerCompProps = IContextHocProps<R> &
       OuterCompProps &
@@ -159,7 +151,7 @@ export default function<
 
     class Comp extends React.Component<InnerCompProps> {
       public static displayName = `Records_${getDisplayName<P>(
-        WrappedComponent,
+        WrappedComponent
       )}`;
 
       static defaultProps = {
@@ -169,15 +161,13 @@ export default function<
 
       mountId: number = -1;
 
-      debouncedSearchRecords: (
-        specParams?: ICommonObj,
-      ) => Promise<IResponseOfSearchRecords<R>>;
+      debouncedSearchRecords: IContextMethods<R>['debouncedSearchRecords'];
 
-      latestSearchParams: ICommonObj;
+      latestSearchParams: TCommonObj = {};
 
-      autoRegisteredStoreNsMap: { [key: string]: boolean } = {};
+      autoRegisteredStoreNsMap: Record<string, boolean> = {};
 
-      constructor(props: any) {
+      constructor(props: InnerCompProps) {
         super(props);
 
         this.debouncedSearchRecords = debounce(this.searchRecords, 10);
@@ -215,14 +205,14 @@ export default function<
           const prevSearchParams = this.getFinalSearchParams(prevProps);
 
           const currentSearchParams = this.getFinalSearchParams(
-            this.props as any,
+            this.props as InnerCompProps
           );
 
           const searchParamsChanged =
-            !isSearchParamsEqual(prevSearchParams, currentSearchParams) &&
-            !isSearchParamsEqual(
+            !isSearchParamsEqual!(prevSearchParams, currentSearchParams) &&
+            !isSearchParamsEqual!(
               currentSearchParams,
-              this.latestSearchParams || {},
+              this.latestSearchParams || {}
             );
 
           if (
@@ -245,7 +235,7 @@ export default function<
       }
 
       cancleDebouncedSearchRecords = () => {
-        const { cancel } = this.debouncedSearchRecords as any;
+        const { cancel } = this.debouncedSearchRecords;
         if (cancel) {
           cancel();
         }
@@ -285,7 +275,6 @@ export default function<
           return false;
         }
 
-        // eslint-disable-next-line no-underscore-dangle
         const existModels = app._models;
 
         if (!existModels) {
@@ -295,13 +284,15 @@ export default function<
         return existModels.some((model: any) => model.namespace === namespace);
       };
 
-      getRecordModelPkg = () => recordModel;
+      getRecordModelPkg: IContextMethods<R>['getRecordModelPkg'] = () =>
+        recordModel;
 
-      getConfigModelPkg = () => configModel;
+      getConfigModelPkg: IContextMethods<R>['getConfigModelPkg'] = () =>
+        configModel;
 
       getRelModelPkgs = () => {
         return [this.getRecordModelPkg(), this.getConfigModelPkg()].filter(
-          pkg => !!pkg,
+          (pkg) => !!pkg
         );
       };
 
@@ -318,18 +309,18 @@ export default function<
           throw new Error('get DvaApp Failed');
         }
 
-        this.getRelModelPkgs().forEach(modelPkg => {
-          if (this.isModelNsExists(modelPkg.StoreNs)) {
+        this.getRelModelPkgs().forEach((modelPkg) => {
+          if (this.isModelNsExists(modelPkg.StoreNs!)) {
             // logInfo(`Model alreay exists: ${modelPkg.StoreNs}`);
             return;
           }
 
-          logInfo(`${StoreNsTitle}: Load model: ${modelPkg.StoreNs}`);
+          logInfo(`${StoreNsTitle}: Load model: ${modelPkg.StoreNs!}`);
 
           app.model(modelPkg.default);
 
           if (modelPkg.isDynamic) {
-            this.autoRegisteredStoreNsMap[modelPkg.StoreNs] = true;
+            this.autoRegisteredStoreNsMap[modelPkg.StoreNs!] = true;
           }
         });
       };
@@ -341,20 +332,20 @@ export default function<
           return;
         }
 
-        this.getRelModelPkgs().forEach(modelPkg => {
-          if (this.autoRegisteredStoreNsMap[modelPkg.StoreNs]) {
-            logInfo(`${StoreNsTitle}: Unload model: ${modelPkg.StoreNs}`);
+        this.getRelModelPkgs().forEach((modelPkg) => {
+          if (this.autoRegisteredStoreNsMap[modelPkg.StoreNs!]) {
+            logInfo(`${StoreNsTitle}: Unload model: ${modelPkg.StoreNs!}`);
 
-            app.unmodel(modelPkg.StoreNs);
-            delete this.autoRegisteredStoreNsMap[modelPkg.StoreNs];
+            app.unmodel(modelPkg.StoreNs!);
+            delete this.autoRegisteredStoreNsMap[modelPkg.StoreNs!];
           }
         });
       };
 
       getFinalSearchParams = (
         specProps?: InnerCompProps,
-        specParams?: ICommonObj,
-      ): ICommonObj => {
+        specParams?: TCommonObj
+      ): TCommonObj => {
         const props = specProps || this.props;
 
         const params =
@@ -390,14 +381,18 @@ export default function<
       /*
        默认参数
        */
-      getDefaultSearchParams = (...args: any) => {
+      getDefaultSearchParams: IContextMethods<R>['getDefaultSearchParams'] = (
+        ...args: any
+      ) => {
         return this.calcParamsWithProp('defaultSearchParams', ...args);
       };
 
       /*
        指定参数
        */
-      getSpecSearchParams = (...args: any) => {
+      getSpecSearchParams: IContextMethods<R>['getSpecSearchParams'] = (
+        ...args: any
+      ) => {
         return this.calcParamsWithProp('specSearchParams', ...args);
       };
 
@@ -409,12 +404,12 @@ export default function<
         return this.calcParamsWithProp('filterSearchParams', ...args);
       };
 
-      searchRecords = (specParams?: ICommonObj) => {
+      searchRecords: IContextMethods<R>['searchRecords'] = (specParams) => {
         const { dispatch, updateSearchParamsEvenError } = this.props;
 
         this.latestSearchParams = this.getFinalSearchParams(
           this.props as InnerCompProps,
-          specParams,
+          specParams
         );
 
         return dispatch({
@@ -424,9 +419,10 @@ export default function<
         }) as Promise<IResponseOfSearchRecords<R>>;
       };
 
-      getLatestSearchParams = () => {
-        return this.latestSearchParams;
-      };
+      getLatestSearchParams: IContextMethods<R>['getLatestSearchParams'] =
+        () => {
+          return this.latestSearchParams;
+        };
 
       getLocation = (specProps?: InnerCompProps) => {
         const props = specProps || this.props;
@@ -442,12 +438,15 @@ export default function<
         return history.location;
       };
 
-      getUrlParams = (specProps?: InnerCompProps) => {
+      getUrlParams: IContextMethods<R>['getUrlParams'] = (specProps) => {
         const props = specProps || this.props;
 
-        return fromUrlQuery(this.getLocation(specProps).search, {
-          ns: props.urlParamsNs,
-        });
+        return fromUrlQuery(
+          this.getLocation(specProps as InnerCompProps).search,
+          {
+            ns: props.urlParamsNs,
+          }
+        );
       };
 
       isSyncParamsToUrlEnabled = (specProps?: InnerCompProps): boolean => {
@@ -466,7 +465,7 @@ export default function<
         return !!syncParamsToUrl;
       };
 
-      getSearchParams = (specProps?: InnerCompProps) => {
+      getSearchParams: IContextMethods<R>['getSearchParams'] = (specProps) => {
         const props = specProps || this.props;
 
         let params;
@@ -481,12 +480,12 @@ export default function<
         return params;
       };
 
-      reloadSearch = () => {
+      reloadSearch: IContextMethods<R>['reloadSearch'] = () => {
         const { storeRef } = this.props;
         return this.searchRecords(storeRef.searchParams);
       };
 
-      goSearch = async (params: ICommonObj = {}) => {
+      goSearch: IContextMethods<R>['goSearch'] = async (params = {}) => {
         const {
           reservedUrlParamNames,
           passSearchWhenParamsEqual,
@@ -505,7 +504,7 @@ export default function<
           if (reservedUrlParamNames && reservedUrlParamNames.length > 0) {
             Object.assign(
               reservedParams,
-              pick(oldQueryParams, reservedUrlParamNames),
+              pick(oldQueryParams, reservedUrlParamNames)
             );
           }
 
@@ -526,8 +525,8 @@ export default function<
             const restSearchQuery = toUrlQuery(
               pickBy(
                 fromUrlQuery(searchInLocation),
-                (value, key) => key !== urlParamsNs,
-              ),
+                (value, key) => key !== urlParamsNs
+              )
             );
 
             if (restSearchQuery) {
@@ -550,23 +549,25 @@ export default function<
         return this.searchRecords(params);
       };
 
-      showEmptyRecordForm = () => {
+      showEmptyRecordForm: IContextMethods<R>['showEmptyRecordForm'] = () => {
         return this.showRecordForm(null);
       };
 
-      hideRecordFormOnly = () => {
+      hideRecordFormOnly: IContextMethods<R>['hideRecordFormOnly'] = () => {
         const { dispatch, onRecordFormVisibleTagChange } = this.props;
 
-        return (dispatch({
-          type: `${StoreNs}/hideRecordFormOnly`,
-        }) as Promise<any>).then(() => {
+        return (
+          dispatch({
+            type: `${StoreNs}/hideRecordFormOnly`,
+          }) as Promise<any>
+        ).then(() => {
           if (onRecordFormVisibleTagChange) {
             onRecordFormVisibleTagChange(false);
           }
         });
       };
 
-      getRecord = (paramsOrId: TSearchParamsOrId) => {
+      getRecord: IContextMethods<R>['getRecord'] = (paramsOrId) => {
         const { dispatch } = this.props;
 
         return dispatch({
@@ -579,7 +580,11 @@ export default function<
         }) as Promise<R>;
       };
 
-      getRecordMapByIdList = async (idList: TRecordId[]) => {
+      getRecordMapByIdList: IContextMethods<R>['getRecordMapByIdList'] = async (
+        idList
+      ) => {
+        await this.tryRegisterModels();
+
         const { getRecordMapByIdList } = this.props;
 
         if (getRecordMapByIdList) {
@@ -587,24 +592,27 @@ export default function<
         }
 
         const recordList = await Promise.all(
-          idList.map(id => this.getRecord({ [idFieldName]: id })),
+          idList.map((id) => this.getRecord({ [idFieldName]: id }))
         );
 
-        const dataMap: ICommonObj = {};
+        const dataMap: TCommonObj = {};
 
-        recordList.forEach(record => {
+        recordList.forEach((record) => {
           dataMap[getRecordId(record)] = record;
         });
 
         return dataMap;
       };
 
-      loadAndShowRecordForm = (
-        paramsOrId: TSearchParamsOrId,
+      loadAndShowRecordForm: IContextMethods<R>['loadAndShowRecordForm'] = (
+        paramsOrId,
         recordFormVisibleTag = true,
-        opts?: { showLoadingModal: boolean },
+        opts
       ) => {
-        const { showLoadingModal } = { showLoadingModal: true, ...opts };
+        const { showLoadingModal, recordFilter } = {
+          showLoadingModal: true,
+          ...opts,
+        };
 
         const modal = showLoadingModal
           ? Modal.info({
@@ -615,7 +623,13 @@ export default function<
           : null;
 
         return this.getRecord(paramsOrId)
-          .then(activeRecord => {
+          .then((origActiveRecord) => {
+            let activeRecord = origActiveRecord;
+
+            if (recordFilter) {
+              activeRecord = recordFilter(activeRecord);
+            }
+
             if (activeRecord) {
               return this.showRecordForm(activeRecord, recordFormVisibleTag);
             }
@@ -630,26 +644,28 @@ export default function<
           });
       };
 
-      showRecordForm = (
-        activeRecord: R,
-        recordFormVisibleTag: TRecordFormVisibleTag = true,
+      showRecordForm: IContextMethods<R>['showRecordForm'] = (
+        activeRecord,
+        recordFormVisibleTag = true
       ) => {
         const { dispatch, onRecordFormVisibleTagChange } = this.props;
 
-        return (dispatch({
-          type: `${StoreNs}/showRecordForm`,
-          params: {
-            activeRecord,
-            recordFormVisibleTag,
-          },
-        }) as Promise<any>).then(() => {
+        return (
+          dispatch({
+            type: `${StoreNs}/showRecordForm`,
+            params: {
+              activeRecord,
+              recordFormVisibleTag,
+            },
+          }) as Promise<any>
+        ).then(() => {
           if (onRecordFormVisibleTagChange) {
             onRecordFormVisibleTagChange(recordFormVisibleTag);
           }
         });
       };
 
-      clearActiveRecord = () => {
+      clearActiveRecord: IContextMethods<R>['clearActiveRecord'] = () => {
         const { dispatch } = this.props;
         return dispatch({
           type: `${StoreNs}/clearActiveRecord`,
@@ -666,18 +682,15 @@ export default function<
           successMsg,
           blinkRecord = true,
           StoreNs: specStoreNs,
-        }: IStoreActionParams,
+        }: IStoreActionParams
       ) => {
         if (resp && resp.success) {
-          const {
-            searchRecordsOnRefresh,
-            onRefresh,
-            successHandler,
-          } = this.props;
+          const { searchRecordsOnRefresh, onRefresh, successHandler } =
+            this.props;
 
           if (successMsg !== false && successHandler) {
             successHandler({
-              StoreNs: specStoreNs || StoreNs,
+              StoreNs: specStoreNs || StoreNs!,
               successMsg,
               action,
               actionTitle,
@@ -697,7 +710,7 @@ export default function<
               const { storeRef: { searchParams = {} } = {} } = this.props;
 
               this.searchRecords(
-                isAddRecord ? omit(searchParams, ['pageNum']) : searchParams,
+                isAddRecord ? omit(searchParams, ['pageNum']) : searchParams
               ).then(() => {
                 if (blinkRecord && isUpsert) {
                   const matchRecord = resp.data || payload.record;
@@ -720,7 +733,7 @@ export default function<
         }
       };
 
-      blinkRecordById = (id: TRecordId) => {
+      blinkRecordById: IContextMethods<R>['blinkRecordById'] = (id) => {
         const { dispatch } = this.props;
         return dispatch({
           type: `${StoreNs}/blinkRecordById`,
@@ -728,7 +741,7 @@ export default function<
         });
       };
 
-      callStoreAction = (args: IStoreActionParams) => {
+      callStoreAction: IContextMethods<R>['callStoreAction'] = (args) => {
         const {
           action,
           actionForCount: origActionForCount,
@@ -774,11 +787,11 @@ export default function<
       };
 
       /** @deprecated use callStoreAction instead */
-      callAction = (
-        action: string,
-        actionTitle: string,
-        payload: any,
-        shouldRefresh: boolean = true,
+      callAction: IContextMethods<R>['callAction'] = (
+        action,
+        actionTitle,
+        payload,
+        shouldRefresh = true
       ) => {
         // eslint-disable-next-line no-console
         console.warn('callAction is deprecated, use callStoreAction instead');
@@ -790,12 +803,12 @@ export default function<
         });
       };
 
-      callService = ({
+      callService: IContextMethods<R>['callService'] = ({
         serviceTitle,
         serviceFunction,
         serviceParams,
         ...rest
-      }: IServiceParams) =>
+      }) =>
         this.callStoreAction({
           action: 'callService',
           actionTitle: serviceTitle,
@@ -803,10 +816,7 @@ export default function<
           ...rest,
         });
 
-      addRecord = (
-        record: R,
-        opts?: IStoreActionParams | TResponseOfActionHandler<R>,
-      ) => {
+      addRecord: IContextMethods<R>['addRecord'] = (record, opts) => {
         const [callback, actionArgs] =
           typeof opts === 'function' ? [opts] : [, opts];
 
@@ -819,10 +829,7 @@ export default function<
         });
       };
 
-      updateRecord = (
-        record: R,
-        opts?: IStoreActionParams | TResponseOfActionHandler<R>,
-      ) => {
+      updateRecord: IContextMethods<R>['updateRecord'] = (record, opts?) => {
         const [callback, actionArgs] =
           typeof opts === 'function' ? [opts] : [, opts];
 
@@ -843,14 +850,11 @@ export default function<
         });
       };
 
-      deleteRecord = (
-        params: TSearchParams,
-        opts?: IStoreActionParams | TResponseOfActionHandler<R>,
-      ) => {
+      deleteRecord: IContextMethods<R>['deleteRecord'] = (params, opts) => {
         const [callback, actionArgs] =
           typeof opts === 'function' ? [opts] : [, opts];
 
-        const recordId = getRecordId(params as any);
+        const recordId = getRecordId(params as R);
 
         return this.callStoreAction({
           action: 'deleteRecord',
@@ -876,10 +880,10 @@ export default function<
         return this.handleTableChange({ current, pageSize });
       };
 
-      handleTableChange = (
-        { current, pageSize }: { current: number; pageSize: number },
+      handleTableChange: IContextMethods<R>['handleTableChange'] = (
+        { current, pageSize },
         filters?: any,
-        sorter?: any,
+        sorter?: any
       ) => {
         const {
           searchParams = {},
@@ -902,9 +906,9 @@ export default function<
           pageSize: pageSize || origPageSize,
         };
 
-        const withUpdates = !this.props.isSearchParamsEqual(
+        const withUpdates = !this.props.isSearchParamsEqual!(
           newSearchParams,
-          searchParams,
+          searchParams
         );
 
         if (withUpdates) {
@@ -912,7 +916,7 @@ export default function<
         }
       };
 
-      renderEmpty = () => {
+      renderEmpty: IContextMethods<R>['renderEmpty'] = () => {
         const { searchLoading } = this.props;
 
         return (
@@ -924,18 +928,16 @@ export default function<
                   <LoadingOutlined style={{ marginRight: 4 }} />
                   加载中
                 </span>
-              ) : (
-                undefined
-              )
+              ) : undefined
             }
           />
         );
       };
 
-      renderPagination = ({
+      renderPagination: IContextMethods<R>['renderPagination'] = ({
         className,
         ...restProps
-      }: PaginationProps = {}) => {
+      } = {}) => {
         const { storeRef } = this.props;
 
         const { pagination } = storeRef;
@@ -955,7 +957,7 @@ export default function<
               onChange: this.handlePageNumChange,
               onShowSizeChange: this.onShowSizeChange,
               showTotal: this.showTotal,
-              pageSizeOptions: [10, 20, 30, 50, 100].map(s => String(s)),
+              pageSizeOptions: [10, 20, 30, 50, 100].map((s) => String(s)),
               showSizeChanger: true,
               // showQuickJumper: true,
             }}
@@ -964,17 +966,23 @@ export default function<
         );
       };
 
-      updateConfig = (
-        getConfig: TStandConfigGetConfigItem,
-        updateConfigLoading: boolean = false,
-      ): Promise<ICommonObj> => {
+      updateConfig: IContextMethods<R>['updateConfig'] = (
+        getConfigNew,
+        updateConfigLoading = false
+      ): Promise<TCommonObj> => {
         const { dispatch } = this.props;
 
-        return dispatch({
+        const result = dispatch({
           type: `${this.getConfigModelPkg().StoreNs}/${ConfigUpdateMethod}`,
-          getConfig,
+          getConfig: getConfigNew,
           updateConfigLoading,
-        }) as any;
+        });
+
+        if ('then' in result) {
+          return result;
+        }
+
+        return Promise.reject(result);
       };
 
       getInsMethods = (): IContextMethods<R> => {
@@ -1090,11 +1098,8 @@ export default function<
       };
 
       getActionCounterHocInject = (): IActionCounterHocInjectProps => {
-        const {
-          increaseActionCount,
-          decreaseActionCount,
-          getActionCount,
-        } = this.props;
+        const { increaseActionCount, decreaseActionCount, getActionCount } =
+          this.props;
 
         return {
           increaseActionCount,
@@ -1113,7 +1118,7 @@ export default function<
         } = this.props;
 
         return {
-          StoreNs,
+          StoreNs: StoreNs!,
           storeRef,
           configStoreRef,
           config: configStoreRef,
@@ -1123,7 +1128,7 @@ export default function<
           StoreNsTitle,
           idFieldName,
           nameFieldName,
-          formNamePrefix,
+          formNamePrefix: formNamePrefix!,
 
           isStoreDataStale: this.isStoreDataStale(),
           mountId: this.mountId,
@@ -1166,10 +1171,13 @@ export default function<
           getStandContext: this.getStandContext,
 
           // context props
-          ...pickProps(contextVal, receiveContextAsProps),
+          ...pickProps(contextVal, receiveContextAsProps!),
 
           // hocparams props
-          ...pickProps(pick(restProps, hocParamsKeys), receiveHocParamsAsProps),
+          ...pickProps(
+            pick(restProps, hocParamsKeys),
+            receiveHocParamsAsProps!
+          ),
 
           // pass rest props
           ...omit(restProps, [...Object.keys(contextVal), ...hocParamsKeys]),
@@ -1188,7 +1196,7 @@ export default function<
                   configLoading ||
                   contextVal.getActionCount() > 0,
               },
-              wrapperClassName,
+              wrapperClassName
             )}
           >
             <StandContext.Provider value={contextVal}>
@@ -1216,8 +1224,8 @@ export default function<
 
             return isEqual(a, b);
           },
-        })(Comp as any),
-      ),
+        })(Comp)
+      )
     );
   };
 }

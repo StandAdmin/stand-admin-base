@@ -1,6 +1,6 @@
-import { IGlobalConfig } from './interface';
+import type { TGlobalConfig } from './interface';
 
-const globalConfig: IGlobalConfig = {
+const globalConfig: TGlobalConfig = {
   getDvaApp: () => {
     throw new Error('getDvaApp not set in Config');
   },
@@ -16,7 +16,7 @@ export function getConfig() {
   return globalConfig;
 }
 
-export function setConfig(config: Partial<IGlobalConfig>) {
+export function setConfig(config: Partial<TGlobalConfig>) {
   Object.assign(globalConfig, config);
   return globalConfig;
 }

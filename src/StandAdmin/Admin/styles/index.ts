@@ -1,4 +1,5 @@
-import { ElementOf, tuple } from '../../utils/type';
+import type { ElementOf} from '../../utils/type';
+import { tuple } from '../../utils/type';
 
 import './index.less';
 

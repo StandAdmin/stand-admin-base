@@ -2,7 +2,7 @@ import { StandContext } from '../const';
 import StandSelectCtrlHoc from './SelectCtrlHoc';
 import StandContextHoc from './ContextHoc';
 import StandRecordInfoHoc from './RecordInfoHoc';
-import {
+import type {
   IContextHocCommonParams,
   IContextHocFullParams,
   ISelectCtrlHocParams,

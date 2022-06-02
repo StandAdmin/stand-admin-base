@@ -10,33 +10,7 @@ export * from './Admin/hooks/useStandTableList';
 
 export * from './Admin/hooks/useStandContext';
 
-export {
-  IResponseOfSearchRecords,
-  IResponseOfGetRecord,
-  IResponseOfAction,
-  IStandModelOptions,
-  IStandConfigModelOptions,
-  IStoreActionParams,
-  IServiceParams,
-  IStoreRef,
-  IContextHocCommonParams,
-  IContextHocFullParams,
-  IContextHocInjectProps,
-  IContextHocProps,
-  ISelectCtrlHocParams,
-  ISelectCtrlHocInjectProps,
-  ISelectCtrlHocProps,
-  IIdSelectCtrlHocProps,
-  IRecordInfoHocInjectProps,
-  IStandContextProps,
-  TContextHocComponent,
-  TSelectCtrlHocComponent,
-  IUseStandSearchFormResult,
-  IUseStandUpsertFormResult,
-  IStandTableRenderParams,
-  IUseStandTableListResult,
-  IModelPkg,
-} from './interface';
+export * from './interface';
 
 import BatchCheckHoc from './BatchCheckHoc';
 import ActionCounterHoc from './ActionCounterHoc';

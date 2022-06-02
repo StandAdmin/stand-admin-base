@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { IStandContextProps } from './interface';
+import type { IStandContextProps } from './interface';
 
 export const StandContext = React.createContext<IStandContextProps>({} as any);
 

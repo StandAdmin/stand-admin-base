@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { EmptyRecordModel } from '../../standModelHelper';
-import {
+import type {
   IRecordInfoHocInjectProps,
   IContextHocFullParams,
   TContextHocComponent,
   IResponseOfGetRecord,
-  ICommonObj,
+  TCommonObj,
 } from '../../interface';
 
 import { set, omit } from 'lodash';
@@ -19,14 +19,14 @@ import {
   getAutoStoreNs,
 } from '../../standModelHelper';
 
-export default function<
-  R extends ICommonObj = any,
+export default function <
+  R extends TCommonObj = any,
   P extends IRecordInfoHocInjectProps<R> = any
 >(hocParams: IContextHocFullParams<R>) {
   const { recordModel = EmptyRecordModel } = hocParams;
 
   return (
-    WrappedComponent: React.ComponentType<P>,
+    WrappedComponent: React.ComponentType<P>
   ): TContextHocComponent<R, P> => {
     const Comp = (props: P) => {
       const {
@@ -61,9 +61,9 @@ export default function<
           if (getRecord) {
             return getRecord(
               omit(params, [
-                searchParamsMap['pageSize'],
-                searchParamsMap['pageNum'],
-              ]),
+                searchParamsMap.pageSize!,
+                searchParamsMap.pageNum!,
+              ])
             ).then((resp: IResponseOfGetRecord<R>) => {
               if (!resp.success) {
                 return resp;
@@ -82,20 +82,20 @@ export default function<
 
               if (typeof targetListPathItem !== 'string') {
                 throw new Error(
-                  'fldsPathInResp.list is supposed to be a string for RecordInfoHoc!',
+                  'fldsPathInResp.list is supposed to be a string for RecordInfoHoc!'
                 );
               }
 
               set(
                 finalResp,
                 targetListPathItem.split('.'),
-                resp.data ? [resp.data] : [],
+                resp.data ? [resp.data] : []
               );
 
               return finalResp;
             });
           } else {
-            return searchRecords(params);
+            return searchRecords!(params);
           }
         },
       }),

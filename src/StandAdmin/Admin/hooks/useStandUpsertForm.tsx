@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import { Form } from '@/UI/lib';
-import { FormInstance } from '../../../UI/interface';
+import { Form } from '../../../UI/lib';
+import type { FormInstance } from '../../../UI/interface';
 import { identity, isEqual } from 'lodash';
-import { usePersistFn } from '@/StandAdmin/utils/hooks';
+import { usePersistFn } from '../../utils/hooks';
 import { useStandContext } from './useStandContext';
-import {
-  ICommonObj,
-  TCommonObjOrEmpty,
+import type {
+  TCommonObj,
+  TRecordOrEmpty,
   IUseStandUpsertFormResult,
   IStandContextProps,
   TSearchParams,
@@ -20,19 +20,19 @@ import {
 import { encodeFormValues, decodeFormValues } from '../../utils/formEncoder';
 import { jsxJoin } from '../../utils/util';
 
-import FormHistroyTrigger from '@/FormHistroy/trigger';
+import FormHistroyTrigger from '../../../FormHistroy/trigger';
 
-function defaultSubmitValues<R extends ICommonObj = any>(
-  values: TCommonObjOrEmpty,
+function defaultSubmitValues<R extends TCommonObj = any>(
+  values: TRecordOrEmpty,
   options: {
-    config: TCommonObjOrEmpty;
+    config: TRecordOrEmpty;
     context: IStandContextProps;
     activeRecord: R;
     isUpdate: boolean;
     addRecord: IStandContextProps<R>['addRecord'];
     updateRecord: IStandContextProps<R>['updateRecord'];
     recordFormVisibleTag: IStoreRef<R>['recordFormVisibleTag'];
-  },
+  }
 ) {
   const { isUpdate, addRecord, updateRecord, activeRecord, context } = options;
 
@@ -55,24 +55,24 @@ export interface IStandUpsertFormOpts<R> {
    * 默认的表单数据
    */
   defaultValues?:
-    | TCommonObjOrEmpty
-    | ((options: { config: TCommonObjOrEmpty }) => TCommonObjOrEmpty);
+    | TRecordOrEmpty
+    | ((options: { config: TRecordOrEmpty }) => TRecordOrEmpty);
 
   /**
    * 接口数据（通常来自于列表接口）转换为表单数据
    */
   recordToValues?: (
     record: R,
-    options: { config: TCommonObjOrEmpty; defaultValues: TCommonObjOrEmpty },
-  ) => TCommonObjOrEmpty;
+    options: { config: TRecordOrEmpty; defaultValues: TRecordOrEmpty }
+  ) => TRecordOrEmpty;
 
   /**
    * 表单数据转为接口数据（后续会传递给 addRecord/updateRecord）
    */
   recordFromValues?: (
     values: any,
-    activeRecord: TCommonObjOrEmpty,
-  ) => TCommonObjOrEmpty;
+    activeRecord: TRecordOrEmpty
+  ) => TRecordOrEmpty;
 
   /**
    * 默认调用 addRecord/updateRecord
@@ -93,7 +93,7 @@ export interface IStandUpsertFormOpts<R> {
 export interface IPropsForStandUpsertForm {
   isStandAdminHoc: boolean;
   specParamsAsRecordInitialValues?: boolean;
-  recordInitialValues?: ICommonObj;
+  recordInitialValues?: TCommonObj;
   specSearchParams?: TSearchParams | TFnParamsFilter;
 }
 
@@ -111,7 +111,7 @@ function stringifyRecordFormVisibleTag(tag: TRecordFormVisibleTag): string {
 
 export function getOptsForStandUpsertForm(
   props: IPropsForStandUpsertForm,
-  extraOpts: IExtraOpts = {},
+  extraOpts: IExtraOpts = {}
 ) {
   const { defaultValues = {} } = extraOpts || {};
 
@@ -126,9 +126,7 @@ export function getOptsForStandUpsertForm(
   if (defaultValues) {
     Object.assign(
       finalDefaultValues,
-      typeof defaultValues === 'function'
-        ? defaultValues(props)
-        : defaultValues,
+      typeof defaultValues === 'function' ? defaultValues(props) : defaultValues
     );
   }
 
@@ -137,7 +135,7 @@ export function getOptsForStandUpsertForm(
       finalDefaultValues,
       typeof specSearchParams === 'function'
         ? specSearchParams(props)
-        : specSearchParams,
+        : specSearchParams
     );
   }
 
@@ -151,8 +149,8 @@ export function getOptsForStandUpsertForm(
 
 const isWeakTrue = (v: any) => !!v;
 
-export function useStandUpsertForm<R extends ICommonObj = any>(
-  opts: IStandUpsertFormOpts<R> | IPropsForStandUpsertForm,
+export function useStandUpsertForm<R extends TCommonObj = any>(
+  opts: IStandUpsertFormOpts<R> | IPropsForStandUpsertForm
 ): IUseStandUpsertFormResult<R> {
   const stOpts: IStandUpsertFormOpts<R> = useMemo(() => {
     return (
@@ -198,7 +196,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
 
   const refPrevInitValues = useRef(null);
 
-  const getInitValuesByRecord = usePersistFn(specRecord => {
+  const getInitValuesByRecord = usePersistFn((specRecord) => {
     const finalDefaultValues =
       typeof defaultValues === 'function'
         ? defaultValues({ config })
@@ -214,7 +212,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     };
   });
 
-  const getInitValues = usePersistFn(specRecord => {
+  const getInitValues = usePersistFn((specRecord) => {
     const initValues = getInitValuesByRecord(specRecord || activeRecord);
 
     if (isEqual(initValues, refPrevInitValues.current)) {
@@ -234,11 +232,13 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
       if (isModalVisible(recordFormVisibleTag)) {
         const values = form.getFieldsValue();
 
-        const emptyValues: ICommonObj = {};
+        const emptyValues: TCommonObj = {};
 
-        Object.keys(values).forEach(k => {
+        Object.keys(values).forEach((k) => {
           emptyValues[k] = undefined;
         });
+
+        form.resetFields();
 
         form.setFieldsValue({ ...emptyValues, ...getInitValues(activeRecord) });
       }
@@ -249,22 +249,22 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     };
   }, [isModalVisible, recordFormVisibleTag, activeRecord, form, getInitValues]);
 
-  const activeRecordId = getRecordId(activeRecord);
+  const activeRecordId = getRecordId(activeRecord as any);
 
   const isUpdate = activeRecordId !== undefined && activeRecordId !== null;
 
   const resetForm = usePersistFn(() => form.resetFields());
 
-  const onFinish = usePersistFn(values =>
+  const onFinish = usePersistFn((values) =>
     submitValues(recordFromValues(values, activeRecord), {
       config,
       context,
-      activeRecord,
+      activeRecord: activeRecord as any,
       isUpdate,
       addRecord,
       updateRecord,
       recordFormVisibleTag,
-    }).then(resp => {
+    }).then((resp) => {
       if (resp && resp.success) {
         if (!isUpdate) {
           resetForm();
@@ -274,13 +274,13 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
           onSuccess(resp, values);
         }
       }
-    }),
+    })
   );
 
   const submitForm = usePersistFn(() =>
-    form.validateFields().then(values => {
+    form.validateFields().then((values) => {
       onFinish(values);
-    }),
+    })
   );
 
   const handleCancel = usePersistFn(() => {
@@ -293,7 +293,7 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
     }
   });
 
-  const activeRecordName = getRecordName(activeRecord);
+  const activeRecordName = getRecordName(activeRecord as any);
 
   const formId = `${formNamePrefix}_${StoreNs}_${formIdTag}${
     typeof recordFormVisibleTag !== 'boolean'
@@ -320,12 +320,12 @@ export function useStandUpsertForm<R extends ICommonObj = any>(
             : renderOpts)}
         />
       );
-    },
+    }
   );
 
   return {
     formId,
-    renderFormHistroyTrigger,
+    renderFormHistroyTrigger: renderFormHistroyTrigger as any,
     formProps: {
       name: `${formId}_${mountId}`,
       form,

@@ -1,6 +1,6 @@
 import { identity } from 'lodash';
 
-import { ICommonObj } from '../interface';
+import type { TCommonObj } from '../interface';
 
 import { toUrlQuery, fromUrlQuery } from './urlQueryHelper';
 
@@ -10,10 +10,10 @@ export default {
   /**
    * map({key:value}) 转 option({value:key,label:value})
    */
-  mapToOptions(obj: ICommonObj, opts?: { valueFilter: (val: any) => any }) {
+  mapToOptions(obj: TCommonObj, opts?: { valueFilter: (val: any) => any }) {
     const { valueFilter = identity } = opts || {};
 
-    return Object.keys(obj).map(key => ({
+    return Object.keys(obj).map((key) => ({
       value: valueFilter(key),
       label: obj[key],
     }));
@@ -24,7 +24,7 @@ export default {
   arrayToOptions(arr: any[], opts?: { valueFilter: (val: any) => any }) {
     const { valueFilter = identity } = opts || {};
 
-    return arr.map(value => ({ value: valueFilter(value), label: value }));
+    return arr.map((value) => ({ value: valueFilter(value), label: value }));
   },
 
   stringifyQueryParams: toUrlQuery,

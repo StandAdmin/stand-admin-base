@@ -1,6 +1,6 @@
 import React from 'react';
 import { pullAll, uniqWith } from 'lodash';
-import { IBatchCheckHocProps, IBatchCheckHocInjectProps } from '../interface';
+import type { IBatchCheckHocProps, IBatchCheckHocInjectProps } from '../interface';
 import { getDisplayName } from '../utils/util';
 
 interface IBatchCheckState<R> {

@@ -1,16 +1,16 @@
 import React, { Fragment } from 'react';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Button, Modal, Tag } from '@/UI/lib';
+import { Button, Modal, Tag } from '../../../UI/lib';
 import classNames from 'classnames';
 import StandContextHoc from '../ContextHoc';
-import {
+import type {
   ISelectCtrlHocInjectProps,
   ISelectCtrlHocParams,
   IContextHocFullParams,
   TSelectCtrlHocComponent,
   ISelectCtrlHocProps,
   IModalTriggerOpts,
-  ICommonObj,
+  TCommonObj,
   TIdSelectCtrlHocComponent,
 } from '../../interface';
 import IdSelectCtrlHoc from './IdSelectCtrlHoc';
@@ -48,7 +48,7 @@ function defaultModalTriggerCheckedListRender<R>(opts: IModalTriggerOpts<R>) {
 
   return (
     <div className={styles.tagList}>
-      {checkedList.map(record => (
+      {checkedList.map((record) => (
         <Tag
           key={getRecordId(record)}
           closable
@@ -81,8 +81,8 @@ function defaultModalTriggerRender<R>(opts: IModalTriggerOpts<R>) {
   );
 }
 
-export default function<
-  R extends ICommonObj = any,
+export default function <
+  R extends TCommonObj = any,
   P extends ISelectCtrlHocInjectProps<R> = any
 >(hocParams: ISelectCtrlHocParams<R>) {
   const { ...restHocParams } = hocParams;
@@ -107,7 +107,7 @@ export default function<
   type OuterCompProps = Omit<P, keyof ISelectCtrlHocInjectProps<R>>;
 
   return (
-    WrappedComponent: React.ComponentType<P>,
+    WrappedComponent: React.ComponentType<P>
   ): TSelectCtrlHocComponent<R, OuterCompProps> => {
     type InnerCompProps = OuterCompProps &
       Omit<ISelectCtrlHocProps<R>, keyof IContextHocFullParams<R>> & {
@@ -123,11 +123,11 @@ export default function<
 
       static contextType = StandContext;
 
-      declare context: React.ContextType<typeof StandContext>;
+      // declare context: React.ContextType<typeof StandContext>;
 
       static getDerivedStateFromProps(
         props: InnerCompProps,
-        state: ISelectCtrlState,
+        state: ISelectCtrlState
       ) {
         if ('modalVisible' in props) {
           return {
@@ -158,7 +158,7 @@ export default function<
 
       componentDidUpdate(
         prevProps: InnerCompProps,
-        prevState: ISelectCtrlState,
+        prevState: ISelectCtrlState
       ) {
         const prevModalVisible = this.isModalVisible(prevProps, prevState);
         const currModalVisible = this.isModalVisible();
@@ -166,14 +166,14 @@ export default function<
         if (!prevModalVisible && currModalVisible) {
           const { resetSearchParamsOnModalShow } = this.props;
           this.context.debouncedSearchRecords(
-            resetSearchParamsOnModalShow ? {} : undefined,
+            resetSearchParamsOnModalShow ? {} : undefined
           );
         }
       }
 
       isModalVisible = (
         specProps?: InnerCompProps,
-        specState?: ISelectCtrlState,
+        specState?: ISelectCtrlState
       ) => {
         const { modalVisible } = specState || this.state;
 
@@ -248,8 +248,8 @@ export default function<
             {listRowSelectionSupport && (
               <>
                 <div className={styles.block}>
-                  {maxCheckedLength > 0 ? `限选 ${maxCheckedLength}，` : ''}已选{' '}
-                  {checkedList.length}
+                  {maxCheckedLength! > 0 ? `限选 ${maxCheckedLength}，` : ''}
+                  已选 {checkedList.length}
                 </div>
                 <div className={styles.block}>
                   <Button
@@ -327,7 +327,7 @@ export default function<
           <Modal
             wrapClassName={classNames(
               styles.modalWrapper,
-              modalWrapperClassName,
+              modalWrapperClassName
             )}
             title={`选择${recordNsTitle}`}
             // onOk={this.handleOk}
@@ -396,7 +396,7 @@ export default function<
       ...standHocParams,
     };
 
-    FinalComp.IdSelectCtrl = (StandContextHoc<R, P>({
+    FinalComp.IdSelectCtrl = StandContextHoc<R, P>({
       ...IdSelectHocParams,
       makeRecordModelPkgDynamic: 'IdSelectCtrlOuterWrapper',
       searchRecordsOnParamsChange: false,
@@ -407,9 +407,9 @@ export default function<
       // First StandContextHoc hoc, just provide the context IdSelectCtrlHoc needs
       IdSelectCtrlHoc<R, ISelectCtrlHocInjectProps<R>>()(
         // Second level, the real core ListHocComp
-        StandContextHoc<R, P>(IdSelectHocParams)(Comp as any) as any,
-      ),
-    ) as any) as TIdSelectCtrlHocComponent<R, OuterCompProps>;
+        StandContextHoc<R, P>(IdSelectHocParams)(Comp as any) as any
+      )
+    ) as any as TIdSelectCtrlHocComponent<R, OuterCompProps>;
 
     return FinalComp;
   };

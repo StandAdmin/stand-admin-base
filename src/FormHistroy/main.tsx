@@ -15,9 +15,9 @@ import {
 import List from './List';
 import RecordForm from './RecordForm';
 
-import { IFormHistroyTriggerProps, IHistoryRecord } from './interface';
+import type { IFormHistroyTriggerProps, IHistoryRecord } from './interface';
 
-import {
+import type {
   TSelectCtrlHocComponent,
   ISelectCtrlHocInjectProps,
   IContextHocCommonParams,
@@ -45,15 +45,15 @@ export const recordModel = buildStandRecordModelPkg({
   StoreNsTitle: '表单草稿',
   idFieldName: 'id',
   nameFieldName: 'name',
-  searchRecords,
+  searchRecords: searchRecords as any,
   // getRecord,
-  addRecord,
-  updateRecord,
-  deleteRecord,
+  addRecord: addRecord as any,
+  updateRecord: updateRecord as any,
+  deleteRecord: deleteRecord as any,
 });
 
 function MainComp(
-  props: IFormHistroyTriggerProps & ISelectCtrlHocInjectProps<IHistoryRecord>,
+  props: IFormHistroyTriggerProps & ISelectCtrlHocInjectProps<IHistoryRecord>
 ) {
   // const { config } = useStandContext();
   return (
@@ -71,7 +71,7 @@ function MainComp(
 export function RecordFormWrapper(
   props: IFormHistroyTriggerProps & {
     trigger: (context: IStandContextProps<IHistoryRecord>) => React.ReactNode;
-  },
+  }
 ) {
   const context = useStandContext<IHistoryRecord>();
 
@@ -97,7 +97,7 @@ const hocParams = defineContextHocParams({
   // defaultSearchParams: {},
 });
 
-const DynamicCompCache: { [key: string]: TSelectCtrlHocComponent } = {};
+const DynamicCompCache: Record<string, TSelectCtrlHocComponent> = {};
 
 // 动态主组件，支持不同的数据空间
 export const getDynamicComp = (
@@ -108,7 +108,7 @@ export const getDynamicComp = (
   }: {
     Comp?: React.ComponentType<any>;
     extraHocParams?: IContextHocCommonParams;
-  } = {},
+  } = {}
 ) => {
   if (!DynamicCompCache[namespace]) {
     const hocWrapper = StandSelectCtrlHoc;

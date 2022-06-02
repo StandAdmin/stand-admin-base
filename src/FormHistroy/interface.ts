@@ -2,9 +2,7 @@ export {
   ITargetFormInfo,
   IFormHistroyTriggerProps,
 } from '../StandAdmin/interface';
-export interface FormValues {
-  [key: string]: any;
-}
+export type FormValues = Record<string, any>;
 
 export interface IHistoryRecord {
   id?: string;

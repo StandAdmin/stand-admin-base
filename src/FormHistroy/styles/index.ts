@@ -1,4 +1,5 @@
-import { ElementOf, tuple } from '../../StandAdmin/utils/type';
+import type { ElementOf} from '../../StandAdmin/utils/type';
+import { tuple } from '../../StandAdmin/utils/type';
 
 import './index.less';
 

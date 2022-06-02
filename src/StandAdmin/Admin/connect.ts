@@ -1,7 +1,7 @@
 import { ConfigLoadingFld, ConfigLoadMethod } from '../const';
 import { getConfig } from '../config';
 import { memoize, omit } from 'lodash';
-import { IContextHocModelParams, IStandConnectInjectProps } from '../interface';
+import type { IContextHocModelParams, IStandConnectInjectProps } from '../interface';
 
 const filterState = memoize(state => {
   return omit(state, [ConfigLoadingFld]);

@@ -1,16 +1,16 @@
 import React, { Fragment, useMemo } from 'react';
-import { Table } from '@/UI/lib';
+import { Table } from '../../../UI/lib';
 import classNames from 'classnames';
-import {
+import type {
   PaginationProps,
   TableProps,
   ColumnsType,
 } from '../../../UI/interface';
 import { useStandContext } from './useStandContext';
-import {
+import type {
   IStandTableRenderParams,
   IUseStandTableListResult,
-  ICommonObj,
+  TCommonObj,
   TSearchParams,
   TFnParamsFilter,
 } from '../../interface';
@@ -19,10 +19,10 @@ import styles from '../styles';
 
 export function calColWidth(
   columns: ColumnsType<any>,
-  defaultColWidth: number,
+  defaultColWidth: number
 ) {
   let total = 0;
-  columns.forEach(col => {
+  columns.forEach((col) => {
     if (col.width) {
       if (typeof col.width === 'number') {
         total += col.width;
@@ -55,7 +55,7 @@ export interface IStandTableListOpts<R> {
 }
 
 export function getOptsForStandTableList<R>(
-  props: IPropsForStandTableList<R>,
+  props: IPropsForStandTableList<R>
 ): IStandTableListOpts<R> {
   const {
     listRowSelectionSupport = false,
@@ -78,7 +78,7 @@ export function getOptsForStandTableList<R>(
 
     Object.assign(opts, {
       disabledSearchParams: Object.keys(specParamsMap).filter(
-        k => specParamsMap[k] !== undefined,
+        (k) => specParamsMap[k] !== undefined
       ),
     });
   }
@@ -86,8 +86,8 @@ export function getOptsForStandTableList<R>(
   return opts;
 }
 
-export function useStandTableList<R extends ICommonObj = any>(
-  opts: IStandTableListOpts<R> | IPropsForStandTableList<R>,
+export function useStandTableList<R extends TCommonObj = any>(
+  opts: IStandTableListOpts<R> | IPropsForStandTableList<R>
 ): IUseStandTableListResult<R> {
   const stOpts: IStandTableListOpts<R> = useMemo(() => {
     return (
@@ -128,7 +128,7 @@ export function useStandTableList<R extends ICommonObj = any>(
     }, {});
 
     const rowsNotInRecords = checkedList.filter(
-      (item: R) => !recordsIdMap[getRecordId(item)],
+      (item: R) => !recordsIdMap[getRecordId(item)]
     );
 
     if (setChecked) {
@@ -183,10 +183,10 @@ export function useStandTableList<R extends ICommonObj = any>(
 
       // 禁用的搜索项禁用过滤
       if (noFiltersForDisabledSearchParams && stOpts.disabledSearchParams) {
-        stOpts.disabledSearchParams.forEach(paramKey => {
+        stOpts.disabledSearchParams.forEach((paramKey) => {
           if (columns) {
             const colItem = columns.find(
-              (item: R) => item.dataIndex === paramKey,
+              (item: any) => item.dataIndex === paramKey
             );
             if (colItem) {
               if (colItem.filters) {

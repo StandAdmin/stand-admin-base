@@ -1,19 +1,19 @@
 import React, { useEffect, useMemo } from 'react';
 
-import { Form } from '@/UI/lib';
-import { FormInstance, FormItemProps } from '../../../UI/interface';
+import { Form } from '../../../UI/lib';
+import type { FormInstance, FormItemProps } from '../../../UI/interface';
 // import moment from 'moment';
 // import classNames from 'classnames';
 import { identity, isEqual } from 'lodash';
-import { usePersistFn } from '@/StandAdmin/utils/hooks';
+import { usePersistFn } from '../../utils/hooks';
 import { encodeFormValues, decodeFormValues } from '../../utils/formEncoder';
 import { useStandContext } from './useStandContext';
-import FormHistroyTrigger from '@/FormHistroy/trigger';
+import FormHistroyTrigger from '../../../FormHistroy/trigger';
 
-import {
-  ICommonObj,
+import type {
+  TCommonObj,
   TSearchParams,
-  TCommonObjOrEmpty,
+  TRecordOrEmpty,
   IUseStandSearchFormResult,
   TFnParamsFilter,
   TRenderFormHistroyTriggerOpts,
@@ -23,11 +23,11 @@ import {
 export interface IStandSearchFormOpts {
   formIdTag?: string;
   defaultSearchParams?: TSearchParams;
-  searchParamsToValues?: (params: TSearchParams) => TCommonObjOrEmpty;
+  searchParamsToValues?: (params: TSearchParams) => TRecordOrEmpty;
   searchParamsFromValues?: (
-    values: ICommonObj,
-    searchParams: TSearchParams,
-  ) => TCommonObjOrEmpty;
+    values: TCommonObj,
+    searchParams: TSearchParams
+  ) => TRecordOrEmpty;
   disabledSearchParams?: string[];
 }
 
@@ -37,7 +37,7 @@ export interface IPropsForStandSearchForm {
 }
 
 export function getOptsForStandSearchForm(
-  props: IPropsForStandSearchForm,
+  props: IPropsForStandSearchForm
 ): IStandSearchFormOpts {
   const { specSearchParams } = props;
 
@@ -51,7 +51,7 @@ export function getOptsForStandSearchForm(
 
     Object.assign(opts, {
       disabledSearchParams: Object.keys(specParamsMap).filter(
-        k => specParamsMap[k] !== undefined,
+        (k) => specParamsMap[k] !== undefined
       ),
     });
   }
@@ -59,8 +59,8 @@ export function getOptsForStandSearchForm(
   return opts;
 }
 
-export function useStandSearchForm<R extends ICommonObj = any>(
-  opts: IStandSearchFormOpts | IPropsForStandSearchForm,
+export function useStandSearchForm<R extends TCommonObj = any>(
+  opts: IStandSearchFormOpts | IPropsForStandSearchForm
 ): IUseStandSearchFormResult<R> {
   const stOpts: IStandSearchFormOpts = useMemo(() => {
     return (
@@ -102,29 +102,29 @@ export function useStandSearchForm<R extends ICommonObj = any>(
       ...context.getSearchParams(),
       ...storeRef.searchParams,
       ...getSpecSearchParams(),
-    }),
+    })
   );
 
   useEffect(() => {
     form.setFieldsValue(getInitValues());
   }, [form, getInitValues, storeRef.searchParams]);
 
-  const onFinish = usePersistFn((params: ICommonObj) =>
-    goSearch(searchParamsFromValues(params, storeRef.searchParams)),
+  const onFinish = usePersistFn((params: TCommonObj) =>
+    goSearch(searchParamsFromValues(params, storeRef.searchParams) as any)
   );
 
   const submitForm = usePersistFn(() =>
-    form.validateFields().then(values => {
+    form.validateFields().then((values) => {
       onFinish(values);
-    }),
+    })
   );
 
   const resetForm = usePersistFn(() => {
     const values = form.getFieldsValue();
 
-    const emptyValues: ICommonObj = {};
+    const emptyValues: TCommonObj = {};
 
-    Object.keys(values).forEach(k => {
+    Object.keys(values).forEach((k) => {
       // const currVal = values[k];
       emptyValues[k] = undefined; // getEmptyVal(currVal);
     });
@@ -151,8 +151,8 @@ export function useStandSearchForm<R extends ICommonObj = any>(
 
       const disabled = !!(
         disabledSearchParams &&
-        disabledSearchParams.find(disabledName =>
-          isEqual(itemProps.name, disabledName),
+        disabledSearchParams.find((disabledName) =>
+          isEqual(itemProps.name, disabledName)
         )
       );
 
@@ -160,7 +160,7 @@ export function useStandSearchForm<R extends ICommonObj = any>(
         if (React.isValidElement(children)) {
           finalChildren = React.cloneElement(
             children as React.ReactElement<any>,
-            { disabled: true },
+            { disabled: true }
           );
         } else {
           console.error('Disable will not work', itemProps);
@@ -168,7 +168,7 @@ export function useStandSearchForm<R extends ICommonObj = any>(
       }
 
       return <Form.Item {...restProps}>{finalChildren}</Form.Item>;
-    },
+    }
   );
 
   const formId = `${formNamePrefix}_${StoreNs}_${formIdTag}`;
@@ -193,16 +193,16 @@ export function useStandSearchForm<R extends ICommonObj = any>(
             : renderOpts)}
         />
       );
-    },
+    }
   );
 
   return {
     formId,
-    renderFormHistroyTrigger,
+    renderFormHistroyTrigger: renderFormHistroyTrigger as any,
     formProps: {
       name: `${formId}_${mountId}`,
       form,
-      initialValues: getInitValues(),
+      initialValues: getInitValues() as any,
       onFinish,
     },
     config,
